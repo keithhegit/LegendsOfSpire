@@ -15,7 +15,8 @@ const PROFILEICON_URL = `${CDN_URL}/img/profileicon`;
 const MAP_BG_URL = "https://pub-c98d5902eedf42f6a99765dfad981fd88.r2.dev/LoL/lol-valley.jpg";
 
 // BGM 地址
-const BGM_URL = "https://pub-e9a8f18bbe6141f28c8b86c4c54070e1.r2.dev/bgm/origin/01%20-%20Aim%20to%20Be%20a%20Pok%C3%A9mon%20Master%20-%20%E3%82%81%E3%81%96%E3%81%9B%E3%83%9D%E3%82%B1%E3%83%A2%E3%83%B3%E3%83%9E%E3%82%B9%E3%82%BF%E3%83%BC.mp3";
+const BGM_URL = "https://pub-e9a8f18bbe6141f28c8b86c4c54070e1.r2.dev/bgm/spire/To-the-Infinity%20-Castle%20(1).mp3"; // 局外BGM
+const BATTLE_BGM_URL = "https://pub-e9a8f18bbe6141f28c8b86c4c54070e1.r2.dev/bgm/spire/guimie-battle%20(1).mp3"; // 战斗BGM
 
 // 初始卡组 (基础卡)
 const STARTING_DECK_BASIC = ["Strike", "Strike", "Strike", "Strike", "Defend", "Defend", "Defend", "Defend"];
@@ -428,15 +429,34 @@ const generateMap = (usedEnemyIds) => {
 
 // --- 4. 子组件 ---
 
-// 4.0 背景音乐组件 (AudioPlayer) - 无变动
+// 4.0 背景音乐组件 (AudioPlayer) - 支持战斗/局外BGM切换
 
-const AudioPlayer = () => {
+const AudioPlayer = ({ currentView }) => {
     const audioRef = useRef(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [volume, setVolume] = useState(0.3);
 
+    // 根据当前视图选择BGM
+    const currentBGM = currentView === 'COMBAT' ? BATTLE_BGM_URL : BGM_URL;
+
     useEffect(() => {
         if(audioRef.current) {
+            const wasPlaying = isPlaying;
+            audioRef.current.pause();
+            audioRef.current.src = currentBGM;
+            audioRef.current.volume = volume;
+            if (wasPlaying) {
+                const playPromise = audioRef.current.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => setIsPlaying(true)).catch(() => setIsPlaying(false));
+                }
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentBGM]);
+
+    useEffect(() => {
+        if(audioRef.current && !isPlaying) {
             audioRef.current.volume = volume;
             const playPromise = audioRef.current.play();
             if (playPromise !== undefined) {
@@ -452,7 +472,7 @@ const AudioPlayer = () => {
 
     return (
         <div className="fixed top-4 right-4 z-[100] flex items-center gap-2 bg-black/50 p-2 rounded-full border border-[#C8AA6E]/50 hover:bg-black/80 transition-all">
-            <audio ref={audioRef} src={BGM_URL} loop />
+            <audio ref={audioRef} src={currentBGM} loop />
             <button onClick={togglePlay} className="text-[#C8AA6E] hover:text-white">
                 {isPlaying ? <Pause size={16} /> : <Play size={16} />}
             </button>
@@ -921,7 +941,7 @@ export default function App() {
 
   return (
       <div className="relative h-screen w-full bg-[#091428] font-sans select-none overflow-hidden">
-          <AudioPlayer />
+          <AudioPlayer currentView={view} />
           {view !== 'GAMEOVER' && view !== 'VICTORY_ALL' && view !== 'CHAMPION_SELECT' && champion && (
               <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-black to-transparent z-50 flex items-center justify-between px-8 pointer-events-none">
                   <div className="flex items-center gap-6 pointer-events-auto">
