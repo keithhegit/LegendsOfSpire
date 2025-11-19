@@ -106,8 +106,14 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
       if(card.effect === 'CLEANSE') setPlayerStatus(s => ({ ...s, weak: 0, vulnerable: 0 }));
       if(card.effect === 'HEAL') setPlayerHp(h => Math.min(heroData.maxHp, h + card.effectValue));
       if(card.type === 'ATTACK') {
-          playSfx('ATTACK');
-          triggerAnim('HERO', 'attack'); setTimeout(() => triggerAnim('ENEMY', 'hit'), 200);
+          // 播放攻击挥击音效
+          playSfx('ATTACK_SWING');
+          triggerAnim('HERO', 'attack'); 
+          setTimeout(() => {
+              triggerAnim('ENEMY', 'hit');
+              // 延迟播放攻击命中音效
+              playSfx('ATTACK_HIT');
+          }, 200);
           let dmg = card.value + playerStatus.strength;
           if (playerStatus.weak > 0) dmg = Math.floor(dmg * 0.75);
           const hits = card.isMultiHit ? card.hits : 1;
@@ -119,9 +125,13 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
               if (heroData.relics.includes("InfinityEdge")) finalDmg = Math.floor(finalDmg * 1.5);
               let dmgToHp = finalDmg;
               if (enemyBlock > 0) { 
-                  playSfx('BLOCK');
+                  // 敌人格挡时播放格挡音效
+                  playSfx('BLOCK_SHIELD');
                   if (enemyBlock >= finalDmg) { setEnemyBlock(b => b - finalDmg); dmgToHp = 0; } 
                   else { dmgToHp = finalDmg - enemyBlock; setEnemyBlock(0); } 
+              } else if (dmgToHp > 0) {
+                  // 敌人受击时播放受击音效
+                  setTimeout(() => playSfx('HIT_TAKEN'), 250);
               }
               setEnemyHp(h => Math.max(0, h - dmgToHp)); total += dmgToHp;
               if(heroData.relics.includes("VampiricScepter")) setPlayerHp(h => Math.min(heroData.maxHp, h + 1));
@@ -130,7 +140,8 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
           setDmgOverlay({val: total, target: 'ENEMY'}); setTimeout(()=>setDmgOverlay(null), 800);
       }
       if(card.block) {
-          playSfx('BLOCK');
+          // 玩家获得格挡时播放格挡音效
+          playSfx('BLOCK_SHIELD');
           setPlayerBlock(b => b + card.block);
       }
   };
@@ -158,8 +169,13 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
       triggerAnim('ENEMY', 'attack');
       const act = nextEnemyAction;
       if(act.type === 'ATTACK' || act.actionType === 'Attack') {
-          setTimeout(() => triggerAnim('HERO', 'hit'), 200);
-          playSfx('ATTACK');
+          // 敌人攻击挥击音效
+          playSfx('ATTACK_SWING');
+          setTimeout(() => {
+              triggerAnim('HERO', 'hit');
+              // 延迟播放攻击命中音效
+              playSfx('ATTACK_HIT');
+          }, 200);
           const baseDmg = act.type === 'ATTACK' ? act.value : act.dmgValue;
           let dmg = baseDmg + enemyStatus.strength;
           if(enemyStatus.weak > 0) dmg = Math.floor(dmg * 0.75);
@@ -169,12 +185,15 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
              let finalDmg = dmg;
              if(playerStatus.vulnerable > 0) finalDmg = Math.floor(finalDmg * 1.5);
              if(remBlock >= finalDmg) {
-                 playSfx('BLOCK');
+                 // 玩家格挡时播放格挡音效
+                 playSfx('BLOCK_SHIELD');
                  remBlock -= finalDmg;
              } else { 
                  let pierce = finalDmg - remBlock; 
                  remBlock = 0; 
-                 currHp -= pierce; 
+                 currHp -= pierce;
+                 // 玩家受击时播放受击音效
+                 setTimeout(() => playSfx('HIT_TAKEN'), 250);
                  if(heroData.relics.includes("BrambleVest")) setEnemyHp(h => Math.max(0, h - 3)); 
              }
              total += finalDmg;
@@ -182,7 +201,8 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
           setPlayerBlock(remBlock); setPlayerHp(currHp); setDmgOverlay({val: total, target: 'PLAYER'}); setTimeout(()=>setDmgOverlay(null), 800);
       }
       if(act.type === 'BUFF') {
-          playSfx('BLOCK');
+          // 敌人获得格挡时播放格挡音效
+          playSfx('BLOCK_SHIELD');
           setEnemyBlock(b => b + act.effectValue);
       }
       if(act.type === 'DEBUFF') { if(act.effect === 'WEAK') setPlayerStatus(s => ({...s, weak: s.weak + act.effectValue})); if(act.effect === 'VULNERABLE') setPlayerStatus(s => ({...s, vulnerable: s.vulnerable + act.effectValue})); }
