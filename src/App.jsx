@@ -23,8 +23,9 @@ const ACT_BACKGROUNDS = {
     3: "https://pic.upmedia.mg/uploads/content/20220519/EV220519112427593030.webp"  // 虚空之地
 };
 
-const BGM_MAP_URL = "https://pub-e9a8f18bbe6141f28c8b86c4c54070e1.r2.dev/bgm/origin/01%20-%20Aim%20to%20Be%20a%20Pok%C3%A9mon%20Master%20-%20%E3%82%81%E3%81%96%E3%81%9B%E3%83%9D%E3%82%B1%E3%83%A2%E3%83%B3%E3%83%9E%E3%82%B9%E3%82%BF%E3%83%BC.mp3";
-const BGM_BATTLE_URL = "https://pub-e9a8f18bbe6141f28c8b86c4c54070e1.r2.dev/bgm/origin/01%20-%20Aim%20to%20Be%20a%20Pok%C3%A9mon%20Master%20-%20%E3%82%81%E3%81%96%E3%81%9B%E3%83%9D%E3%82%B1%E3%83%A2%E3%83%B3%E3%83%9E%E3%82%B9%E3%82%BF%E3%83%BC.mp3";
+// BGM URLs - 从constants导入
+const BGM_MAP_URL = "https://pub-e9a8f18bbe6141f28c8b86c4c54070e1.r2.dev/bgm/spire/To-the-Infinity%20-Castle%20(1).mp3";
+const BGM_BATTLE_URL = "https://pub-e9a8f18bbe6141f28c8b86c4c54070e1.r2.dev/bgm/spire/guimie-battle%20(1).mp3";
 
 // 音效 - 使用新的R2存储地址
 const SFX_BASE_URL = "https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/sfx";
@@ -206,7 +207,8 @@ const scaleEnemyStats = (baseStats, floorIndex, act) => {
     const isAttack = scaledAction.type === 'ATTACK' || scaledAction.actionType === 'Attack';
     if (isAttack) {
       const baseDmg = scaledAction.type === 'ATTACK' ? scaledAction.value : scaledAction.dmgValue;
-      const scaledDmg = Math.floor(baseDmg + floorIndex * 2 + (act - 1) * 5);
+      // 降低攻击力50%：原来 floorIndex * 2，现在改为 floorIndex * 1，并且整体降低50%
+      const scaledDmg = Math.floor((baseDmg + floorIndex * 1 + (act - 1) * 3) * 0.5);
       if (scaledAction.type === 'ATTACK') scaledAction.value = scaledDmg;
       if (scaledAction.actionType === 'Attack') scaledAction.dmgValue = scaledDmg;
     }
@@ -267,9 +269,9 @@ const RelicTooltip = ({ relic, children }) => {
     return (
         <div className="relative group">
             {children}
-            <div className="absolute top-0 left-12 mt-2 w-48 bg-black border border-[#C8AA6E] p-3 z-[110] hidden group-hover:block text-center pointer-events-none rounded-lg shadow-xl">
-                <div className="font-bold text-[#F0E6D2]">{relic.name}</div>
-                <div className="text-xs text-[#A09B8C]">{relic.description}</div>
+            <div className="absolute top-full left-0 mt-2 w-56 bg-black/95 border border-[#C8AA6E] p-3 z-[110] hidden group-hover:block text-left pointer-events-none rounded-lg shadow-xl">
+                <div className="font-bold text-[#F0E6D2] mb-1">{relic.name}</div>
+                <div className="text-xs text-[#A09B8C] leading-relaxed whitespace-normal">{relic.description}</div>
                 {relic.charges !== undefined && <div className="text-xs text-red-400 mt-1">剩余次数: {relic.charges}</div>}
             </div>
         </div>
@@ -281,13 +283,23 @@ const AudioPlayer = ({ src }) => {
     const [isPlaying, setIsPlaying] = useState(true);
     const [volume, setVolume] = useState(0.3);
     useEffect(() => { 
-        if(audioRef.current) { 
+        if(audioRef.current && src) { 
             audioRef.current.volume = volume; 
+            audioRef.current.load(); // 重新加载音频
             const p = audioRef.current.play(); 
-            if(p !== undefined) p.catch(() => setIsPlaying(false)); 
+            if(p !== undefined) {
+                p.then(() => setIsPlaying(true)).catch(() => setIsPlaying(false)); 
+            }
         } 
-    }, [src]);
-    const togglePlay = () => { if (isPlaying) { audioRef.current.pause(); setIsPlaying(false); } else { audioRef.current.play(); setIsPlaying(true); } };
+    }, [src, volume]);
+    const togglePlay = () => { 
+        if (isPlaying) { 
+            audioRef.current?.pause(); 
+            setIsPlaying(false); 
+        } else { 
+            audioRef.current?.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false)); 
+        } 
+    };
     return (
         <div className="fixed top-4 right-4 z-[100] flex items-center gap-2 bg-black/50 p-2 rounded-full border border-[#C8AA6E]/50 hover:bg-black/80 transition-all">
             <audio ref={audioRef} src={src} loop />
@@ -456,15 +468,23 @@ const ShopView = ({ onLeave, onBuyCard, onBuyRelic, gold, deck, relics, champion
     )
 }
 
-const ChestView = ({ onLeave, onRelicReward, relics }) => {
-    const availableRelics = Object.values(RELIC_DATABASE).filter(r => r.rarity !== 'PASSIVE' && r.rarity !== 'BASIC' && !relics.includes(r.id));
-    const rewards = useMemo(() => shuffle(availableRelics).slice(0, 3), [relics]);
+const ChestView = ({ onLeave, onRelicReward, relics, act }) => {
+    // 根据当前章节过滤遗物：ACT1只能获得通用遗物，ACT2可以获得ACT1+ACT2，ACT3可以获得所有
+    const availableRelics = Object.values(RELIC_DATABASE).filter(r => {
+        if (r.rarity === 'PASSIVE' || r.rarity === 'BASIC' || relics.includes(r.id)) return false;
+        // 章节专属遗物检查
+        if (r.id === 'Cull' || r.id === 'DarkSeal') return act === 1; // ACT1专属
+        if (r.id === 'QSS' || r.id === 'Executioner') return act >= 2; // ACT2专属
+        if (r.id === 'Nashor') return act >= 3; // ACT3专属
+        return true; // 通用遗物所有章节都可以获得
+    });
+    const rewards = useMemo(() => shuffle(availableRelics).slice(0, 3), [relics, act]);
     const [rewardChosen, setRewardChosen] = useState(false);
     const handleChoose = (relic) => { if (rewardChosen) return; setRewardChosen(true); onRelicReward(relic); };
     return (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/90">
             <div className="relative z-10 max-w-4xl bg-[#091428]/90 border-2 border-[#C8AA6E] p-10 text-center rounded-xl shadow-[0_0_50px_#C8AA6E]">
-                <div className="w-24 h-24 mx-auto mb-6 rounded-full border-4 border-[#C8AA6E] overflow-hidden"><img src={`${PROFILEICON_URL}/2065.png`} className="w-full h-full object-cover" /></div>
+                <div className="w-24 h-24 mx-auto mb-6 rounded-full border-4 border-[#C8AA6E] overflow-hidden bg-black flex items-center justify-center"><img src={`${ITEM_URL}/3400.png`} className="w-full h-full object-cover" /></div>
                 <h2 className="text-4xl font-bold text-[#C8AA6E] mb-6">海克斯宝箱</h2>
                 <p className="text-[#F0E6D2] text-lg mb-8">打开宝箱，选择一件强大的装备来武装自己。</p>
                 <div className="flex justify-center gap-8">
@@ -967,7 +987,7 @@ export default function LegendsOfTheSpire() {
           case 'MAP': return <MapView mapData={mapData} onNodeSelect={handleNodeSelect} currentFloor={currentFloor} act={currentAct} />;
           case 'SHOP': return <ShopView gold={gold} deck={masterDeck} relics={relics} onLeave={() => completeNode()} onBuyCard={handleBuyCard} onBuyRelic={handleBuyRelic} championName={champion.name} />;
           case 'EVENT': return <EventView onLeave={() => completeNode()} onReward={handleEventReward} />;
-          case 'CHEST': return <ChestView onLeave={() => completeNode()} onRelicReward={handleRelicReward} relics={relics} />;
+          case 'CHEST': return <ChestView onLeave={() => completeNode()} onRelicReward={handleRelicReward} relics={relics} act={currentAct} />;
           case 'COMBAT': return <BattleScene heroData={{...champion, maxHp, currentHp, relics, baseStr}} enemyId={activeNode.enemyId} initialDeck={masterDeck} onWin={handleBattleWin} onLose={() => { localStorage.removeItem(SAVE_KEY); setView('GAMEOVER'); }} floorIndex={currentFloor} act={currentAct} />;
           case 'REWARD': return <RewardView goldReward={50} onCardSelect={handleCardReward} onSkip={handleSkipReward} championName={champion.name} />;
           case 'REST': return <RestView onRest={handleRest} />;
