@@ -6,9 +6,8 @@ import { shuffle } from '../utils/gameLogic';
 const ChampionSelect = ({ onChampionSelect, unlockedIds }) => {
     const allChamps = Object.values(CHAMPION_POOL);
     const displayChamps = useMemo(() => {
-        const nonGarenChamps = allChamps.filter(c => c.name !== '盖伦');
-        const randomTwo = shuffle(nonGarenChamps).slice(0, 2);
-        return shuffle([allChamps.find(c => c.name === '盖伦'), ...randomTwo]);
+        // 完全随机选择3个英雄，不固定盖伦
+        return shuffle([...allChamps]).slice(0, 3);
     }, []);
     
     return (
