@@ -4,11 +4,19 @@ import { CARD_DATABASE } from '../../data/cards';
 
 const Card = ({ cardId, index, totalCards, canPlay, onPlay }) => {
   const card = CARD_DATABASE[cardId];
+  const dragStartY = React.useRef(null);
   
   // 堆叠逻辑计算
   const overlap = totalCards > 5 ? -40 : 10; 
   const rotation = (index - (totalCards - 1) / 2) * 3; // 扇形展开角度
   const yOffset = Math.abs(index - (totalCards - 1) / 2) * 5; // 扇形弧度
+  
+  // 处理点击事件（作为拖拽的备用方案）
+  const handleTap = () => {
+    if (canPlay) {
+      onPlay(index);
+    }
+  };
   
   return (
     <motion.div
@@ -27,18 +35,24 @@ const Card = ({ cardId, index, totalCards, canPlay, onPlay }) => {
       drag={canPlay ? "y" : false} // 只允许 Y 轴拖拽
       dragConstraints={{ top: -300, bottom: 0 }} // 拖拽限制
       dragSnapToOrigin={true} // 松手后回弹
+      onDragStart={(event, info) => {
+        dragStartY.current = info.point.y;
+      }}
       onDragEnd={(event, info) => {
         // 如果向上拖动超过 150px，视为出牌
         if (info.offset.y < -150 && canPlay) {
           onPlay(index);
         }
+        dragStartY.current = null;
       }}
+      // 使用 onTap 处理点击（不会与拖拽冲突）
+      onTap={handleTap}
       whileHover={{ scale: 1.2, y: -50, zIndex: 100, rotate: 0 }} // 悬停放大
       whileDrag={{ scale: 1.1, zIndex: 100, rotate: 0, opacity: 0.8 }}
       
       className={`
         w-40 h-60 bg-[#1E2328] border-2 rounded-lg flex flex-col items-center overflow-hidden shadow-2xl 
-        ${canPlay ? 'border-[#C8AA6E] cursor-grab active:cursor-grabbing' : 'border-slate-700 opacity-60 cursor-not-allowed'}
+        ${canPlay ? 'border-[#C8AA6E] cursor-pointer hover:border-[#F0E6D2]' : 'border-slate-700 opacity-60 cursor-not-allowed'}
       `}
     >
       {/* 卡牌图片 */}
