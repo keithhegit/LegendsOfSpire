@@ -614,7 +614,14 @@ export default function LegendsOfTheSpire() {
 
   useEffect(() => {
       if (view !== 'MENU' && view !== 'CHAMPION_SELECT' && view !== 'GAMEOVER' && view !== 'VICTORY_ALL') {
-          localStorage.setItem(SAVE_KEY, JSON.stringify({ view, mapData, currentFloor, currentAct, masterDeck, champion, currentHp, maxHp, gold, relics, baseStr, activeNode, usedEnemies }));
+          // 序列化 mapData，将 Map 转换为普通对象以便 JSON.stringify
+          const serializableMapData = {
+              ...mapData,
+              nodeMap: mapData.nodeMap instanceof Map 
+                  ? Object.fromEntries(mapData.nodeMap) 
+                  : mapData.nodeMap
+          };
+          localStorage.setItem(SAVE_KEY, JSON.stringify({ view, mapData: serializableMapData, currentFloor, currentAct, masterDeck, champion, currentHp, maxHp, gold, relics, baseStr, activeNode, usedEnemies }));
       }
   }, [view, currentHp, gold, currentFloor, currentAct]);
 
@@ -622,7 +629,16 @@ export default function LegendsOfTheSpire() {
       const s = localStorage.getItem(SAVE_KEY);
       if (s) {
           const data = JSON.parse(s);
-          setMapData(data.mapData); setCurrentFloor(data.currentFloor); setCurrentAct(data.currentAct || 1); setMasterDeck(data.masterDeck); setChampion(data.champion); setCurrentHp(data.currentHp); setMaxHp(data.maxHp); setGold(data.gold); setRelics(data.relics); setBaseStr(data.baseStr); setActiveNode(data.activeNode); setUsedEnemies(data.usedEnemies); setView(data.view);
+          // 恢复 nodeMap：如果它是普通对象，转换为 Map
+          const restoredMapData = { ...data.mapData };
+          if (restoredMapData.nodeMap && !(restoredMapData.nodeMap instanceof Map)) {
+              // 如果 nodeMap 是普通对象，转换为 Map
+              restoredMapData.nodeMap = new Map(Object.entries(restoredMapData.nodeMap));
+          } else if (!restoredMapData.nodeMap) {
+              // 如果 nodeMap 不存在，创建新的 Map
+              restoredMapData.nodeMap = new Map();
+          }
+          setMapData(restoredMapData); setCurrentFloor(data.currentFloor); setCurrentAct(data.currentAct || 1); setMasterDeck(data.masterDeck); setChampion(data.champion); setCurrentHp(data.currentHp); setMaxHp(data.maxHp); setGold(data.gold); setRelics(data.relics); setBaseStr(data.baseStr); setActiveNode(data.activeNode); setUsedEnemies(data.usedEnemies); setView(data.view);
       }
   };
 
@@ -671,7 +687,9 @@ export default function LegendsOfTheSpire() {
           });
       }
       
-      const updatedNodeMap = new Map(mapData.nodeMap);
+      // 确保 nodeMap 是 Map 对象
+      const nodeMap = mapData.nodeMap instanceof Map ? mapData.nodeMap : new Map();
+      const updatedNodeMap = new Map(nodeMap);
       updatedNodeMap.set(`${currentNode.row}-${currentNode.col}`, { ...currentNode, status: 'COMPLETED' });
       
       setMapData({ ...mapData, grid: newGrid, nodeMap: updatedNodeMap });
@@ -745,7 +763,9 @@ export default function LegendsOfTheSpire() {
           });
       }
       
-      const updatedNodeMap = new Map(mapData.nodeMap);
+      // 确保 nodeMap 是 Map 对象
+      const nodeMap = mapData.nodeMap instanceof Map ? mapData.nodeMap : new Map();
+      const updatedNodeMap = new Map(nodeMap);
       updatedNodeMap.set(`${node.row}-${node.col}`, node);
       
       setMapData({ ...mapData, grid: newGrid, nodeMap: updatedNodeMap });
