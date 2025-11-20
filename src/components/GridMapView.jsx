@@ -35,15 +35,28 @@ const GridMapView = ({ mapData, onNodeSelect, currentFloor, act, activeNode }) =
     };
     
     // 判断节点是否可点击（参考 map.js 的 mapcan 逻辑：只能点击正前、左前、右前）
-    const canClickNode = (node, currentRow, currentCol) => {
+    // mapcan(x,y,id): if((id-20)==(x) || (id-20)==(x.sub(1)) || (id-20)==(x.add(1))){return true}
+    // 在我们的实现中：id 对应 node.col，x 对应 activeNode.col（当前列位置）
+    const canClickNode = (node) => {
         if (!node) return false;
-        // 如果节点在当前层，可以点击
-        if (node.row === currentRow) return true;
-        // 如果节点在下一层，需要检查是否是相邻列（正前、左前、右前）
-        if (node.row === currentRow + 1) {
-            const colDiff = Math.abs(node.col - currentCol);
-            return colDiff <= 1; // 正前(colDiff=0)、左前(colDiff=1)、右前(colDiff=1)
+        // 如果没有 activeNode，只能点击当前层的 AVAILABLE 节点
+        if (!activeNode) {
+            return node.row === currentFloor && node.status === 'AVAILABLE';
         }
+        
+        // 如果节点在当前层，检查是否是 AVAILABLE
+        if (node.row === currentFloor) {
+            return node.status === 'AVAILABLE';
+        }
+        
+        // 如果节点在下一层，需要检查是否是相邻列（正前、左前、右前）
+        // 参考 mapcan: (id-20)==(x) || (id-20)==(x.sub(1)) || (id-20)==(x.add(1))
+        if (node.row === currentFloor + 1) {
+            const colDiff = node.col - activeNode.col;
+            // 正前(colDiff=0)、左前(colDiff=-1)、右前(colDiff=1)
+            return Math.abs(colDiff) <= 1;
+        }
+        
         return false;
     };
 
