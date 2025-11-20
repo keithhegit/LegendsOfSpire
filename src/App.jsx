@@ -6,6 +6,7 @@ import GridMapView from './components/GridMapView';
 import CodexView from './components/CodexView';
 import DeckView from './components/DeckView';
 import BattleScene from './components/BattleScene';
+import ChampionSelect from './components/ChampionSelect';
 
 // ==========================================
 // 1. 静态资源与全局配置
@@ -512,74 +513,6 @@ const ChestView = ({ onLeave, onRelicReward, relics, act }) => {
                     ))}
                 </div>
                 <button onClick={onLeave} className="mt-8 px-8 py-3 border border-slate-600 text-slate-400 hover:text-white hover:border-white rounded uppercase tracking-widest" disabled={!rewardChosen}>关闭宝箱</button>
-            </div>
-        </div>
-    );
-};
-
-const ChampionSelect = ({ onChampionSelect, unlockedIds }) => {
-    const allChamps = Object.values(CHAMPION_POOL);
-    const [refreshCount, setRefreshCount] = useState(0);
-    const [displayChamps, setDisplayChamps] = useState(() => {
-        const shuffled = shuffle([...allChamps]);
-        return shuffled.slice(0, 3);
-    });
-    
-    const handleRefresh = () => {
-        if (refreshCount >= 3) {
-            alert("基哥觉得你很机车，不许你再挑赶紧开始测");
-            return;
-        }
-        const shuffled = shuffle([...allChamps]);
-        setDisplayChamps(shuffled.slice(0, 3));
-        setRefreshCount(prev => prev + 1);
-    };
-    
-    return (
-        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/95">
-            <h1 className="text-5xl font-bold text-[#C8AA6E] mb-4 uppercase tracking-widest">选择你的英雄</h1>
-            <p className="text-[#F0E6D2] mb-4">选择一位英雄开始你的符文之地冒险</p>
-            <button 
-                onClick={handleRefresh} 
-                className="mb-8 px-6 py-2 bg-[#C8AA6E]/20 hover:bg-[#C8AA6E]/40 border border-[#C8AA6E] text-[#C8AA6E] rounded transition-all flex items-center gap-2"
-            >
-                <RefreshCw size={16} />
-                <span>刷新英雄 ({refreshCount}/3)</span>
-            </button>
-            <div className="flex gap-8">
-                {displayChamps.map(c => { 
-                    return (
-                        <button 
-                            key={c.id} 
-                            onClick={() => onChampionSelect(c)} 
-                            className="w-72 h-96 border-2 border-[#C8AA6E] p-4 text-left relative group transition-all hover:scale-105 cursor-pointer bg-[#091428]/80"
-                        >
-                            <img src={c.img} className="w-full h-56 object-cover mb-4 rounded border border-[#C8AA6E]/50" />
-                            <div className="mb-2">
-                                <h2 className="text-2xl text-[#C8AA6E] font-bold">{c.name}</h2>
-                                <p className="text-sm text-[#A09B8C] italic">{c.title}</p>
-                            </div>
-                            <div className="mb-2 flex items-center gap-2 text-xs">
-                                <span className="text-red-400 flex items-center gap-1"><Heart size={12} /> {c.maxHp} HP</span>
-                                <span className="text-blue-400 flex items-center gap-1"><Zap size={12} /> {c.maxMana} 能量</span>
-                            </div>
-                            <p className="text-xs text-gray-300 mt-2 mb-3 line-clamp-2">{c.description}</p>
-                            <div className="border-t border-[#C8AA6E]/30 pt-2 mt-2">
-                                <div className="text-xs text-blue-400 font-bold mb-1">专属被动</div>
-                                <div className="text-xs text-[#A09B8C]">{c.passive}</div>
-                            </div>
-                            <div className="border-t border-[#C8AA6E]/30 pt-2 mt-2">
-                                <div className="text-xs text-purple-400 font-bold mb-1">初始卡组</div>
-                                <div className="text-xs text-[#A09B8C] flex flex-wrap gap-1">
-                                    {c.initialCards.map(cardId => {
-                                        const card = CARD_DATABASE[cardId];
-                                        return card ? <span key={cardId} className="px-1 bg-black/50 rounded">{card.name}</span> : null;
-                                    })}
-                                </div>
-                            </div>
-                        </button>
-                    ) 
-                })}
             </div>
         </div>
     );
