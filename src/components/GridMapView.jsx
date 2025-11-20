@@ -90,9 +90,9 @@ const GridMapView = ({ mapData, onNodeSelect, currentFloor, act }) => {
         <div className="flex flex-col items-center h-full w-full relative overflow-hidden bg-[#0c0c12]">
             {/* 背景 */}
             <div className="absolute inset-0 z-0">
-                <div className="absolute inset-0 bg-black/70 z-10" />
+                <div className="absolute inset-0 bg-black/50 z-10" />
                 <div 
-                    className="absolute inset-0 bg-cover bg-center opacity-40" 
+                    className="absolute inset-0 bg-cover bg-center opacity-60" 
                     style={{ backgroundImage: `url('${ACT_BACKGROUNDS[act || 1]}')` }}
                 />
             </div>
