@@ -237,8 +237,16 @@ const generateMap = (usedEnemyIds, act) => {
 
   map.push([{ ...createNode('1-0', 'BATTLE'), status: 'AVAILABLE', next: ['2-0', '2-1'] }]);
   for (let i = 2; i <= 8; i++) {
-    const nodeType1 = shuffle(['BATTLE', 'REST', 'SHOP'])[0];
-    const nodeType2 = shuffle(['BATTLE', 'EVENT', 'CHEST'])[0];
+    // Rest只在第8层（Boss前）出现，且只有10%概率
+    const restOptions = i === 8 ? (Math.random() < 0.1 ? ['REST'] : []) : [];
+    const nodeType1Pool = i === 8 
+      ? [...restOptions, 'BATTLE', 'SHOP', 'EVENT', 'CHEST'].filter(Boolean)
+      : ['BATTLE', 'SHOP', 'EVENT', 'CHEST'];
+    const nodeType2Pool = i === 8 
+      ? [...restOptions, 'BATTLE', 'EVENT', 'CHEST', 'SHOP'].filter(Boolean)
+      : ['BATTLE', 'EVENT', 'CHEST', 'SHOP'];
+    const nodeType1 = shuffle(nodeType1Pool)[0];
+    const nodeType2 = shuffle(nodeType2Pool)[0];
     const nodes = [createNode(`${i}-0`, nodeType1), createNode(`${i}-1`, nodeType2)];
     const nextFloorIndex = i + 1;
     if (nextFloorIndex <= 9) { 
@@ -251,6 +259,7 @@ const generateMap = (usedEnemyIds, act) => {
     }
     map.push(nodes);
   }
+  // 第9层固定为REST（Boss前）
   map.push([{ ...createNode('9-0', 'REST'), next: ['10-0'] }]);
   
   let bossId = "Darius_BOSS";
@@ -505,24 +514,64 @@ const ChestView = ({ onLeave, onRelicReward, relics, act }) => {
 
 const ChampionSelect = ({ onChampionSelect, unlockedIds }) => {
     const allChamps = Object.values(CHAMPION_POOL);
-    const displayChamps = useMemo(() => {
-        const nonGaren = allChamps.filter(c => c.name !== '盖伦');
-        return [allChamps.find(c => c.name === '盖伦'), ...shuffle(nonGaren).slice(0, 2)];
-    }, []);
+    const [refreshCount, setRefreshCount] = useState(0);
+    const [displayChamps, setDisplayChamps] = useState(() => {
+        const shuffled = shuffle([...allChamps]);
+        return shuffled.slice(0, 3);
+    });
+    
+    const handleRefresh = () => {
+        if (refreshCount >= 3) {
+            alert("基哥觉得你很机车，不许你再挑赶紧开始测");
+            return;
+        }
+        const shuffled = shuffle([...allChamps]);
+        setDisplayChamps(shuffled.slice(0, 3));
+        setRefreshCount(prev => prev + 1);
+    };
+    
     return (
         <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/95">
             <h1 className="text-5xl font-bold text-[#C8AA6E] mb-4 uppercase tracking-widest">选择你的英雄</h1>
-            <p className="text-[#F0E6D2] mb-12">选择一位英雄开始你的符文之地冒险</p>
+            <p className="text-[#F0E6D2] mb-4">选择一位英雄开始你的符文之地冒险</p>
+            <button 
+                onClick={handleRefresh} 
+                className="mb-8 px-6 py-2 bg-[#C8AA6E]/20 hover:bg-[#C8AA6E]/40 border border-[#C8AA6E] text-[#C8AA6E] rounded transition-all flex items-center gap-2"
+            >
+                <RefreshCw size={16} />
+                <span>刷新英雄 ({refreshCount}/3)</span>
+            </button>
             <div className="flex gap-8">
                 {displayChamps.map(c => { 
-                    const isUnlocked = unlockedIds.includes(c.id); 
                     return (
-                        <button key={c.id} onClick={()=>isUnlocked&&onChampionSelect(c)} disabled={!isUnlocked} className={`w-64 h-80 border p-4 text-left relative group transition-all ${isUnlocked?'border-[#C8AA6E] hover:scale-105 cursor-pointer':'border-gray-700 opacity-50 cursor-not-allowed'}`}>
-                            <img src={c.img} className={`w-full h-48 object-cover mb-4 ${!isUnlocked ? 'grayscale' : ''}`} />
-                            <h2 className="text-xl text-[#C8AA6E] font-bold">{c.name}</h2>
-                            <p className="text-xs text-gray-400 mt-2 line-clamp-3">{c.description}</p>
-                            <div className="absolute bottom-4 left-4 text-xs text-blue-400">被动: {c.passive}</div>
-                            { !isUnlocked && <div className="absolute inset-0 flex items-center justify-center bg-black/60"><Lock size={48} className="text-gray-400"/></div> }
+                        <button 
+                            key={c.id} 
+                            onClick={() => onChampionSelect(c)} 
+                            className="w-72 h-96 border-2 border-[#C8AA6E] p-4 text-left relative group transition-all hover:scale-105 cursor-pointer bg-[#091428]/80"
+                        >
+                            <img src={c.img} className="w-full h-56 object-cover mb-4 rounded border border-[#C8AA6E]/50" />
+                            <div className="mb-2">
+                                <h2 className="text-2xl text-[#C8AA6E] font-bold">{c.name}</h2>
+                                <p className="text-sm text-[#A09B8C] italic">{c.title}</p>
+                            </div>
+                            <div className="mb-2 flex items-center gap-2 text-xs">
+                                <span className="text-red-400 flex items-center gap-1"><Heart size={12} /> {c.maxHp} HP</span>
+                                <span className="text-blue-400 flex items-center gap-1"><Zap size={12} /> {c.maxMana} 能量</span>
+                            </div>
+                            <p className="text-xs text-gray-300 mt-2 mb-3 line-clamp-2">{c.description}</p>
+                            <div className="border-t border-[#C8AA6E]/30 pt-2 mt-2">
+                                <div className="text-xs text-blue-400 font-bold mb-1">专属被动</div>
+                                <div className="text-xs text-[#A09B8C]">{c.passive}</div>
+                            </div>
+                            <div className="border-t border-[#C8AA6E]/30 pt-2 mt-2">
+                                <div className="text-xs text-purple-400 font-bold mb-1">初始卡组</div>
+                                <div className="text-xs text-[#A09B8C] flex flex-wrap gap-1">
+                                    {c.initialCards.map(cardId => {
+                                        const card = CARD_DATABASE[cardId];
+                                        return card ? <span key={cardId} className="px-1 bg-black/50 rounded">{card.name}</span> : null;
+                                    })}
+                                </div>
+                            </div>
                         </button>
                     ) 
                 })}
@@ -548,7 +597,37 @@ const EventView = ({ onLeave, onReward }) => (
 
 const RewardView = ({ onSkip, onCardSelect, goldReward, championName }) => {
   const rewards = useMemo(() => { const all = Object.values(CARD_DATABASE).filter(c => c.rarity!=='BASIC'&&c.rarity!=='PASSIVE'&&(c.hero==='Neutral'||c.hero===championName)); return shuffle(all).slice(0,3); }, [championName]);
-  return (<div className="absolute inset-0 z-50 bg-black/90 flex items-center justify-center"><div className="p-8 bg-[#1E2328] border border-[#C8AA6E] text-center"><h2 className="text-3xl text-[#C8AA6E] mb-4">奖励</h2><p>金币 +{goldReward}</p><div className="flex gap-4 my-4">{rewards.map(c=><div key={c.id} onClick={()=>onCardSelect(c.id)} className="p-4 border cursor-pointer">{c.name}</div>)}</div><button onClick={onSkip} className="px-4 py-2 border text-white">跳过</button></div></div>);
+  return (
+    <div className="absolute inset-0 z-50 bg-black/90 flex items-center justify-center">
+      <div className="max-w-4xl bg-[#091428]/90 border-2 border-[#C8AA6E] p-10 text-center rounded-xl shadow-[0_0_50px_#C8AA6E]">
+        <h2 className="text-4xl font-bold text-[#C8AA6E] mb-6">奖励</h2>
+        <div className="text-2xl text-yellow-400 mb-8 flex items-center justify-center gap-2">
+          <Coins size={28} className="text-yellow-400" />
+          <span>金币 +{goldReward}</span>
+        </div>
+        <div className="flex justify-center gap-6 my-8">
+          {rewards.map(c => (
+            <div 
+              key={c.id} 
+              onClick={() => onCardSelect(c.id)} 
+              className="w-48 h-64 bg-[#1E2328] border-2 border-[#C8AA6E] rounded-lg overflow-hidden cursor-pointer hover:scale-110 hover:shadow-[0_0_20px_#C8AA6E] transition-all group relative"
+            >
+              <div className="w-full h-40 bg-black overflow-hidden relative">
+                <img src={c.img} className="w-full h-full object-cover opacity-90 group-hover:opacity-100" alt={c.name} />
+                <div className="absolute top-2 left-2 w-8 h-8 bg-[#091428] rounded-full border border-[#C8AA6E] flex items-center justify-center text-[#C8AA6E] font-bold text-sm">{c.cost}</div>
+              </div>
+              <div className="p-3 flex flex-col h-24">
+                <div className="text-sm font-bold text-[#F0E6D2] mb-1 line-clamp-1">{c.name}</div>
+                <div className="text-[10px] text-[#A09B8C] leading-tight line-clamp-2">{c.description}</div>
+                <div className="mt-auto text-[8px] text-slate-500 uppercase font-bold">{c.type}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+        <button onClick={onSkip} className="mt-6 px-8 py-3 border border-slate-600 text-slate-400 hover:text-white hover:border-white rounded uppercase tracking-widest transition-all">跳过</button>
+      </div>
+    </div>
+  );
 };
 
 const RestView = ({ onRest }) => (
@@ -855,8 +934,13 @@ export default function LegendsOfTheSpire() {
   const [activeNode, setActiveNode] = useState(null);
   const [usedEnemies, setUsedEnemies] = useState([]); 
   
-  const [unlockedChamps, setUnlockedChamps] = useState(() => { try { const d = localStorage.getItem(UNLOCK_KEY); return d ? JSON.parse(d) : ['Garen']; } catch { return ['Garen']; } });
+  const [unlockedChamps, setUnlockedChamps] = useState(() => { try { const d = localStorage.getItem(UNLOCK_KEY); return d ? JSON.parse(d) : Object.keys(CHAMPION_POOL); } catch { return Object.keys(CHAMPION_POOL); } });
   const [hasSave, setHasSave] = useState(false);
+  const [showUpdateLog, setShowUpdateLog] = useState(() => {
+      const lastVersion = localStorage.getItem('last_version');
+      return lastVersion !== 'v0.7.5';
+  });
+  const [bgmStarted, setBgmStarted] = useState(false);
 
   useEffect(() => { const savedData = localStorage.getItem(SAVE_KEY); if (savedData) setHasSave(true); }, []);
 
@@ -887,13 +971,14 @@ export default function LegendsOfTheSpire() {
   };
 
   const completeNode = () => {
+      // 节点已经在handleNodeSelect时锁定，这里只需要解锁下一层节点
       const newMap = [...mapData];
-      const floorNodes = newMap[currentFloor];
-      floorNodes.forEach(n => { if (n.id === activeNode.id) n.status = 'COMPLETED'; else n.status = 'LOCKED'; });
       const nextFloorIdx = currentFloor + 1;
       if (nextFloorIdx < newMap.length) {
           activeNode.next.forEach(nextId => { const nextNode = newMap[nextFloorIdx].find(n => n.id === nextId); if(nextNode) nextNode.status = 'AVAILABLE'; });
-          setCurrentFloor(nextFloorIdx); setView('MAP');
+          setMapData(newMap);
+          setCurrentFloor(nextFloorIdx); 
+          setView('MAP');
       } else { 
           // 章节通关逻辑
           if (currentAct < 3) {
@@ -925,6 +1010,17 @@ export default function LegendsOfTheSpire() {
   
   const handleNodeSelect = (node) => {
       if (node.status !== 'AVAILABLE') return;
+      // 立即锁定同层的其他节点
+      const newMap = [...mapData];
+      const floorNodes = newMap[currentFloor];
+      floorNodes.forEach(n => { 
+          if (n.id === node.id) {
+              n.status = 'COMPLETED';
+          } else {
+              n.status = 'LOCKED';
+          }
+      });
+      setMapData(newMap);
       setActiveNode(node);
       switch(node.type) {
           case 'BATTLE': case 'BOSS': setView('COMBAT'); break;
@@ -980,7 +1076,51 @@ export default function LegendsOfTheSpire() {
           case 'MENU': return (
               <div className="h-screen w-full bg-slate-900 flex flex-col items-center justify-center text-white bg-[url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ryze_0.jpg')] bg-cover bg-center">
                   <div className="absolute inset-0 bg-black/60"></div>
-                  <div className="z-10 text-center"><h1 className="text-8xl font-black text-[#C8AA6E] mb-8 drop-shadow-lg tracking-widest">峡谷尖塔</h1><div className="flex flex-col gap-4 w-64 mx-auto">{hasSave && (<button onClick={handleContinue} className="px-8 py-4 bg-[#0AC8B9] hover:bg-white hover:text-[#0AC8B9] text-black font-bold rounded flex items-center justify-center gap-2 transition-all"><Play fill="currentColor" /> 继续征程</button>)}<button onClick={handleNewGame} className="px-8 py-4 border-2 border-[#C8AA6E] hover:bg-[#C8AA6E] hover:text-black text-[#C8AA6E] font-bold rounded flex items-center justify-center gap-2 transition-all"><RotateCcw /> 新游戏</button></div><p className="mt-8 text-slate-400 text-sm">v7.5 Beta</p></div>
+                  <div className="z-10 text-center"><h1 className="text-8xl font-black text-[#C8AA6E] mb-8 drop-shadow-lg tracking-widest">峡谷尖塔</h1><div className="flex flex-col gap-4 w-64 mx-auto">{hasSave && (<button onClick={handleContinue} className="px-8 py-4 bg-[#0AC8B9] hover:bg-white hover:text-[#0AC8B9] text-black font-bold rounded flex items-center justify-center gap-2 transition-all"><Play fill="currentColor" /> 继续征程</button>)}<button onClick={handleNewGame} className="px-8 py-4 border-2 border-[#C8AA6E] hover:bg-[#C8AA6E] hover:text-black text-[#C8AA6E] font-bold rounded flex items-center justify-center gap-2 transition-all"><RotateCcw /> 新游戏</button></div><p className="mt-8 text-slate-400 text-sm">v0.7.5 Beta</p></div>
+                  {showUpdateLog && (
+                      <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/90">
+                          <div className="max-w-2xl bg-[#091428]/95 border-2 border-[#C8AA6E] p-8 rounded-xl shadow-[0_0_50px_#C8AA6E]">
+                              <h2 className="text-3xl font-bold text-[#C8AA6E] mb-6 text-center">v0.7.5 (当前版本) 更新日志</h2>
+                              <div className="space-y-4 text-left max-h-96 overflow-y-auto">
+                                  <div className="border-l-4 border-green-500 pl-4">
+                                      <div className="font-bold text-green-400 mb-1">[Feature] 全英雄实装</div>
+                                      <div className="text-sm text-[#A09B8C]">英雄池扩充至 20 位，包含瑞文、卡牌、盲僧等新英雄，且每位英雄拥有独特的初始卡组和被动遗物。</div>
+                                  </div>
+                                  <div className="border-l-4 border-green-500 pl-4">
+                                      <div className="font-bold text-green-400 mb-1">[Feature] 三章节系统</div>
+                                      <div className="text-sm text-[#A09B8C]">正式实装 Act 1 (峡谷), Act 2 (暗影岛), Act 3 (虚空) 的完整流程，包含专属敌人和 Boss。</div>
+                                  </div>
+                                  <div className="border-l-4 border-green-500 pl-4">
+                                      <div className="font-bold text-green-400 mb-1">[Feature] 章节专属遗物</div>
+                                      <div className="text-sm text-[#A09B8C]">新增了只能在特定章节获取的强力遗物（如 Act 3 的纳什之牙）。</div>
+                                  </div>
+                                  <div className="border-l-4 border-blue-500 pl-4">
+                                      <div className="font-bold text-blue-400 mb-1">[Fix] 牌库打空 Bug</div>
+                                  </div>
+                                  <div className="border-l-4 border-blue-500 pl-4">
+                                      <div className="font-bold text-blue-400 mb-1">[Fix] 厄加特回血 Bug</div>
+                                  </div>
+                                  <div className="border-l-4 border-blue-500 pl-4">
+                                      <div className="font-bold text-blue-400 mb-1">[Fix] 地图路径逻辑</div>
+                                  </div>
+                                  <div className="border-l-4 border-blue-500 pl-4">
+                                      <div className="font-bold text-blue-400 mb-1">[Fix] 资源链接</div>
+                                      <div className="text-sm text-[#A09B8C]">全面校对了 20 位英雄的技能图标、头像和 Loading 图，修复了所有 broken image。</div>
+                                  </div>
+                              </div>
+                              <button 
+                                  onClick={() => {
+                                      setShowUpdateLog(false);
+                                      localStorage.setItem('last_version', 'v0.7.5');
+                                      setBgmStarted(true);
+                                  }} 
+                                  className="mt-6 w-full px-8 py-3 bg-[#C8AA6E] hover:bg-[#F0E6D2] text-black font-bold rounded transition-all"
+                              >
+                                  关闭
+                              </button>
+                          </div>
+                      </div>
+                  )}
               </div>
           );
           case 'CHAMPION_SELECT': return <ChampionSelect onChampionSelect={handleChampionSelect} unlockedIds={unlockedChamps} />;
@@ -999,7 +1139,7 @@ export default function LegendsOfTheSpire() {
 
   return (
       <div className="relative h-screen w-full bg-[#091428] font-sans select-none overflow-hidden">
-          <AudioPlayer src={getCurrentBgm()} />
+          <AudioPlayer src={bgmStarted || view !== 'MENU' ? getCurrentBgm() : null} />
           {view !== 'GAMEOVER' && view !== 'VICTORY_ALL' && view !== 'MENU' && view !== 'CHAMPION_SELECT' && champion && (
               <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-black to-transparent z-50 flex items-center justify-between px-8 pointer-events-none">
                   <div className="flex items-center gap-6 pointer-events-auto">
@@ -1019,7 +1159,7 @@ export default function LegendsOfTheSpire() {
                           <div className="flex items-center gap-4 text-sm font-bold"><span className="text-red-400 flex items-center gap-1"><Heart size={14} fill="currentColor"/> {currentHp}/{maxHp}</span><span className="text-yellow-400 flex items-center gap-1"><Coins size={14} fill="currentColor"/> {gold}</span></div>
                       </div>
                   </div>
-                  <div className="flex gap-2 pointer-events-auto mr-4">
+                  <div className="flex gap-2 pointer-events-auto mr-4 flex-wrap max-w-md justify-end">
                       {relics.filter(rid => rid !== champion.relicId).map((rid, i) => {
                           const relic = RELIC_DATABASE[rid];
                           return (
