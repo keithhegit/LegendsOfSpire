@@ -710,7 +710,25 @@ export default function LegendsOfTheSpire() {
   };
   
   const handleNodeSelect = (node) => {
-      if (node.status !== 'AVAILABLE') return;
+      // 参考 map.js 的 mapcan 逻辑：只能点击正前、左前、右前的节点
+      // 检查节点是否在可点击范围内
+      if (!activeNode) {
+          // 如果没有 activeNode，只能点击当前层的 AVAILABLE 节点
+          if (node.status !== 'AVAILABLE' || node.row !== currentFloor) return;
+      } else {
+          // 如果有 activeNode，检查节点是否在可点击范围内
+          if (node.row === currentFloor) {
+              // 当前层的节点，必须是 AVAILABLE
+              if (node.status !== 'AVAILABLE') return;
+          } else if (node.row === currentFloor + 1) {
+              // 下一层的节点，检查是否是相邻列（正前、左前、右前）
+              const colDiff = Math.abs(node.col - activeNode.col);
+              if (colDiff > 1) return; // 不在可点击范围内
+              // 在可点击范围内，即使状态是 LOCKED 也可以点击（参考 map.js 逻辑）
+          } else {
+              return; // 不在当前层或下一层
+          }
+      }
       
       // 立即锁定同层的其他节点
       const newGrid = mapData.grid.map(row => [...row]);
@@ -720,7 +738,7 @@ export default function LegendsOfTheSpire() {
       if (newGrid[gridRow]) {
           newGrid[gridRow].forEach((n, colIndex) => {
               if (n && n.id === node.id) {
-                  // 当前节点保持 AVAILABLE，稍后在 completeNode 中标记为 COMPLETED
+                  // 当前节点保持当前状态，稍后在 completeNode 中标记为 COMPLETED
               } else if (n) {
                   n.status = 'LOCKED';
               }
