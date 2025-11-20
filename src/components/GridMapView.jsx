@@ -25,12 +25,26 @@ const GridMapView = ({ mapData, onNodeSelect, currentFloor, act }) => {
         return null; 
     };
 
-    // 判断节点是否被迷雾覆盖
+    // 判断节点是否被迷雾覆盖（参考 map.js 的 mapcan 逻辑）
     const isFogged = (node) => {
         if (!node) return true;
-        // 如果节点在当前层或下一层，不显示迷雾
+        // 如果节点在当前层或下一层（正前、左前、右前），不显示迷雾
+        // 参考 map.js: mapcan 函数检查 (id-20)==(x) || (id-20)==(x.sub(1)) || (id-20)==(x.add(1))
         if (node.row <= currentFloor + 1) return false;
         return true;
+    };
+    
+    // 判断节点是否可点击（参考 map.js 的 mapcan 逻辑：只能点击正前、左前、右前）
+    const canClickNode = (node, currentRow, currentCol) => {
+        if (!node) return false;
+        // 如果节点在当前层，可以点击
+        if (node.row === currentRow) return true;
+        // 如果节点在下一层，需要检查是否是相邻列（正前、左前、右前）
+        if (node.row === currentRow + 1) {
+            const colDiff = Math.abs(node.col - currentCol);
+            return colDiff <= 1; // 正前(colDiff=0)、左前(colDiff=1)、右前(colDiff=1)
+        }
+        return false;
     };
 
     // 网格单元格渲染
@@ -45,7 +59,22 @@ const GridMapView = ({ mapData, onNodeSelect, currentFloor, act }) => {
         const isCompleted = node.status === 'COMPLETED';
         const isLocked = node.status === 'LOCKED';
         const isFog = isFogged(node);
+        // 检查节点是否在可点击范围内（正前、左前、右前）
+        const isInClickableRange = canClickNode(node, currentFloor, activeNode?.col);
         const iconUrl = getMapIcon(node);
+        
+        // 节点类型颜色（参考 map.js 的 mapsty 函数）
+        const getNodeTypeColor = (node) => {
+            if (!node) return 'border-slate-700';
+            if (node.type === 'BOSS') return 'border-red-600 bg-red-900/30';
+            if (node.type === 'BATTLE') return 'border-slate-500 bg-slate-800/50';
+            if (node.type === 'SHOP') return 'border-yellow-500 bg-yellow-900/30';
+            if (node.type === 'CHEST') return 'border-green-500 bg-green-900/30';
+            if (node.type === 'EVENT') return 'border-purple-500 bg-purple-900/30';
+            if (node.type === 'REST') return 'border-orange-500 bg-orange-900/30';
+            return 'border-slate-700';
+        };
+        const typeColor = getNodeTypeColor(node);
 
         return (
             <div key={node.id} className="relative flex items-center justify-center w-16 h-16">
@@ -55,10 +84,12 @@ const GridMapView = ({ mapData, onNodeSelect, currentFloor, act }) => {
                     onClick={() => isAvailable && onNodeSelect(node)}
                     disabled={!isAvailable}
                     className={`
-                        w-12 h-12 rounded-full border-2 flex items-center justify-center overflow-hidden bg-black shadow-lg transition-all relative
-                        ${isAvailable ? 'border-[#C8AA6E] ring-2 ring-[#C8AA6E]/50 z-20 cursor-pointer' : 'border-slate-700 cursor-not-allowed'}
-                        ${isCompleted ? 'opacity-40 grayscale' : ''}
-                        ${isLocked || isFog ? 'opacity-20 blur-[1px]' : ''}
+                        w-12 h-12 rounded-full border-2 flex items-center justify-center overflow-hidden shadow-lg transition-all relative
+                        ${isAvailable ? 'border-[#C8AA6E] ring-2 ring-[#C8AA6E]/50 z-20 cursor-pointer brightness-110' : typeColor}
+                        ${isCompleted ? 'opacity-50 grayscale' : ''}
+                        ${isLocked && !isFog && isInClickableRange ? 'opacity-60' : ''}
+                        ${isFog ? 'opacity-30 brightness-50' : ''}
+                        ${!isInClickableRange && !isFog ? 'opacity-40' : ''}
                     `}
                 >
                     {iconUrl && (

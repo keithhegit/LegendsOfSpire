@@ -20,7 +20,7 @@ const Card = ({ cardId, index, totalCards, canPlay, onPlay }) => {
   
   return (
     <motion.div
-      layout // 自动处理布局变化动画
+      layout
       initial={{ y: 100, opacity: 0, scale: 0.5 }}
       animate={{ y: yOffset, opacity: 1, scale: 1, rotate: rotation }}
       exit={{ y: -100, opacity: 0, scale: 0.5 }}
@@ -31,21 +31,24 @@ const Card = ({ cardId, index, totalCards, canPlay, onPlay }) => {
         transformOrigin: "bottom center",
         position: 'relative'
       }}
-      // 悬停特效：放大、上移、高亮边框
+      drag={canPlay ? "y" : false}
+      dragConstraints={{ top: -300, bottom: 0 }}
+      dragSnapToOrigin={true}
+      onDragEnd={(event, info) => { 
+        if (info.offset.y < -150 && canPlay) { 
+          onPlay(index); 
+        } 
+      }}
       whileHover={canPlay ? { 
-        scale: 1.25, 
-        y: -60, 
+        scale: 1.2, 
+        y: -80, 
         zIndex: 100, 
-        rotate: 0,
-        boxShadow: "0 0 30px rgba(200, 170, 110, 0.8)"
+        rotate: 0
       } : {}}
-      // 点击事件
       onClick={handleClick}
-      
       className={`
         w-40 h-60 bg-[#1E2328] border-2 rounded-lg flex flex-col items-center overflow-hidden shadow-2xl 
-        transition-all duration-200
-        ${canPlay ? 'border-[#C8AA6E] cursor-pointer hover:border-[#F0E6D2] hover:shadow-[0_0_30px_rgba(200,170,110,0.8)]' : 'border-slate-700 opacity-60 cursor-not-allowed'}
+        ${canPlay ? 'border-[#C8AA6E] cursor-grab active:cursor-grabbing' : 'border-slate-700 opacity-60 cursor-not-allowed'}
       `}
     >
       {/* 卡牌图片 */}

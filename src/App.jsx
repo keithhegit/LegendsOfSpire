@@ -836,7 +836,7 @@ export default function LegendsOfTheSpire() {
               </div>
           );
           case 'CHAMPION_SELECT': return <ChampionSelect onChampionSelect={handleChampionSelect} unlockedIds={unlockedChamps} />;
-          case 'MAP': return <GridMapView mapData={mapData} onNodeSelect={handleNodeSelect} currentFloor={currentFloor} act={currentAct} />;
+          case 'MAP': return <GridMapView mapData={mapData} onNodeSelect={handleNodeSelect} currentFloor={currentFloor} act={currentAct} activeNode={activeNode} />;
           case 'SHOP': return <ShopView gold={gold} deck={masterDeck} relics={relics} onLeave={() => completeNode()} onBuyCard={handleBuyCard} onBuyRelic={handleBuyRelic} championName={champion.name} />;
           case 'EVENT': return <EventView onLeave={() => completeNode()} onReward={handleEventReward} />;
           case 'CHEST': return <ChestView onLeave={() => completeNode()} onRelicReward={handleRelicReward} relics={relics} act={currentAct} />;
