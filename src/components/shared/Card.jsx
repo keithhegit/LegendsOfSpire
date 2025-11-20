@@ -5,6 +5,12 @@ import { CARD_DATABASE } from '../../data/cards';
 const Card = ({ cardId, index, totalCards, canPlay, onPlay }) => {
   const card = CARD_DATABASE[cardId];
   
+  // 如果卡牌不存在，返回空组件或占位符
+  if (!card) {
+    console.warn(`Card not found: ${cardId}`);
+    return null;
+  }
+  
   // 堆叠逻辑计算
   const overlap = totalCards > 5 ? -40 : 10; 
   const rotation = (index - (totalCards - 1) / 2) * 3; // 扇形展开角度

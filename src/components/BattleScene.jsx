@@ -95,7 +95,12 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
       if(gameState!=='PLAYER_TURN') return;
       const { hand, discardPile } = deckRef.current;
       const cardId = hand[index];
+      if (!cardId) return; // 防止无效的 cardId
       const card = CARD_DATABASE[cardId];
+      if (!card) {
+        console.error(`Card not found in database: ${cardId}`);
+        return;
+      }
       if(playerMana < card.cost) return;
       setPlayerMana(p => p - card.cost);
       const newHand = [...hand]; newHand.splice(index, 1);
