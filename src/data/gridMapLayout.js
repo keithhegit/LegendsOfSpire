@@ -30,11 +30,17 @@ const getRandomEnemy = (act, usedEnemies = []) => {
                !usedEnemies.includes(id);
     });
     if (enemies.length === 0) {
-        // 如果没有可用敌人，返回所有符合条件的敌人
-        return Object.keys(ENEMY_POOL).find(id => {
+        // 如果没有可用敌人，返回所有符合条件的敌人（不限制usedEnemies）
+        const allActEnemies = Object.keys(ENEMY_POOL).filter(id => {
             const enemy = ENEMY_POOL[id];
             return enemy.act === act && enemy.difficultyRank < 99;
-        }) || "Garen";
+        });
+        if (allActEnemies.length > 0) {
+            return allActEnemies[Math.floor(Math.random() * allActEnemies.length)];
+        }
+        // 如果连这个都没有，返回第一个普通敌人
+        const firstEnemy = Object.keys(ENEMY_POOL).find(id => ENEMY_POOL[id].difficultyRank < 99);
+        return firstEnemy || "Katarina"; // 使用Katarina作为默认值
     }
     return enemies[Math.floor(Math.random() * enemies.length)];
 };

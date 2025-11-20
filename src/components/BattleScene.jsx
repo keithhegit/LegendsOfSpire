@@ -5,7 +5,7 @@ import { CARD_DATABASE } from '../data/cards';
 import { RELIC_DATABASE } from '../data/relics';
 import { ENEMY_POOL } from '../data/enemies';
 import { scaleEnemyStats, shuffle } from '../utils/gameLogic';
-import { SPLASH_URL } from '../data/constants';
+import { ACT_BACKGROUNDS } from '../data/constants';
 import { playSfx, playChampionVoice } from '../utils/audioManager';
 import Card from './shared/Card';
 
