@@ -4,7 +4,7 @@ import { CDN_URL, ITEM_URL, PROFILEICON_URL, ACT_BACKGROUNDS } from '../data/con
 import { ENEMY_POOL } from '../data/enemies';
 import { GRID_ROWS, GRID_COLS } from '../data/gridMapLayout';
 
-const GridMapView = ({ mapData, onNodeSelect, currentFloor, act }) => {
+const GridMapView = ({ mapData, onNodeSelect, currentFloor, act, activeNode }) => {
     // 图标获取逻辑
     const getMapIcon = (node) => {
         if (!node) return null;
@@ -60,7 +60,7 @@ const GridMapView = ({ mapData, onNodeSelect, currentFloor, act }) => {
         const isLocked = node.status === 'LOCKED';
         const isFog = isFogged(node);
         // 检查节点是否在可点击范围内（正前、左前、右前）
-        const isInClickableRange = canClickNode(node, currentFloor, activeNode?.col);
+        const isInClickableRange = canClickNode(node);
         const iconUrl = getMapIcon(node);
         
         // 节点类型颜色（参考 map.js 的 mapsty 函数）
