@@ -262,7 +262,12 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
             <div className="flex items-end justify-center pointer-events-auto" style={{ width: '600px', height: '240px', position: 'relative' }}>
                 <AnimatePresence>
                     {hand.map((cid, i) => {
-                        const canPlay = playerMana >= CARD_DATABASE[cid].cost && gameState === 'PLAYER_TURN';
+                        const card = CARD_DATABASE[cid];
+                        if (!card) {
+                          console.warn(`Card not found in database: ${cid}`);
+                          return null;
+                        }
+                        const canPlay = playerMana >= card.cost && gameState === 'PLAYER_TURN';
                         return (
                             <Card 
                                 key={`${cid}-${i}`} 
