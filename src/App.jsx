@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { Sword, Shield, Zap, Skull, Heart, RefreshCw, AlertTriangle, Flame, XCircle, Activity, Map as MapIcon, Gift, Anchor, Coins, ShoppingBag, ChevronRight, Star, Play, Pause, Volume2, VolumeX, Landmark, Lock, RotateCcw, Save, ArrowRight } from 'lucide-react';
+import { Sword, Shield, Zap, Skull, Heart, RefreshCw, AlertTriangle, Flame, XCircle, Activity, Map as MapIcon, Gift, Anchor, Coins, ShoppingBag, ChevronRight, Star, Play, Pause, Volume2, VolumeX, Landmark, Lock, RotateCcw, Save, ArrowRight, BookOpen, Layers } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { generateGridMap, GRID_ROWS, GRID_COLS } from './data/gridMapLayout';
+import GridMapView from './components/GridMapView';
+import CodexView from './components/CodexView';
+import DeckView from './components/DeckView';
 
 // ==========================================
 // 1. 静态资源与全局配置
@@ -921,7 +925,7 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
 
 export default function LegendsOfTheSpire() {
   const [view, setView] = useState('MENU'); 
-  const [mapData, setMapData] = useState([]);
+  const [mapData, setMapData] = useState({ grid: [], nodes: [], nodeMap: new Map() });
   const [currentFloor, setCurrentFloor] = useState(0);
   const [currentAct, setCurrentAct] = useState(1);
   const [masterDeck, setMasterDeck] = useState([]);
@@ -932,7 +936,9 @@ export default function LegendsOfTheSpire() {
   const [relics, setRelics] = useState([]);
   const [baseStr, setBaseStr] = useState(0);
   const [activeNode, setActiveNode] = useState(null);
-  const [usedEnemies, setUsedEnemies] = useState([]); 
+  const [usedEnemies, setUsedEnemies] = useState([]);
+  const [showCodex, setShowCodex] = useState(false);
+  const [showDeck, setShowDeck] = useState(false); 
   
   const [unlockedChamps, setUnlockedChamps] = useState(() => { try { const d = localStorage.getItem(UNLOCK_KEY); return d ? JSON.parse(d) : Object.keys(CHAMPION_POOL); } catch { return Object.keys(CHAMPION_POOL); } });
   const [hasSave, setHasSave] = useState(false);
@@ -966,27 +972,57 @@ export default function LegendsOfTheSpire() {
     setChampion(selectedChamp); setMaxHp(selectedChamp.maxHp); setCurrentHp(selectedChamp.maxHp);
     setMasterDeck([...STARTING_DECK_BASIC, ...selectedChamp.initialCards]);
     setRelics([RELIC_DATABASE[selectedChamp.relicId].id]);
-    const { map: newMap } = generateMap(usedEnemies, 1);
-    setMapData(newMap); setCurrentFloor(0); setCurrentAct(1); setView('MAP');
+    // 使用新的网格地图生成器
+    const newMapData = generateGridMap(1, 10, usedEnemies);
+    setMapData(newMapData); setCurrentFloor(0); setCurrentAct(1); setView('MAP');
   };
 
   const completeNode = () => {
-      // 节点已经在handleNodeSelect时锁定，这里只需要解锁下一层节点
-      const newMap = [...mapData];
-      const nextFloorIdx = currentFloor + 1;
-      if (nextFloorIdx < newMap.length) {
-          activeNode.next.forEach(nextId => { const nextNode = newMap[nextFloorIdx].find(n => n.id === nextId); if(nextNode) nextNode.status = 'AVAILABLE'; });
-          setMapData(newMap);
-          setCurrentFloor(nextFloorIdx); 
-          setView('MAP');
-      } else { 
+      if (!activeNode) return;
+      
+      // 标记当前节点为已完成
+      const newGrid = mapData.grid.map(row => [...row]);
+      const currentNode = activeNode;
+      const gridRow = GRID_ROWS - 1 - currentNode.row;
+      if (newGrid[gridRow] && newGrid[gridRow][currentNode.col]) {
+          newGrid[gridRow][currentNode.col].status = 'COMPLETED';
+      }
+      
+      // 解锁下一层相邻节点
+      const nextFloor = currentNode.row + 1;
+      if (nextFloor < 10) {
+          const nextGridRow = GRID_ROWS - 1 - nextFloor;
+          // 解锁正前、左前、右前的节点
+          const nextCols = [
+              currentNode.col,      // 正前
+              currentNode.col - 1,  // 左前
+              currentNode.col + 1   // 右前
+          ].filter(col => col >= 0 && col < GRID_COLS);
+          
+          nextCols.forEach(col => {
+              if (newGrid[nextGridRow] && newGrid[nextGridRow][col] && newGrid[nextGridRow][col]) {
+                  const nextNode = newGrid[nextGridRow][col];
+                  if (nextNode && nextNode.status === 'LOCKED') {
+                      nextNode.status = 'AVAILABLE';
+                  }
+              }
+          });
+      }
+      
+      const updatedNodeMap = new Map(mapData.nodeMap);
+      updatedNodeMap.set(`${currentNode.row}-${currentNode.col}`, { ...currentNode, status: 'COMPLETED' });
+      
+      setMapData({ ...mapData, grid: newGrid, nodeMap: updatedNodeMap });
+      
+      // 检查是否到达最后一层
+      if (nextFloor >= 10) {
           // 章节通关逻辑
           if (currentAct < 3) {
               const nextAct = currentAct + 1;
               setCurrentAct(nextAct);
               setCurrentFloor(0);
-              const { map: nextMap } = generateMap(usedEnemies, nextAct);
-              setMapData(nextMap);
+              const nextMapData = generateGridMap(nextAct, 10, usedEnemies);
+              setMapData(nextMapData);
               // 章节奖励：回复 50% 生命
               setCurrentHp(Math.min(maxHp, currentHp + Math.floor(maxHp * 0.5)));
               alert(`第 ${currentAct} 章通关！进入下一章...`);
@@ -1005,23 +1041,37 @@ export default function LegendsOfTheSpire() {
               localStorage.removeItem(SAVE_KEY);
               setView('VICTORY_ALL'); 
           }
+      } else {
+          setCurrentFloor(nextFloor);
+          setView('MAP');
       }
   };
   
   const handleNodeSelect = (node) => {
       if (node.status !== 'AVAILABLE') return;
+      
       // 立即锁定同层的其他节点
-      const newMap = [...mapData];
-      const floorNodes = newMap[currentFloor];
-      floorNodes.forEach(n => { 
-          if (n.id === node.id) {
-              n.status = 'COMPLETED';
-          } else {
-              n.status = 'LOCKED';
-          }
-      });
-      setMapData(newMap);
+      const newGrid = mapData.grid.map(row => [...row]);
+      const gridRow = GRID_ROWS - 1 - node.row;
+      
+      // 锁定同层的所有其他节点
+      if (newGrid[gridRow]) {
+          newGrid[gridRow].forEach((n, colIndex) => {
+              if (n && n.id === node.id) {
+                  // 当前节点保持 AVAILABLE，稍后在 completeNode 中标记为 COMPLETED
+              } else if (n) {
+                  n.status = 'LOCKED';
+              }
+          });
+      }
+      
+      const updatedNodeMap = new Map(mapData.nodeMap);
+      updatedNodeMap.set(`${node.row}-${node.col}`, node);
+      
+      setMapData({ ...mapData, grid: newGrid, nodeMap: updatedNodeMap });
       setActiveNode(node);
+      setCurrentFloor(node.row);
+      
       switch(node.type) {
           case 'BATTLE': case 'BOSS': setView('COMBAT'); break;
           case 'REST': setView('REST'); break;
@@ -1174,6 +1224,8 @@ export default function LegendsOfTheSpire() {
               </div>
           )}
           {renderView()}
+          {showCodex && <CodexView onClose={() => setShowCodex(false)} />}
+          {showDeck && <DeckView deck={masterDeck} onClose={() => setShowDeck(false)} />}
       </div>
   );
 }

@@ -18,3 +18,9 @@ export const VOICE_URL = "https://pub-e9a8f18bbe6141f28c8b86c4c54070e1.r2.dev/au
 
 export const STARTING_DECK_BASIC = ["Strike", "Strike", "Strike", "Strike", "Defend", "Defend", "Defend", "Defend"];
 
+// 背景图配置 (按章节)
+export const ACT_BACKGROUNDS = {
+    1: "https://i.17173cdn.com/2fhnvk/YWxqaGBf/cms3/JfEzktbjDoBxmzd.jpg", // 召唤师峡谷
+    2: "https://images.17173cdn.com/2014/lol/2014/08/22/Shadow_Isles_10.jpg", // 暗影之地
+    3: "https://pic.upmedia.mg/uploads/content/20220519/EV220519112427593030.webp"  // 虚空之地
+};
