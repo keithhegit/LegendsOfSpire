@@ -193,13 +193,14 @@ export function generateGridMap(act = 1, usedEnemies = []) {
     // 找到未被覆盖的主路径区段
     let chainStartStep = -1;
     let chainEndStep = -1;
+    let actualChainLength = 0; // 记录实际链长度
     
     // 尝试多次找到合适的区段
     for (let attempt = 0; attempt < 20; attempt++) {
       const maxStart = Math.max(2, minSteps - (chainLengthMax + 2));
       const tryStartStep = 2 + Math.floor(Math.random() * maxStart);
-      const chainLength = chainLengthMin + Math.floor(Math.random() * (chainLengthMax - chainLengthMin + 1));
-      const tryEndStep = Math.min(tryStartStep + chainLength, minSteps - 2);
+      const tryChainLength = chainLengthMin + Math.floor(Math.random() * (chainLengthMax - chainLengthMin + 1));
+      const tryEndStep = Math.min(tryStartStep + tryChainLength, minSteps - 2);
       
       // 检查这个区段是否已被覆盖
       let isOverlap = false;
@@ -213,6 +214,7 @@ export function generateGridMap(act = 1, usedEnemies = []) {
       if (!isOverlap) {
         chainStartStep = tryStartStep;
         chainEndStep = tryEndStep;
+        actualChainLength = tryChainLength; // 保存实际链长度
         // 标记这个区段为已覆盖
         for (let s = chainStartStep; s <= chainEndStep; s++) {
           coveredSteps.add(s);
@@ -238,7 +240,7 @@ export function generateGridMap(act = 1, usedEnemies = []) {
     const detourChainNodes = [];
     let prevDetourNode = null;
     
-    for (let i = 0; i < chainLength && currentNodeCount < targetNodeCount; i++) {
+    for (let i = 0; i < actualChainLength && currentNodeCount < targetNodeCount; i++) {
       const step = chainStartStep + i;
       const correspondingMainNode = mainPath[step];
       
