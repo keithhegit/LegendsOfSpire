@@ -7,11 +7,22 @@
 
 ## 📖 目录
 
-1. [英雄数据](#英雄数据)
-2. [卡牌数据](#卡牌数据)
-3. [敌人数据](#敌人数据)
-4. [遗物数据](#遗物数据)
-5. [平衡性修复日志](./BALANCE_FIXES_SUMMARY.md) 🔗 外部文档
+### 核心数据手册
+1. [英雄数据](#英雄数据) - 20位英雄基础属性、被动技能、初始卡组
+2. [卡牌数据](#卡牌数据) - 82张卡牌详细数值（通用卡+专属技能）
+3. [敌人数据](#敌人数据) - Act 1-2 敌人技能和缩放机制
+4. [遗物数据](#遗物数据) - 被动遗物+通用遗物效果说明
+5. [游戏机制速查](#游戏机制速查) - 战斗奖励、升级、状态效果
+
+### 外部文档索引 🔗
+
+| 文档名称 | 说明 | 最后更新 |
+|---------|------|----------|
+| [BALANCE_FIXES_SUMMARY.md](./BALANCE_FIXES_SUMMARY.md) | 英雄技能平衡性修复汇总<br>• TwistedFate Q/R 费用调整<br>• Yasuo/Urgot R技能数值平衡<br>• Teemo/Riven 缺失技能补充 | 2025-11-21 |
+| [NEW_HERO_SKILL_IMPLEMENTATION_SUMMARY.md](./NEW_HERO_SKILL_IMPLEMENTATION_SUMMARY.md) | 8个被动技能实装总结<br>• 瑞文/盲僧/薇恩/劫/内瑟斯/艾瑞莉娅/锤石/卡特琳娜<br>• 代码实现细节和测试验证 | 2025-11-21 |
+| [PASSIVE_TEST_GUIDE.md](./PASSIVE_TEST_GUIDE.md) | 被动技能测试指南<br>• 20个被动技能测试步骤<br>• 触发条件和预期效果验证 | 2025-11-21 |
+| [SKILL_DESCRIPTION_AUDIT.md](./SKILL_DESCRIPTION_AUDIT.md) | **🔴 待修复**<br>技能描述一致性审计报告<br>• 文档 vs 游戏内 vs 代码逻辑对比<br>• 13/20 英雄需修正描述<br>• P0-P2 优先级修复计划 | 2025-11-21 |
+| [readme_version.md](./readme_version.md) | 版本迭代日志<br>• 分支功能对比（new_map vs new_mobile）<br>• Commit 历史记录<br>• 游戏机制演进说明 | 2025-11-21 |
 
 ---
 
