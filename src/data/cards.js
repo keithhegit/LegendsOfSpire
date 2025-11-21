@@ -36,7 +36,7 @@ export const CARD_DATABASE = {
   // 娑娜
   "SonaQ": { id: "SonaQ", hero: "Sona", name: "英勇赞美诗", price: 50, type: "ATTACK", cost: 1, value: 7, effect: "HEAL", effectValue: 3, description: "造成 7 点伤害，回复 3 点生命。", img: `${SPELL_URL}/SonaHymnofValor.png`, rarity: "COMMON" },
   "SonaW": { id: "SonaW", hero: "Sona", name: "坚毅咏叹调", price: 80, type: "SKILL", cost: 1, block: 8, effect: "HEAL", effectValue: 5, description: "获得 8 点护甲，回复 5 点生命。", img: `${SPELL_URL}/SonaAriaofPerseverance.png`, rarity: "UNCOMMON" },
-  "SonaR": { id: "SonaR", hero: "Sona", name: "狂舞终乐章", price: 150, type: "SKILL", cost: 3, effect: "STUN", description: "晕眩所有敌人 1 回合（简化为给予虚弱和易伤）。", effect: "WEAK", effectValue: 3, img: `${SPELL_URL}/SonaR.png`, rarity: "RARE" },
+  "SonaR": { id: "SonaR", hero: "Sona", name: "狂舞终乐章", price: 150, type: "SKILL", cost: 3, effect: "WEAK", effectValue: 3, effect2: "VULNERABLE", effectValue2: 3, description: "给予 3 层虚弱和 3 层易伤 (群体晕眩简化)。", img: `${SPELL_URL}/SonaR.png`, rarity: "RARE" },
 
   // 艾克
   "EkkoQ": { id: "EkkoQ", hero: "Ekko", name: "时间卷曲器", price: 50, type: "ATTACK", cost: 1, value: 12, exhaust: true, description: "造成 12 点伤害。消耗。", img: `${SPELL_URL}/EkkoQ.png`, rarity: "COMMON" },
@@ -60,13 +60,14 @@ export const CARD_DATABASE = {
 
   // 瑞文
   "RivenQ": { id: "RivenQ", hero: "Riven", name: "折翼之舞", price: 50, type: "ATTACK", cost: 0, value: 4, description: "造成 4 点伤害。", img: `${SPELL_URL}/RivenTriCleave.png`, rarity: "COMMON" },
+  "RivenW": { id: "RivenW", hero: "Riven", name: "镇魂怒吼", price: 70, type: "SKILL", cost: 1, effect: "WEAK", effectValue: 2, description: "给予 2 层虚弱 (AOE晕眩简化)。", img: `${SPELL_URL}/RivenMartyr.png`, rarity: "UNCOMMON" },
   "RivenE": { id: "RivenE", hero: "Riven", name: "勇往直前", price: 80, type: "SKILL", cost: 1, block: 5, effect: "DRAW", effectValue: 1, description: "获得 5 点护甲。抓取 1 张牌。", img: `${SPELL_URL}/RivenFeint.png`, rarity: "UNCOMMON" },
   "RivenR": { id: "RivenR", hero: "Riven", name: "放逐之刃", price: 150, type: "ATTACK", cost: 3, value: 12, isMultiHit: true, hits: 3, description: "造成 3 次 12 点伤害。", img: `${SPELL_URL}/RivenFengShuiEngine.png`, rarity: "RARE" },
 
   // 卡牌大师
-  "TwistedFateW": { id: "TwistedFateW", hero: "TwistedFate", name: "选牌", price: 60, type: "SKILL", cost: 1, effect: "DRAW", effectValue: 2, description: "获得随机一张红/黄/蓝牌 (简化: 抽2张)", img: `${SPELL_URL}/PickACard.png`, rarity: "COMMON" },
-  "TwistedFateQ": { id: "TwistedFateQ", hero: "TwistedFate", name: "万能牌", price: 90, type: "ATTACK", cost: 2, value: 8, description: "造成 8 点伤害 (群攻简化为单体)。", img: `${SPELL_URL}/WildCards.png`, rarity: "COMMON" },
-  "TwistedFateR": { id: "TwistedFateR", hero: "TwistedFate", name: "命运", price: 150, type: "SKILL", cost: 2, effect: "DRAW", effectValue: 3, description: "抓取 3 张牌。全图视野(简化为抽牌)。", img: `${SPELL_URL}/Destiny.png`, rarity: "RARE" },
+  "TwistedFateW": { id: "TwistedFateW", hero: "TwistedFate", name: "选牌", price: 60, type: "SKILL", cost: 1, effect: "DRAW", effectValue: 2, description: "抽2张牌 (随机红/黄/蓝牌简化)。", img: `${SPELL_URL}/PickACard.png`, rarity: "COMMON" },
+  "TwistedFateQ": { id: "TwistedFateQ", hero: "TwistedFate", name: "万能牌", price: 70, type: "ATTACK", cost: 1, value: 8, description: "造成 8 点伤害。", img: `${SPELL_URL}/WildCards.png`, rarity: "COMMON" },
+  "TwistedFateR": { id: "TwistedFateR", hero: "TwistedFate", name: "命运", price: 150, type: "SKILL", cost: 1, effect: "DRAW", effectValue: 2, effect2: "STRENGTH", effectValue2: 1, description: "抽2张牌，获得1点力量。", img: `${SPELL_URL}/Destiny.png`, rarity: "RARE" },
 
   // 盲僧
   "LeeSinQ": { id: "LeeSinQ", hero: "LeeSin", name: "天音波", price: 50, type: "ATTACK", cost: 1, value: 6, effect: "VULNERABLE", effectValue: 1, description: "造成 6 点伤害。给予 1 层易伤。", img: `${SPELL_URL}/BlindMonkQOne.png`, rarity: "COMMON" },
@@ -80,7 +81,8 @@ export const CARD_DATABASE = {
 
   // 提莫
   "TeemoQ": { id: "TeemoQ", hero: "Teemo", name: "致盲吹箭", price: 50, type: "ATTACK", cost: 1, value: 5, effect: "WEAK", effectValue: 2, description: "造成 5 点伤害。给予 2 层虚弱。", img: `${SPELL_URL}/BlindingDart.png`, rarity: "COMMON" },
-  "TeemoR": { id: "TeemoR", hero: "Teemo", name: "种蘑菇", price: 80, type: "SKILL", cost: 1, effect: "VULNERABLE", effectValue: 4, exhaust: true, description: "给予 4 层易伤。消耗。", img: `${SPELL_URL}/TeemoRCast.png`, rarity: "UNCOMMON" },
+  "TeemoW": { id: "TeemoW", hero: "Teemo", name: "小跑", price: 60, type: "SKILL", cost: 0, block: 4, effect: "DRAW", effectValue: 1, description: "获得 4 点护甲。抓取 1 张牌。", img: `${SPELL_URL}/SummonerHaste.png`, rarity: "UNCOMMON" },
+  "TeemoR": { id: "TeemoR", hero: "Teemo", name: "致命毒刺", price: 150, type: "ATTACK", cost: 2, value: 6, isMultiHit: true, hits: 4, description: "造成 4 次 6 点伤害 (种蘑菇DoT简化)。", img: `${SPELL_URL}/TeemoRCast.png`, rarity: "RARE" },
 
   // 劫
   "ZedQ": { id: "ZedQ", hero: "Zed", name: "影奥义！诸刃", price: 50, type: "ATTACK", cost: 1, value: 8, description: "造成 8 点伤害。", img: `${SPELL_URL}/ZedQ.png`, rarity: "COMMON" },
@@ -98,7 +100,7 @@ export const CARD_DATABASE = {
   "IreliaR": { id: "IreliaR", hero: "Irelia", name: "先锋之刃", price: 150, type: "ATTACK", cost: 3, value: 8, isMultiHit: true, hits: 4, description: "造成 4 次 8 点伤害。", img: `${SPELL_URL}/IreliaR.png`, rarity: "RARE" },
 
   // 锤石
-  "ThreshQ": { id: "ThreshQ", hero: "Thresh", name: "死亡判决", price: 80, type: "ATTACK", cost: 2, value: 10, effect: "VULNERABLE", effectValue: 1, description: "造成 10 点伤害。给予 1 层易伤。", img: `${SPELL_URL}/ThreshQ.png`, rarity: "COMMON" },
+  "ThreshQ": { id: "ThreshQ", hero: "Thresh", name: "死亡判决", price: 60, type: "ATTACK", cost: 1, value: 8, effect: "VULNERABLE", effectValue: 1, description: "造成 8 点伤害。给予 1 层易伤。", img: `${SPELL_URL}/ThreshQ.png`, rarity: "COMMON" },
   "ThreshW": { id: "ThreshW", hero: "Thresh", name: "魂引之灯", price: 70, type: "SKILL", cost: 1, block: 10, effect: "DRAW", effectValue: 1, description: "获得 10 点护甲。抓取 1 张牌。", img: `${SPELL_URL}/ThreshW.png`, rarity: "UNCOMMON" },
   "ThreshR": { id: "ThreshR", hero: "Thresh", name: "幽冥监牢", price: 150, type: "SKILL", cost: 2, effect: "WEAK", effectValue: 3, effectValue2: 3, description: "给予敌人 3 层虚弱和 3 层易伤。", img: `${SPELL_URL}/ThreshR.png`, rarity: "RARE" },
 

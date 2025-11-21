@@ -45,6 +45,209 @@
 
 ---
 
+## 英雄技能图标资源表
+
+> **用途**: 用于排查 broken image 问题，所有图标URL基于 `SPELL_URL` 和 `PASSIVE_URL` 常量
+
+### 图标URL前缀
+- **技能图标**: `https://ddragon.leagueoflegends.com/cdn/13.24.1/img/spell/`
+- **被动图标**: `https://ddragon.leagueoflegends.com/cdn/13.24.1/img/passive/`
+- **物品图标**: `https://ddragon.leagueoflegends.com/cdn/13.24.1/img/item/`
+
+### 盖伦 (Garen) 技能图标
+
+| 技能 | 类型 | 图标文件名 | 完整URL | 状态 |
+|------|------|-----------|---------|------|
+| 坚韧 | 被动 | `Garen_Passive.png` | `${PASSIVE_URL}/Garen_Passive.png` | ✅ |
+| 致命打击 (Q) | 攻击 | `GarenQ.png` | `${SPELL_URL}/GarenQ.png` | ✅ |
+| 勇气 (W) | 技能 | `GarenW.png` | `${SPELL_URL}/GarenW.png` | ✅ |
+| 审判 (E) | 攻击 | `GarenE.png` | `${SPELL_URL}/GarenE.png` | ✅ |
+| 德玛西亚正义 (R) | 攻击 | `GarenR.png` | `${SPELL_URL}/GarenR.png` | ✅ |
+
+### 德莱厄斯 (Darius) 技能图标
+
+| 技能 | 类型 | 图标文件名 | 完整URL | 状态 |
+|------|------|-----------|---------|------|
+| 出血 | 被动 | `Garen_Passive.png` | `${PASSIVE_URL}/Garen_Passive.png` | ⚠️ 占位符 |
+| 致残打击 (Q) | 攻击 | `DariusNoxianTacticsONH.png` | `${SPELL_URL}/DariusNoxianTacticsONH.png` | ✅ |
+| 无情铁手 (W) | 技能 | `SummonerBarrier.png` | `${SPELL_URL}/SummonerBarrier.png` | ⚠️ 通用图标 |
+| 大杀四方 (E) | 攻击 | `DariusCleave.png` | `${SPELL_URL}/DariusCleave.png` | ✅ |
+| 诺克萨斯断头台 (R) | 攻击 | `DariusExecute.png` | `${SPELL_URL}/DariusExecute.png` | ✅ |
+
+### 拉克丝 (Lux) 技能图标
+
+| 技能 | 类型 | 图标文件名 | 完整URL | 状态 |
+|------|------|-----------|---------|------|
+| 光芒四射 | 被动 | `LuxIllumination.png` | `${PASSIVE_URL}/LuxIllumination.png` | ✅ |
+| 光之束缚 (Q) | 技能 | `LuxLightBinding.png` | `${SPELL_URL}/LuxLightBinding.png` | ✅ |
+| 透光奇点 (E) | 攻击 | `LuxLightStrikeKage.png` | `${SPELL_URL}/LuxLightStrikeKage.png` | ✅ |
+| 终极闪光 (R) | 攻击 | `LuxR.png` | `${SPELL_URL}/LuxR.png` | ✅ |
+
+### 金克丝 (Jinx) 技能图标
+
+| 技能 | 类型 | 图标文件名 | 完整URL | 状态 |
+|------|------|-----------|---------|------|
+| 爆发 | 被动 | `Jinx_Passive.png` | `${PASSIVE_URL}/Jinx_Passive.png` | ✅ |
+| 切自动挡 (Q) | 攻击 | `JinxQ.png` | `${SPELL_URL}/JinxQ.png` | ✅ |
+| 震荡电磁波 (W) | 攻击 | `JinxW.png` | `${SPELL_URL}/JinxW.png` | ✅ |
+| 超究极死神飞弹 (R) | 攻击 | `JinxR.png` | `${SPELL_URL}/JinxR.png` | ✅ |
+
+### 亚索 (Yasuo) 技能图标
+
+| 技能 | 类型 | 图标文件名 | 完整URL | 状态 |
+|------|------|-----------|---------|------|
+| 浪客之道 | 被动 | `Yasuo_Passive.png` | `${PASSIVE_URL}/Yasuo_Passive.png` | ✅ |
+| 斩钢闪 (Q) | 攻击 | `YasuoQ1Wrapper.png` | `${SPELL_URL}/YasuoQ1Wrapper.png` | ✅ |
+| 踏前斩 (E) | 攻击 | `YasuoDashWrapper.png` | `${SPELL_URL}/YasuoDashWrapper.png` | ✅ |
+| 狂风绝息斩 (R) | 攻击 | `YasuoR.png` | `${SPELL_URL}/YasuoR.png` | ✅ |
+
+### 娑娜 (Sona) 技能图标
+
+| 技能 | 类型 | 图标文件名 | 完整URL | 状态 |
+|------|------|-----------|---------|------|
+| 能量弦 | 被动 | `Sona_Passive.png` | `${PASSIVE_URL}/Sona_Passive.png` | ✅ |
+| 英勇赞美诗 (Q) | 攻击 | `SonaHymnofValor.png` | `${SPELL_URL}/SonaHymnofValor.png` | ✅ |
+| 坚毅咏叹调 (W) | 技能 | `SonaAriaofPerseverance.png` | `${SPELL_URL}/SonaAriaofPerseverance.png` | ✅ |
+| 狂舞终乐章 (R) | 技能 | `SonaR.png` | `${SPELL_URL}/SonaR.png` | ✅ |
+
+### 艾克 (Ekko) 技能图标
+
+| 技能 | 类型 | 图标文件名 | 完整URL | 状态 |
+|------|------|-----------|---------|------|
+| Z型驱动共振 | 被动 | `Ekko_P.png` | `${PASSIVE_URL}/Ekko_P.png` | ✅ |
+| 时间卷曲器 (Q) | 攻击 | `EkkoQ.png` | `${SPELL_URL}/EkkoQ.png` | ✅ |
+| 相位俯冲 (E) | 技能 | `EkkoE.png` | `${SPELL_URL}/EkkoE.png` | ✅ |
+| 时空断裂 (R) | 混合 | `EkkoR.png` | `${SPELL_URL}/EkkoR.png` | ✅ |
+
+### 塞拉斯 (Sylas) 技能图标
+
+| 技能 | 类型 | 图标文件名 | 完整URL | 状态 |
+|------|------|-----------|---------|------|
+| 叛乱 | 被动 | `SylasP.png` | `${PASSIVE_URL}/SylasP.png` | ✅ |
+| 锁链鞭击 (Q) | 攻击 | `SylasQ.png` | `${SPELL_URL}/SylasQ.png` | ✅ |
+| 弑君突刺 (W) | 技能 | `SylasW.png` | `${SPELL_URL}/SylasW.png` | ✅ |
+| 其人之道 (R) | 技能 | `SylasR.png` | `${SPELL_URL}/SylasR.png` | ✅ |
+
+### 厄加特 (Urgot) 技能图标
+
+| 技能 | 类型 | 图标文件名 | 完整URL | 状态 |
+|------|------|-----------|---------|------|
+| 回火 | 被动 | `Urgot_Passive.png` | `${PASSIVE_URL}/Urgot_Passive.png` | ✅ |
+| 腐蚀电荷 (Q) | 攻击 | `UrgotQ.png` | `${SPELL_URL}/UrgotQ.png` | ✅ |
+| 净除 (W) | 技能 | `UrgotW.png` | `${SPELL_URL}/UrgotW.png` | ✅ |
+| 超越死亡的恐惧 (R) | 攻击 | `UrgotR.png` | `${SPELL_URL}/UrgotR.png` | ✅ |
+
+### 维克托 (Viktor) 技能图标
+
+| 技能 | 类型 | 图标文件名 | 完整URL | 状态 |
+|------|------|-----------|---------|------|
+| 光荣进化 | 被动 | `Viktor_Passive.png` | `${PASSIVE_URL}/Viktor_Passive.png` | ✅ |
+| 能量转移 (Q) | 混合 | `ViktorPowerTransfer.png` | `${SPELL_URL}/ViktorPowerTransfer.png` | ✅ |
+| 死亡射线 (E) | 攻击 | `ViktorDeathRay.png` | `${SPELL_URL}/ViktorDeathRay.png` | ✅ |
+| 混乱风暴 (R) | 攻击 | `ViktorChaosStorm.png` | `${SPELL_URL}/ViktorChaosStorm.png` | ✅ |
+
+### 瑞文 (Riven) 技能图标
+
+| 技能 | 类型 | 图标文件名 | 完整URL | 状态 |
+|------|------|-----------|---------|------|
+| 符文之刃 | 被动 | `RivenRunicBlades.png` | `${PASSIVE_URL}/RivenRunicBlades.png` | ✅ |
+| 折翼之舞 (Q) | 攻击 | `RivenTriCleave.png` | `${SPELL_URL}/RivenTriCleave.png` | ✅ |
+| 镇魂怒吼 (W) | 技能 | `RivenMartyr.png` | `${SPELL_URL}/RivenMartyr.png` | ✅ |
+| 勇往直前 (E) | 技能 | `RivenFeint.png` | `${SPELL_URL}/RivenFeint.png` | ✅ |
+| 放逐之刃 (R) | 攻击 | `RivenFengShuiEngine.png` | `${SPELL_URL}/RivenFengShuiEngine.png` | ✅ |
+
+### 卡牌大师 (TwistedFate) 技能图标
+
+| 技能 | 类型 | 图标文件名 | 完整URL | 状态 |
+|------|------|-----------|---------|------|
+| 灌铅骰子 | 被动 | `CardMaster_SealFate.png` | `${PASSIVE_URL}/CardMaster_SealFate.png` | ✅ |
+| 万能牌 (Q) | 攻击 | `WildCards.png` | `${SPELL_URL}/WildCards.png` | ✅ |
+| 选牌 (W) | 技能 | `PickACard.png` | `${SPELL_URL}/PickACard.png` | ✅ |
+| 命运 (R) | 技能 | `Destiny.png` | `${SPELL_URL}/Destiny.png` | ✅ |
+
+### 盲僧 (LeeSin) 技能图标
+
+| 技能 | 类型 | 图标文件名 | 完整URL | 状态 |
+|------|------|-----------|---------|------|
+| 疾风骤雨 | 被动 | `LeeSinPassive.png` | `${PASSIVE_URL}/LeeSinPassive.png` | ✅ |
+| 天音波 (Q) | 攻击 | `BlindMonkQOne.png` | `${SPELL_URL}/BlindMonkQOne.png` | ✅ |
+| 金钟罩 (W) | 技能 | `BlindMonkWOne.png` | `${SPELL_URL}/BlindMonkWOne.png` | ✅ |
+| 猛龙摆尾 (R) | 攻击 | `BlindMonkRKick.png` | `${SPELL_URL}/BlindMonkRKick.png` | ✅ |
+
+### 薇恩 (Vayne) 技能图标
+
+| 技能 | 类型 | 图标文件名 | 完整URL | 状态 |
+|------|------|-----------|---------|------|
+| 圣银弩箭 | 被动 | `Vayne_SilveredBolts.png` | `${PASSIVE_URL}/Vayne_SilveredBolts.png` | ✅ |
+| 闪避突袭 (Q) | 攻击 | `VayneTumble.png` | `${SPELL_URL}/VayneTumble.png` | ✅ |
+| 恶魔审判 (E) | 攻击 | `VayneCondemn.png` | `${SPELL_URL}/VayneCondemn.png` | ✅ |
+| 终极时刻 (R) | 技能 | `VayneInquisition.png` | `${SPELL_URL}/VayneInquisition.png` | ✅ |
+
+### 提莫 (Teemo) 技能图标
+
+| 技能 | 类型 | 图标文件名 | 完整URL | 状态 |
+|------|------|-----------|---------|------|
+| 游击战 | 被动 | `Teemo_P.png` | `${PASSIVE_URL}/Teemo_P.png` | ✅ |
+| 致盲吹箭 (Q) | 攻击 | `BlindingDart.png` | `${SPELL_URL}/BlindingDart.png` | ✅ |
+| 小跑 (W) | 技能 | `SummonerHaste.png` | `${SPELL_URL}/SummonerHaste.png` | ⚠️ 通用图标 |
+| 致命毒刺 (R) | 攻击 | `TeemoRCast.png` | `${SPELL_URL}/TeemoRCast.png` | ✅ |
+
+### 劫 (Zed) 技能图标
+
+| 技能 | 类型 | 图标文件名 | 完整URL | 状态 |
+|------|------|-----------|---------|------|
+| 影分身 | 被动 | `Zed_Passive.png` | `${PASSIVE_URL}/Zed_Passive.png` | ✅ |
+| 影奥义！诸刃 (Q) | 攻击 | `ZedQ.png` | `${SPELL_URL}/ZedQ.png` | ✅ |
+| 影奥义！鬼斩 (E) | 攻击 | `ZedE.png` | `${SPELL_URL}/ZedE.png` | ✅ |
+| 禁奥义！瞬狱影杀阵 (R) | 攻击 | `ZedR.png` | `${SPELL_URL}/ZedR.png` | ✅ |
+
+### 内瑟斯 (Nasus) 技能图标
+
+| 技能 | 类型 | 图标文件名 | 完整URL | 状态 |
+|------|------|-----------|---------|------|
+| 汲魂痛击 | 被动 | `Nasus_Passive.png` | `${PASSIVE_URL}/Nasus_Passive.png` | ✅ |
+| 汲魂痛击 (Q) | 攻击 | `NasusQ.png` | `${SPELL_URL}/NasusQ.png` | ✅ |
+| 枯萎 (W) | 技能 | `NasusW.png` | `${SPELL_URL}/NasusW.png` | ✅ |
+| 死神降临 (R) | 混合 | `NasusR.png` | `${SPELL_URL}/NasusR.png` | ✅ |
+
+### 艾瑞莉娅 (Irelia) 技能图标
+
+| 技能 | 类型 | 图标文件名 | 完整URL | 状态 |
+|------|------|-----------|---------|------|
+| 热诚 | 被动 | `Irelia_Passive.png` | `${PASSIVE_URL}/Irelia_Passive.png` | ✅ |
+| 利刃冲击 (Q) | 攻击 | `IreliaQ.png` | `${SPELL_URL}/IreliaQ.png` | ✅ |
+| 比翼双刃 (E) | 技能 | `IreliaE.png` | `${SPELL_URL}/IreliaE.png` | ✅ |
+| 先锋之刃 (R) | 攻击 | `IreliaR.png` | `${SPELL_URL}/IreliaR.png` | ✅ |
+
+### 锤石 (Thresh) 技能图标
+
+| 技能 | 类型 | 图标文件名 | 完整URL | 状态 |
+|------|------|-----------|---------|------|
+| 地狱诅咒 | 被动 | `Thresh_Passive.png` | `${PASSIVE_URL}/Thresh_Passive.png` | ✅ |
+| 死亡判决 (Q) | 攻击 | `ThreshQ.png` | `${SPELL_URL}/ThreshQ.png` | ✅ |
+| 魂引之灯 (W) | 技能 | `ThreshW.png` | `${SPELL_URL}/ThreshW.png` | ✅ |
+| 幽冥监牢 (R) | 技能 | `ThreshR.png` | `${SPELL_URL}/ThreshR.png` | ✅ |
+
+### 卡特琳娜 (Katarina) 技能图标
+
+| 技能 | 类型 | 图标文件名 | 完整URL | 状态 |
+|------|------|-----------|---------|------|
+| 贪婪 | 被动 | `Katarina_Passive.png` | `${PASSIVE_URL}/Katarina_Passive.png` | ✅ |
+| 弹射之刃 (Q) | 攻击 | `KatarinaQ.png` | `${SPELL_URL}/KatarinaQ.png` | ✅ |
+| 瞬步 (E) | 攻击 | `KatarinaE.png` | `${SPELL_URL}/KatarinaE.png` | ✅ |
+| 死亡莲华 (R) | 攻击 | `KatarinaR.png` | `${SPELL_URL}/KatarinaR.png` | ✅ |
+
+### 通用卡牌图标
+
+| 卡牌 | 图标文件名 | 完整URL | 状态 |
+|------|-----------|---------|------|
+| 打击 (Strike) | `SummonerFlash.png` | `${SPELL_URL}/SummonerFlash.png` | ⚠️ 通用图标 |
+| 防御 (Defend) | `SummonerBarrier.png` | `${SPELL_URL}/SummonerBarrier.png` | ⚠️ 通用图标 |
+| 点燃 (Ignite) | `SummonerDot.png` | `${SPELL_URL}/SummonerDot.png` | ⚠️ 通用图标 |
+| 治疗术 (Heal) | `SummonerHeal.png` | `${SPELL_URL}/SummonerHeal.png` | ⚠️ 通用图标 |
+
+---
+
 ## 卡牌数据
 
 ### 通用卡牌 (Neutral)
