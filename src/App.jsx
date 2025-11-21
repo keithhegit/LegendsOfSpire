@@ -625,7 +625,7 @@ export default function LegendsOfTheSpire() {
   const [hasSave, setHasSave] = useState(false);
   const [showUpdateLog, setShowUpdateLog] = useState(() => {
       const lastVersion = localStorage.getItem('last_version');
-      return lastVersion !== 'v0.7.5';
+      return lastVersion !== 'v0.8.0';
   });
   const [bgmStarted, setBgmStarted] = useState(false);
 
@@ -929,11 +929,11 @@ export default function LegendsOfTheSpire() {
           case 'MENU': return (
               <div className="h-screen w-full bg-slate-900 flex flex-col items-center justify-center text-white bg-[url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ryze_0.jpg')] bg-cover bg-center">
                   <div className="absolute inset-0 bg-black/60"></div>
-                  <div className="z-10 text-center"><h1 className="text-8xl font-black text-[#C8AA6E] mb-8 drop-shadow-lg tracking-widest">峡谷尖塔</h1><div className="flex flex-col gap-4 w-64 mx-auto">{hasSave && (<button onClick={handleContinue} className="px-8 py-4 bg-[#0AC8B9] hover:bg-white hover:text-[#0AC8B9] text-black font-bold rounded flex items-center justify-center gap-2 transition-all"><Play fill="currentColor" /> 继续征程</button>)}<button onClick={handleNewGame} className="px-8 py-4 border-2 border-[#C8AA6E] hover:bg-[#C8AA6E] hover:text-black text-[#C8AA6E] font-bold rounded flex items-center justify-center gap-2 transition-all"><RotateCcw /> 新游戏</button></div><p className="mt-8 text-slate-400 text-sm">v0.7.5 Beta</p></div>
+                  <div className="z-10 text-center"><h1 className="text-8xl font-black text-[#C8AA6E] mb-8 drop-shadow-lg tracking-widest">峡谷尖塔</h1><div className="flex flex-col gap-4 w-64 mx-auto">{hasSave && (<button onClick={handleContinue} className="px-8 py-4 bg-[#0AC8B9] hover:bg-white hover:text-[#0AC8B9] text-black font-bold rounded flex items-center justify-center gap-2 transition-all"><Play fill="currentColor" /> 继续征程</button>)}<button onClick={handleNewGame} className="px-8 py-4 border-2 border-[#C8AA6E] hover:bg-[#C8AA6E] hover:text-black text-[#C8AA6E] font-bold rounded flex items-center justify-center gap-2 transition-all"><RotateCcw /> 新游戏</button></div><p className="mt-8 text-slate-400 text-sm">v0.8.0 Beta</p></div>
                   {showUpdateLog && (
                       <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/90">
                           <div className="max-w-2xl bg-[#091428]/95 border-2 border-[#C8AA6E] p-8 rounded-xl shadow-[0_0_50px_#C8AA6E]">
-                              <h2 className="text-3xl font-bold text-[#C8AA6E] mb-6 text-center">v0.7.5 (当前版本) 更新日志</h2>
+                              <h2 className="text-3xl font-bold text-[#C8AA6E] mb-6 text-center">v0.8.0 (当前版本) 更新日志</h2>
                               <div className="space-y-4 text-left max-h-96 overflow-y-auto">
                                   <div className="border-l-4 border-green-500 pl-4">
                                       <div className="font-bold text-green-400 mb-1">[Feature] 全英雄实装</div>
@@ -944,7 +944,7 @@ export default function LegendsOfTheSpire() {
                                       <div className="text-sm text-[#A09B8C]">正式实装 Act 1 (峡谷), Act 2 (暗影岛), Act 3 (虚空) 的完整流程，包含专属敌人和 Boss。</div>
                                   </div>
                                   <div className="border-l-4 border-green-500 pl-4">
-                                      <div className="font-bold text-green-400 mb-1">[Feature] 章节专属遗物</div>
+                                      <div className="font-bold text-green-400 mb-1">[Feature] 资巧专属遗物</div>
                                       <div className="text-sm text-[#A09B8C]">新增了只能在特定章节获取的强力遗物（如 Act 3 的纳什之牙）。</div>
                                   </div>
                                   <div className="border-l-4 border-blue-500 pl-4">
@@ -964,7 +964,7 @@ export default function LegendsOfTheSpire() {
                               <button 
                                   onClick={() => {
                                       setShowUpdateLog(false);
-                                      localStorage.setItem('last_version', 'v0.7.5');
+                                      localStorage.setItem('last_version', 'v0.8.0');
                                       setBgmStarted(true);
                                   }} 
                                   className="mt-6 w-full px-8 py-3 bg-[#C8AA6E] hover:bg-[#F0E6D2] text-black font-bold rounded transition-all"
