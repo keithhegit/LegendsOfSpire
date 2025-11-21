@@ -17,29 +17,32 @@ import { getHexNeighbors } from '../utils/hexagonGrid';
 // ===========================
 // 配置常量
 // ===========================
-export const GRID_COLS = 11; // 增加宽度，支持更自由的探索
+export const GRID_COLS = 11; // 网格宽度
 
 const ACT_CONFIG = {
   1: {
-    minRows: 12,
-    maxRows: 15,
-    minNodes: 35,
-    maxNodes: 50,
-    nodeDensity: 0.35 // 35% 的格子有节点
+    rows: 12,
+    minSteps: 16,
+    maxSteps: 22,
+    maxHorizontalRun: 2,
+    detourChance: 0.3,
+    optionalBranches: 3
   },
   2: {
-    minRows: 25,
-    maxRows: 32,
-    minNodes: 70,
-    maxNodes: 100,
-    nodeDensity: 0.32
+    rows: 20,
+    minSteps: 32,
+    maxSteps: 46,
+    maxHorizontalRun: 2,
+    detourChance: 0.45,
+    optionalBranches: 6
   },
   3: {
-    minRows: 45,
-    maxRows: 55,
-    minNodes: 120,
-    maxNodes: 180,
-    nodeDensity: 0.30
+    rows: 28,
+    minSteps: 55,
+    maxSteps: 72,
+    maxHorizontalRun: 3,
+    detourChance: 0.55,
+    optionalBranches: 10
   }
 };
 
@@ -59,7 +62,8 @@ export const generateGridMap = (act, usedEnemies = [], attempt = 0) => {
   console.log(`\n========== 生成 ACT${act} 六边形自由探索地图 ==========`);
   
   const config = ACT_CONFIG[act];
-  const gridRows = config.minRows + Math.floor(Math.random() * (config.maxRows - config.minRows + 1));
+  const gridRows = config.rows;
+  const targetSteps = config.minSteps + Math.floor(Math.random() * (config.maxSteps - config.minSteps + 1));
   
   // 初始化网格
   const grid = Array(gridRows).fill(null).map(() => Array(GRID_COLS).fill(null));
@@ -90,13 +94,12 @@ export const generateGridMap = (act, usedEnemies = [], attempt = 0) => {
   // ===========================
   // Step 3: 生成主路径（确保BOSS可达）
   // ===========================
-  const mainPath = generateMainPath(grid, gridRows, startNode, bossNode, act, usedEnemies, allNodes);
-  
+  const mainPath = generateMainPath(grid, gridRows, startNode, bossNode, config, targetSteps, act, usedEnemies, allNodes);
+
   // ===========================
-  // Step 4: 填充额外节点（达到目标密度）
+  // Step 4: 生成可选支线
   // ===========================
-  const targetNodeCount = Math.floor(gridRows * GRID_COLS * config.nodeDensity);
-  fillAdditionalNodes(grid, gridRows, targetNodeCount, act, usedEnemies, allNodes);
+  addOptionalBranches(grid, mainPath, config.optionalBranches, act, usedEnemies, allNodes);
   
   // ===========================
   // Step 5: BFS验证BOSS可达性
@@ -129,11 +132,15 @@ export const generateGridMap = (act, usedEnemies = [], attempt = 0) => {
 // ===========================
 // 生成主路径（确保BOSS可达）
 // ===========================
-const generateMainPath = (grid, gridRows, startNode, bossNode, act, usedEnemies, allNodes) => {
+const generateMainPath = (grid, gridRows, startNode, bossNode, config, targetSteps, act, usedEnemies, allNodes) => {
   const path = [startNode];
   let currentNode = startNode;
   let currentRow = startNode.row;
   let currentCol = startNode.col;
+  const bossRow = bossNode.row;
+  const bossCol = bossNode.col;
+  const verticalStepsNeeded = bossRow - currentRow;
+  let extraBudget = Math.max(0, targetSteps - verticalStepsNeeded);
 
   const moveHorizontal = (dir) => {
     const targetCol = currentCol + dir;
@@ -166,46 +173,57 @@ const generateMainPath = (grid, gridRows, startNode, bossNode, act, usedEnemies,
     path.push(nextNode);
   };
 
-  // 主路径先推进到 BOSS 楼层的前一层
-  while (currentRow < bossNode.row - 1) {
-    // 水平漂移 0~1 次，保持一定的 S 型
-    if (Math.random() < 0.6) {
-      const dir = bossNode.col > currentCol ? 1 : bossNode.col < currentCol ? -1 : (Math.random() < 0.5 ? 1 : -1);
-      moveHorizontal(dir);
+  // 主路径推进到 BOSS 楼层的前一层
+  while (currentRow < bossRow - 1) {
+    const rowsRemaining = bossRow - currentRow - 1;
+    const maxHorizontal = Math.min(config.maxHorizontalRun, extraBudget);
+    let horizontalMoves = maxHorizontal > 0 ? Math.floor(Math.random() * (maxHorizontal + 1)) : 0;
+    const directionPreference = bossCol > currentCol ? 1 : bossCol < currentCol ? -1 : (Math.random() < 0.5 ? 1 : -1);
+    let direction = directionPreference;
+
+    while (horizontalMoves > 0) {
+      if (!moveHorizontal(direction)) {
+        direction *= -1;
+        if (!moveHorizontal(direction)) break;
+      }
+      extraBudget = Math.max(0, extraBudget - 1);
+      horizontalMoves--;
+    }
+
+    // 如果还剩余大量额外步数且有机会，强制绕远（改变列再返回）
+    if (extraBudget > rowsRemaining && Math.random() < config.detourChance) {
+      const detourDir = directionPreference;
+      if (moveHorizontal(detourDir)) {
+        extraBudget = Math.max(0, extraBudget - 1);
+        if (moveHorizontal(detourDir)) {
+          extraBudget = Math.max(0, extraBudget - 1);
+        }
+      }
     }
 
     // 向上移动（保持蜂窝邻接：同列或左一列）
-    const preferredCol = bossNode.col > currentCol ? currentCol : currentCol; // 默认同列
     const options = [];
-    if (preferredCol >= 0 && preferredCol < GRID_COLS) options.push(preferredCol);
+    if (currentCol >= 0 && currentCol < GRID_COLS) options.push(currentCol);
     if (currentCol - 1 >= 0) options.push(currentCol - 1);
-    const nextCol = options.sort((a, b) => Math.abs(a - bossNode.col) - Math.abs(b - bossNode.col))[0] ?? Math.max(0, Math.min(GRID_COLS - 1, currentCol));
+    const nextCol = options.sort((a, b) => Math.abs(a - bossCol) - Math.abs(b - bossCol))[0] ?? currentCol;
     moveUpward(nextCol);
   }
 
   // 现在处于 BOSS 楼层的前一层，横向调整到 bossCol 或 bossCol+1
-  while (!(currentCol === bossNode.col || currentCol === bossNode.col + 1)) {
-    const dir = currentCol < bossNode.col ? 1 : -1;
+  while (extraBudget > 0) {
+    const dir = currentCol < bossCol ? 1 : currentCol > bossCol ? -1 : (Math.random() < 0.5 ? 1 : -1);
     if (!moveHorizontal(dir)) break;
+    extraBudget = Math.max(0, extraBudget - 1);
   }
 
-  // 最终向上连接 BOSS
-  const finalCol = currentCol === bossNode.col ? bossNode.col : bossNode.col;
-  if (currentCol === bossNode.col + 1) {
-    // 需要先向左一步保证相邻
-    moveHorizontal(-1);
-  } else {
-    while (currentCol < bossNode.col) moveHorizontal(1);
-    while (currentCol > bossNode.col) moveHorizontal(-1);
-  }
+  while (currentCol < bossCol) moveHorizontal(1);
+  while (currentCol > bossCol) moveHorizontal(-1);
 
-  currentRow = bossNode.row - 1;
-  moveUpward(bossNode.col);
-  // 确保使用实际的 bossNode 对象
-  const bossCell = bossNode;
-  grid[bossNode.row][bossNode.col] = bossCell;
-  currentNode = bossCell;
-  path.push(bossCell);
+  currentRow = bossRow - 1;
+  moveUpward(bossCol);
+  grid[bossRow][bossCol] = bossNode;
+  currentNode = bossNode;
+  path.push(bossNode);
 
   console.log(`[主路径] 生成了 ${path.length} 个节点`);
   return path;
@@ -214,37 +232,35 @@ const generateMainPath = (grid, gridRows, startNode, bossNode, act, usedEnemies,
 // ===========================
 // 填充额外节点
 // ===========================
-const fillAdditionalNodes = (grid, gridRows, targetCount, act, usedEnemies, allNodes) => {
-  if (allNodes.length >= targetCount) return;
-  const desiredCount = Math.max(targetCount, allNodes.length);
-  let added = 0;
+const addOptionalBranches = (grid, mainPath, branchCount, act, usedEnemies, allNodes) => {
+  if (!branchCount || branchCount <= 0) return;
+  const gridRows = grid.length;
+  const mainSet = new Set(mainPath.map(n => `${n.row}-${n.col}`));
 
-  const tryPlaceNeighbor = () => {
-    const baseNode = allNodes[Math.floor(Math.random() * allNodes.length)];
-    if (!baseNode) return false;
+  for (let i = 0; i < branchCount; i++) {
+    const baseIndex = 2 + Math.floor(Math.random() * Math.max(1, mainPath.length - 4));
+    const baseNode = mainPath[baseIndex];
+    if (!baseNode) continue;
 
-    const neighbors = getHexNeighbors(baseNode.row, baseNode.col, gridRows, GRID_COLS)
-      .filter(([r, c]) => r > 0 && r < gridRows - 1 && c >= 0 && c < GRID_COLS && !grid[r][c]);
+    let available = getHexNeighbors(baseNode.row, baseNode.col, gridRows, GRID_COLS)
+      .filter(([r, c]) => !grid[r][c]);
+    if (available.length === 0) continue;
 
-    if (neighbors.length === 0) return false;
-    const [row, col] = neighbors[Math.floor(Math.random() * neighbors.length)];
-    const nodeType = getRandomNodeType(row, gridRows);
-    const node = createNode(row, col, nodeType, null, act, usedEnemies);
-    grid[row][col] = node;
-    allNodes.push(node);
-    added++;
-    return true;
-  };
+    const branchLength = 1 + Math.floor(Math.random() * 2);
+    let prevNode = baseNode;
 
-  const maxAttempts = desiredCount * 12;
-  let attempts = 0;
-
-  while (allNodes.length < desiredCount && attempts < maxAttempts) {
-    attempts++;
-    tryPlaceNeighbor();
+    for (let step = 0; step < branchLength; step++) {
+      if (available.length === 0) break;
+      const [row, col] = available[Math.floor(Math.random() * available.length)];
+      const nodeType = getOptionalBranchType();
+      const node = createNode(row, col, nodeType, null, act, usedEnemies);
+      grid[row][col] = node;
+      allNodes.push(node);
+      prevNode = node;
+      available = getHexNeighbors(prevNode.row, prevNode.col, gridRows, GRID_COLS)
+        .filter(([r, c]) => !grid[r][c] && !mainSet.has(`${r}-${c}`));
+    }
   }
-
-  console.log(`[额外节点] 添加了 ${added} 个节点`);
 };
 
 // ===========================
@@ -320,6 +336,15 @@ const getRandomNodeType = (row, totalRows) => {
   return 'BATTLE';
 };
 
+const getOptionalBranchType = () => {
+  const roll = Math.random();
+  if (roll < 0.35) return 'EVENT';
+  if (roll < 0.55) return 'CHEST';
+  if (roll < 0.75) return 'REST';
+  if (roll < 0.9) return 'SHOP';
+  return 'BATTLE';
+};
+
 const getBossId = (act) => {
   if (act === 1) return "Darius_BOSS";
   if (act === 2) return "Viego_BOSS";
@@ -347,7 +372,7 @@ const getRandomEnemy = (act, usedEnemies = []) => {
 const generateFallbackMap = (act, usedEnemies) => {
   console.log('[Fallback] 生成简单线性地图');
   const config = ACT_CONFIG[act];
-  const gridRows = config.minRows;
+  const gridRows = config.rows;
   const grid = Array(gridRows).fill(null).map(() => Array(GRID_COLS).fill(null));
   const allNodes = [];
   
