@@ -143,136 +143,188 @@ function placeKeyNodes(grid, totalFloors, act, usedEnemies) {
 
 /**
  * 阶段3: 生成主路径（确保可达）
- * 使用随机游走算法，从起点走到BOSS
+ * 新算法：生成多条交织路径，增加横向扩展
  */
 function generateMainPath(grid, startNode, bossNode, totalFloors, act, usedEnemies, nodes) {
-  let currentNode = startNode;
   const mainPath = [startNode];
   
-  // 从第1层开始，一直到BOSS前一层
+  // 策略：生成2-3条起始路径，增加横向覆盖
+  const numInitialPaths = Math.min(3, GRID_COLS - 2); // 最多3条路径
+  const startingCols = [
+    startNode.col - 1, // 左侧
+    startNode.col,     // 中间
+    startNode.col + 1  // 右侧
+  ].filter(col => col >= 0 && col < GRID_COLS);
+  
+  let currentLevelNodes = [startNode];
+  
+  // 逐层生成，每层生成2-4个节点，横向分布
   for (let floor = 1; floor < totalFloors - 1; floor++) {
-    // 获取当前节点的"前方"邻居（3个方向）
-    const directions = ['forward-left', 'forward', 'forward-right'];
-    const candidates = directions
-      .map(dir => {
-        const neighbor = getNeighborInDirection(currentNode.row, currentNode.col, dir, totalFloors, GRID_COLS);
-        return neighbor ? { row: neighbor[0], col: neighbor[1], dir } : null;
-      })
-      .filter(Boolean)
-      .filter(({ row, col }) => !grid[row][col]); // 过滤已占用的格子
+    const newLevelNodes = [];
     
-    if (candidates.length === 0) {
-      console.warn(`[MainPath] Floor ${floor}: No candidates available. Forcing fallback.`);
-      // 强制选择一个空位（向BOSS方向偏移）
-      const targetCol = currentNode.col + (bossNode.col > currentNode.col ? 1 : -1);
-      const clampedCol = Math.max(0, Math.min(GRID_COLS - 1, targetCol));
+    // 根据楼层调整节点密度（前期少，中期多，后期收敛）
+    const densityFactor = Math.sin((floor / totalFloors) * Math.PI); // 0 -> 1 -> 0 的曲线
+    const targetNodesThisFloor = Math.floor(2 + densityFactor * 2); // 2-4个节点
+    
+    // 为当前层的每个节点生成1-2个子节点
+    const usedColsThisFloor = new Set();
+    
+    for (const parentNode of currentLevelNodes) {
+      const childrenCount = Math.random() < 0.6 ? 2 : 1; // 60%概率生成2个子节点
       
-      if (grid[floor][clampedCol]) {
-        // 如果目标位置被占用，随机选择附近空位
-        for (let offset = 0; offset < GRID_COLS; offset++) {
-          const testCol = (clampedCol + offset) % GRID_COLS;
-          if (!grid[floor][testCol]) {
-            candidates.push({ row: floor, col: testCol });
-            break;
+      for (let i = 0; i < childrenCount; i++) {
+        // 随机偏移（允许更大的横向移动）
+        const colOffset = Math.floor(Math.random() * 5) - 2; // -2 to +2
+        let targetCol = parentNode.col + colOffset;
+        targetCol = Math.max(0, Math.min(GRID_COLS - 1, targetCol));
+        
+        // 避免同一层重复列
+        if (usedColsThisFloor.has(targetCol) || grid[floor][targetCol]) {
+          // 尝试找附近空位
+          for (let offset = 1; offset < GRID_COLS; offset++) {
+            const testCol1 = (targetCol + offset) % GRID_COLS;
+            const testCol2 = (targetCol - offset + GRID_COLS) % GRID_COLS;
+            
+            if (!usedColsThisFloor.has(testCol1) && !grid[floor][testCol1]) {
+              targetCol = testCol1;
+              break;
+            }
+            if (!usedColsThisFloor.has(testCol2) && !grid[floor][testCol2]) {
+              targetCol = testCol2;
+              break;
+            }
           }
         }
-      } else {
-        candidates.push({ row: floor, col: clampedCol });
+        
+        // 如果仍然被占用，跳过
+        if (grid[floor][targetCol]) continue;
+        
+        // 创建节点
+        const nodeType = getRandomNodeType();
+        const newNode = createNode(floor, targetCol, nodeType, act, usedEnemies);
+        grid[floor][targetCol] = newNode;
+        nodes.push(newNode);
+        newLevelNodes.push(newNode);
+        usedColsThisFloor.add(targetCol);
+        
+        // 建立连接
+        parentNode.next.push(newNode.id);
+        newNode.prev.push(parentNode.id);
+        mainPath.push(newNode);
+        
+        // 限制每层节点数
+        if (newLevelNodes.length >= targetNodesThisFloor) break;
       }
+      
+      if (newLevelNodes.length >= targetNodesThisFloor) break;
     }
     
-    // 随机选择一个候选位置
-    const chosen = candidates[Math.floor(Math.random() * candidates.length)];
+    // 如果这一层没有生成任何节点（异常情况），强制生成一个
+    if (newLevelNodes.length === 0) {
+      const fallbackCol = Math.floor(Math.random() * GRID_COLS);
+      const fallbackNode = createNode(floor, fallbackCol, getRandomNodeType(), act, usedEnemies);
+      grid[floor][fallbackCol] = fallbackNode;
+      nodes.push(fallbackNode);
+      newLevelNodes.push(fallbackNode);
+      
+      // 随机连接到上一层的某个节点
+      const randomParent = currentLevelNodes[Math.floor(Math.random() * currentLevelNodes.length)];
+      randomParent.next.push(fallbackNode.id);
+      fallbackNode.prev.push(randomParent.id);
+    }
     
-    // 创建节点
-    const nodeType = floor === totalFloors - 2 
-      ? getRandomNodeType(['BOSS']) // 倒数第二层不放BOSS
-      : getRandomNodeType();
-    
-    const newNode = createNode(chosen.row, chosen.col, nodeType, act, usedEnemies);
-    grid[chosen.row][chosen.col] = newNode;
-    nodes.push(newNode);
-    
-    // 建立连接
-    currentNode.next.push(newNode.id);
-    newNode.prev.push(currentNode.id);
-    
-    currentNode = newNode;
-    mainPath.push(newNode);
+    currentLevelNodes = newLevelNodes;
   }
   
-  // 连接最后一个节点到BOSS
-  currentNode.next.push(bossNode.id);
-  bossNode.prev.push(currentNode.id);
+  // 连接最后一层所有节点到BOSS
+  for (const node of currentLevelNodes) {
+    node.next.push(bossNode.id);
+    bossNode.prev.push(node.id);
+  }
   mainPath.push(bossNode);
   
-  console.log(`[MainPath] Generated: ${mainPath.length} nodes (${totalFloors} floors)`);
+  console.log(`[MainPath] Generated: ${nodes.length} nodes across ${totalFloors} floors`);
   
   return mainPath;
 }
 
 /**
- * 阶段4: 生成分支（实现"三选一"）
- * 目标：确保玩家每步有2-3个选择
+ * 阶段4: 生成横向连接（增加路径多样性）
+ * 新策略：在同一层节点之间创建横向连接，形成"之字形"路径
  */
 function generateBranches(grid, nodes, totalFloors, act, config, usedEnemies) {
   let totalNodes = nodes.length;
-  const targetMinSteps = config.minSteps;
   const targetMaxSteps = config.maxSteps;
   
-  // 计算目标节点数（平均步数 * 1.5，确保有足够分支）
-  const avgSteps = (targetMinSteps + targetMaxSteps) / 2;
-  const targetNodeCount = Math.floor(avgSteps * 1.3);
+  console.log(`[Branches] Adding cross-floor connections to increase path diversity`);
   
-  console.log(`[Branches] Target: ${targetNodeCount} nodes (current: ${totalNodes})`);
-  
-  // 遍历每一层（除了起点和BOSS层）
-  for (let floor = 0; floor < totalFloors - 1; floor++) {
-    if (totalNodes >= targetNodeCount) break; // 已满足节点数
-    
-    // 找出当前层的所有节点
-    const currentFloorNodes = nodes.filter(n => n.row === floor && n.type !== 'START');
+  // 策略1: 为每个节点确保至少2个next节点（三选一的前提）
+  for (let floor = 0; floor < totalFloors - 2; floor++) {
+    const currentFloorNodes = nodes.filter(n => n.row === floor);
     
     for (const node of currentFloorNodes) {
-      if (totalNodes >= targetNodeCount) break;
-      
-      // 如果该节点的next数量 < 3，尝试添加分支
-      if (node.next.length < 3) {
-        const directions = ['forward-left', 'forward', 'forward-right'];
+      // 如果next数量 < 2，尝试连接到下一层的其他节点
+      while (node.next.length < 2) {
+        const nextFloorNodes = nodes.filter(n => n.row === floor + 1 && !node.next.includes(n.id));
         
-        for (const dir of directions) {
-          if (node.next.length >= 3) break; // 已有3个分支
-          
-          const neighbor = getNeighborInDirection(node.row, node.col, dir, totalFloors, GRID_COLS);
-          if (!neighbor) continue;
-          
-          const [nextRow, nextCol] = neighbor;
-          
-          // 检查该位置是否已有节点
-          if (grid[nextRow][nextCol]) {
-            const existingNode = grid[nextRow][nextCol];
-            // 如果已有节点，但未连接，则建立连接
+        if (nextFloorNodes.length === 0) {
+          // 如果下一层没有可连接的节点，创建一个新节点
+          const randomCol = Math.floor(Math.random() * GRID_COLS);
+          if (!grid[floor + 1][randomCol]) {
+            const newNode = createNode(floor + 1, randomCol, getRandomNodeType(), act, usedEnemies);
+            grid[floor + 1][randomCol] = newNode;
+            nodes.push(newNode);
+            totalNodes++;
+            
+            node.next.push(newNode.id);
+            newNode.prev.push(node.id);
+          } else {
+            // 如果位置被占用，连接到该节点
+            const existingNode = grid[floor + 1][randomCol];
             if (!node.next.includes(existingNode.id)) {
               node.next.push(existingNode.id);
               if (!existingNode.prev.includes(node.id)) {
                 existingNode.prev.push(node.id);
               }
             }
-          } else {
-            // 创建新节点
-            const nodeType = getRandomNodeType();
-            const newNode = createNode(nextRow, nextCol, nodeType, act, usedEnemies);
-            grid[nextRow][nextCol] = newNode;
-            nodes.push(newNode);
-            totalNodes++;
-            
-            // 建立连接
-            node.next.push(newNode.id);
-            newNode.prev.push(node.id);
-            
-            console.log(`[Branches] Added node at (${nextRow}, ${nextCol}) - Type: ${nodeType}`);
-            
-            if (totalNodes >= targetNodeCount) break;
+          }
+          break;
+        }
+        
+        // 随机连接到下一层的一个节点
+        const targetNode = nextFloorNodes[Math.floor(Math.random() * nextFloorNodes.length)];
+        node.next.push(targetNode.id);
+        if (!targetNode.prev.includes(node.id)) {
+          targetNode.prev.push(node.id);
+        }
+      }
+    }
+  }
+  
+  // 策略2: 在同一层节点之间创建"横向跳跃"连接（增加之字形路径）
+  // 这会显著增加最长路径
+  for (let floor = 1; floor < totalFloors - 2; floor++) {
+    const currentFloorNodes = nodes.filter(n => n.row === floor).sort((a, b) => a.col - b.col);
+    
+    if (currentFloorNodes.length >= 2) {
+      // 随机选择相邻的节点对，创建"回流"连接
+      for (let i = 0; i < currentFloorNodes.length - 1; i++) {
+        const node1 = currentFloorNodes[i];
+        const node2 = currentFloorNodes[i + 1];
+        
+        // 30%概率创建横向连接
+        if (Math.random() < 0.3) {
+          // node1 连接到 node2 的子节点
+          const node2Children = node2.next.map(id => nodes.find(n => n.id === id)).filter(Boolean);
+          if (node2Children.length > 0) {
+            const randomChild = node2Children[Math.floor(Math.random() * node2Children.length)];
+            if (!node1.next.includes(randomChild.id)) {
+              node1.next.push(randomChild.id);
+              if (!randomChild.prev.includes(node1.id)) {
+                randomChild.prev.push(node1.id);
+              }
+              console.log(`[Branches] Cross-connection: (${node1.row},${node1.col}) -> (${randomChild.row},${randomChild.col})`);
+            }
           }
         }
       }
