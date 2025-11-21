@@ -131,8 +131,15 @@ function placeKeyNodes(grid, totalFloors, act, usedEnemies) {
   grid[0][startCol] = startNode;
   nodes.push(startNode);
   
-  // BOSS：最后一层，随机选择边缘或角落（col = 0, 1, 5, 6）
-  const bossCol = [0, 1, 5, 6][Math.floor(Math.random() * 4)];
+  // BOSS：最后一层，随机选择列（增加变化性）
+  // ACT1/2: 边缘或角落，ACT3: 任意列
+  let bossCol;
+  if (act <= 2) {
+    bossCol = [0, 1, 5, 6][Math.floor(Math.random() * 4)];
+  } else {
+    bossCol = Math.floor(Math.random() * GRID_COLS);
+  }
+  
   const bossRow = totalFloors - 1;
   const bossNode = createNode(bossRow, bossCol, 'BOSS', act, usedEnemies);
   grid[bossRow][bossCol] = bossNode;
@@ -158,7 +165,7 @@ function generateMainPath(grid, startNode, bossNode, totalFloors, act, usedEnemi
   
   let currentLevelNodes = [startNode];
   
-  // 逐层生成，每层生成2-4个节点，横向分布
+  // 逐层生成，确保每层至少1个节点，最多3-4个节点
   for (let floor = 1; floor < totalFloors - 1; floor++) {
     const newLevelNodes = [];
     
@@ -168,11 +175,19 @@ function generateMainPath(grid, startNode, bossNode, totalFloors, act, usedEnemi
     
     // 为当前层的每个节点生成1-2个子节点
     const usedColsThisFloor = new Set();
+    let attempts = 0;
+    const maxAttempts = 20; // 防止无限循环
     
     for (const parentNode of currentLevelNodes) {
+      if (newLevelNodes.length >= targetNodesThisFloor) break;
+      
       const childrenCount = Math.random() < 0.6 ? 2 : 1; // 60%概率生成2个子节点
       
       for (let i = 0; i < childrenCount; i++) {
+        if (newLevelNodes.length >= targetNodesThisFloor) break;
+        attempts++;
+        if (attempts > maxAttempts) break;
+        
         // 随机偏移（允许更大的横向移动）
         const colOffset = Math.floor(Math.random() * 5) - 2; // -2 to +2
         let targetCol = parentNode.col + colOffset;
@@ -181,19 +196,23 @@ function generateMainPath(grid, startNode, bossNode, totalFloors, act, usedEnemi
         // 避免同一层重复列
         if (usedColsThisFloor.has(targetCol) || grid[floor][targetCol]) {
           // 尝试找附近空位
+          let found = false;
           for (let offset = 1; offset < GRID_COLS; offset++) {
             const testCol1 = (targetCol + offset) % GRID_COLS;
             const testCol2 = (targetCol - offset + GRID_COLS) % GRID_COLS;
             
             if (!usedColsThisFloor.has(testCol1) && !grid[floor][testCol1]) {
               targetCol = testCol1;
+              found = true;
               break;
             }
             if (!usedColsThisFloor.has(testCol2) && !grid[floor][testCol2]) {
               targetCol = testCol2;
+              found = true;
               break;
             }
           }
+          if (!found) continue; // 跳过这个子节点
         }
         
         // 如果仍然被占用，跳过
@@ -211,26 +230,30 @@ function generateMainPath(grid, startNode, bossNode, totalFloors, act, usedEnemi
         parentNode.next.push(newNode.id);
         newNode.prev.push(parentNode.id);
         mainPath.push(newNode);
-        
-        // 限制每层节点数
-        if (newLevelNodes.length >= targetNodesThisFloor) break;
       }
-      
-      if (newLevelNodes.length >= targetNodesThisFloor) break;
     }
     
-    // 如果这一层没有生成任何节点（异常情况），强制生成一个
+    // 如果这一层没有生成任何节点（异常情况），强制生成至少1个
     if (newLevelNodes.length === 0) {
-      const fallbackCol = Math.floor(Math.random() * GRID_COLS);
-      const fallbackNode = createNode(floor, fallbackCol, getRandomNodeType(), act, usedEnemies);
-      grid[floor][fallbackCol] = fallbackNode;
-      nodes.push(fallbackNode);
-      newLevelNodes.push(fallbackNode);
+      console.warn(`[MainPath] Floor ${floor}: No nodes generated, forcing at least one`);
       
-      // 随机连接到上一层的某个节点
-      const randomParent = currentLevelNodes[Math.floor(Math.random() * currentLevelNodes.length)];
-      randomParent.next.push(fallbackNode.id);
-      fallbackNode.prev.push(randomParent.id);
+      // 尝试所有列，找到第一个空位
+      for (let col = 0; col < GRID_COLS; col++) {
+        if (!grid[floor][col]) {
+          const fallbackNode = createNode(floor, col, getRandomNodeType(), act, usedEnemies);
+          grid[floor][col] = fallbackNode;
+          nodes.push(fallbackNode);
+          newLevelNodes.push(fallbackNode);
+          
+          // 随机连接到上一层的某个节点
+          const randomParent = currentLevelNodes[Math.floor(Math.random() * currentLevelNodes.length)];
+          randomParent.next.push(fallbackNode.id);
+          fallbackNode.prev.push(randomParent.id);
+          mainPath.push(fallbackNode);
+          
+          break;
+        }
+      }
     }
     
     currentLevelNodes = newLevelNodes;
@@ -379,12 +402,27 @@ function validateAndFix(grid, nodes, startNode, bossNode, config, totalFloors) {
   // 5.3: 检查步数范围
   const finalCheck = bfsCheck(nodes, startNode, bossNode);
   const minSteps = finalCheck.distance;
-  const maxSteps = countMaxSteps(nodes, startNode, bossNode);
+  
+  // 只在节点数合理时计算最长路径（避免ACT3崩溃）
+  let maxSteps = minSteps;
+  if (nodes.length < 100) {
+    try {
+      maxSteps = countMaxSteps(nodes, startNode, bossNode);
+    } catch (error) {
+      console.warn(`[Validation] Failed to calculate max steps:`, error);
+      maxSteps = minSteps; // 降级到最短路径
+    }
+  } else {
+    console.warn(`[Validation] Skipping max steps calculation (too many nodes: ${nodes.length})`);
+  }
   
   console.log(`[Validation] Steps range: ${minSteps} - ${maxSteps} (target: ${config.minSteps} - ${config.maxSteps})`);
   
-  if (minSteps < config.minSteps || minSteps > config.maxSteps) {
-    console.warn(`[Validation] ⚠️ Minimum steps out of range: ${minSteps} (expected: ${config.minSteps} - ${config.maxSteps})`);
+  if (minSteps < config.minSteps) {
+    console.warn(`[Validation] ⚠️ Minimum steps too short: ${minSteps} (expected: ${config.minSteps}+)`);
+  }
+  if (maxSteps > config.maxSteps) {
+    console.warn(`[Validation] ⚠️ Maximum steps too long: ${maxSteps} (expected: <${config.maxSteps})`);
   }
   
   return { minSteps, maxSteps, reachable: finalCheck.reachable };
@@ -419,31 +457,48 @@ function bfsCheck(nodes, startNode, bossNode) {
 }
 
 /**
- * DFS计算最长路径（估算maxSteps）
+ * DFS计算最长路径（修复版：正确的回溯逻辑）
+ * 使用记忆化搜索避免重复计算
  */
 function countMaxSteps(nodes, startNode, bossNode) {
-  const visited = new Set();
+  const memo = new Map(); // 记忆化：存储每个节点到BOSS的最长路径
   
-  function dfs(node, steps) {
-    if (node.id === bossNode.id) return steps;
+  function dfs(nodeId) {
+    // 如果已经计算过，直接返回
+    if (memo.has(nodeId)) {
+      return memo.get(nodeId);
+    }
     
-    visited.add(node.id);
-    let maxSteps = steps;
+    const node = nodes.find(n => n.id === nodeId);
+    if (!node) return 0;
     
-    node.next.forEach(nextId => {
-      if (!visited.has(nextId)) {
-        const nextNode = nodes.find(n => n.id === nextId);
-        if (nextNode) {
-          maxSteps = Math.max(maxSteps, dfs(nextNode, steps + 1));
-        }
+    // 如果是BOSS，距离为0
+    if (nodeId === bossNode.id) {
+      memo.set(nodeId, 0);
+      return 0;
+    }
+    
+    // 如果没有子节点（死路），距离为-Infinity（标记为不可达）
+    if (node.next.length === 0) {
+      memo.set(nodeId, -Infinity);
+      return -Infinity;
+    }
+    
+    // 递归计算所有子节点到BOSS的最长路径
+    let maxDistance = -Infinity;
+    for (const nextId of node.next) {
+      const distance = dfs(nextId);
+      if (distance !== -Infinity) {
+        maxDistance = Math.max(maxDistance, distance + 1);
       }
-    });
+    }
     
-    visited.delete(node.id);
-    return maxSteps;
+    memo.set(nodeId, maxDistance);
+    return maxDistance;
   }
   
-  return dfs(startNode, 0);
+  const result = dfs(startNode.id);
+  return result === -Infinity ? 0 : result;
 }
 
 /**
