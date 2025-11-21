@@ -25,8 +25,8 @@
     // Flat-top offset to pixel
     function offsetToPixel(row, col) {
       const isOddRow = row % 2 === 1;
-      const x = HEX_SIZE * Math.sqrt(3) * (col + (isOddRow ? 0.5 : 0));
-      const y = HEX_SIZE * 1.5 * row;
+      const x = HEX_SIZE * 1.5 * col + (isOddRow ? HEX_SIZE * 0.75 : 0);
+      const y = HEX_SIZE * Math.sqrt(3) * row;
       return { x, y };
     }
     

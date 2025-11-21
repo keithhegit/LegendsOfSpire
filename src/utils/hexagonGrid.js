@@ -41,12 +41,19 @@ export function axialToPixel(q, r, hexSize = HEX_SIZE) {
 /**
  * Offset坐标 -> Pixel坐标（快捷方法）
  * 使用 flat-top 布局（平顶朝上）
+ * 
+ * Flat-top 六边形尺寸定义：
+ * - hexSize = 外接圆半径 (radius)
+ * - 宽度 = hexSize * 2
+ * - 高度 = hexSize * sqrt(3)
+ * - 水平间距 = hexSize * 2 * 0.75 = hexSize * 1.5
+ * - 垂直间距 = hexSize * sqrt(3)
  */
 export function offsetToPixel(row, col, hexSize = HEX_SIZE) {
-  // Flat-top hexagon layout
+  // Flat-top hexagon layout (odd-r coordinate system)
   const isOddRow = row % 2 === 1;
-  const x = hexSize * Math.sqrt(3) * (col + (isOddRow ? 0.5 : 0));
-  const y = hexSize * 1.5 * row;
+  const x = hexSize * 1.5 * col + (isOddRow ? hexSize * 0.75 : 0);
+  const y = hexSize * Math.sqrt(3) * row;
   return { x, y };
 }
 
@@ -145,15 +152,16 @@ export function hexDistance(row1, col1, row2, col2) {
  * 生成六边形SVG路径字符串（用于渲染）
  * @param {number} centerX - 中心点X坐标
  * @param {number} centerY - 中心点Y坐标
- * @param {number} size - 六边形大小
+ * @param {number} size - 六边形大小（外接圆半径）
  * @returns {string} - SVG path 字符串
  */
 export function generateHexagonPath(centerX, centerY, size = HEX_SIZE) {
   const points = [];
   
-  // 生成6个顶点（flat-top布局，从3点钟方向开始，顺时针）
+  // 生成6个顶点（flat-top布局）
+  // Flat-top: 顶点从右侧开始，角度偏移0度
   for (let i = 0; i < 6; i++) {
-    const angleDeg = 60 * i; // 0度起始，平顶朝上
+    const angleDeg = 60 * i; // 0, 60, 120, 180, 240, 300
     const angleRad = (Math.PI / 180) * angleDeg;
     const x = centerX + size * Math.cos(angleRad);
     const y = centerY + size * Math.sin(angleRad);
