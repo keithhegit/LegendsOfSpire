@@ -46,11 +46,6 @@ export const playSfx = (type) => {
 export const playChampionVoice = (championKey) => {
   if (!championKey) return;
   
-  // 临时禁用语音播放，因为 R2 存储中没有语音文件
-  // TODO: 上传语音文件到 R2 后重新启用
-  return;
-  
-  /*
   // 使用映射表获取正确的语音文件名
   const voiceFileName = getVoiceFileName(championKey);
   const voiceUrl = `${VOICE_URL}/${voiceFileName}.ogg`;
@@ -58,13 +53,9 @@ export const playChampionVoice = (championKey) => {
   const audio = new Audio(voiceUrl);
   audio.volume = 0.6;
   
-  // 更优雅的错误处理 - 静默失败，不在控制台显示错误
-  audio.play().catch(e => {
-    // 仅在开发环境显示详细错误
-    if (process.env.NODE_ENV === 'development') {
-      console.warn(`[Voice] Failed to play ${championKey} (${voiceFileName}.ogg):`, e.name);
-    }
+  // 静默失败 - 如果语音文件不存在也不影响游戏体验
+  audio.play().catch(() => {
+    // 不显示错误，避免控制台污染
   });
-  */
 };
 
