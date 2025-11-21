@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>六边形坐标系统诊断</title>
+  <style>
+    body { 
+      font-family: 'Courier New', monospace; 
+      padding: 20px; 
+      background: #1a1a2e; 
+      color: #eee; 
+    }
+    canvas { 
+      border: 2px solid #C8AA6E; 
+      display: block; 
+      margin: 20px auto; 
+      background: #0a0e27; 
+    }
+    .info { 
+      text-align: center; 
+      margin: 20px; 
+      font-size: 14px;
+    }
+    .debug {
+      max-width: 1000px;
+      margin: 20px auto;
+      background: rgba(255,255,255,0.1);
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="info">
+    <h2>Flat-Top 六边形坐标系统诊断</h2>
+    <p>点击任意六边形查看完整诊断信息</p>
+  </div>
+  <canvas id="canvas" width="900" height="700"></canvas>
+  <div class="debug" id="debug"></div>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const HEX_SIZE = 35;
+    
+    // ===========================
+    // Flat-top offset to pixel (当前实现)
+    // ===========================
+    function offsetToPixel(row, col) {
+      const isOddRow = row % 2 === 1;
+      const x = HEX_SIZE * 1.5 * col + (isOddRow ? HEX_SIZE * 0.75 : 0);
+      const y = HEX_SIZE * Math.sqrt(3) * row;
+      return { x, y };
+    }
+    
+    // ===========================
+    // Get neighbors (当前实现)
+    // ===========================
+    function getNeighbors(row, col) {
+      const isOddRow = row % 2 === 1;
+      return isOddRow
+        ? [
+            [row - 1, col], [row - 1, col + 1],
+            [row, col - 1], [row, col + 1],
+            [row + 1, col], [row + 1, col + 1]
+          ]
+        : [
+            [row - 1, col - 1], [row - 1, col],
+            [row, col - 1], [row, col + 1],
+            [row + 1, col - 1], [row + 1, col]
+          ];
+    }
+    
+    // ===========================
+    // Draw hexagon (flat-top)
+    // ===========================
+    function drawHex(x, y, size, color, text, textSize = 11) {
+      ctx.beginPath();
+      for (let i = 0; i < 6; i++) {
+        const angle = Math.PI / 3 * i; // 0, 60, 120, 180, 240, 300
+        const hx = x + size * Math.cos(angle);
+        const hy = y + size * Math.sin(angle);
+        if (i === 0) ctx.moveTo(hx, hy);
+        else ctx.lineTo(hx, hy);
+      }
+      ctx.closePath();
+      ctx.fillStyle = color;
+      ctx.fill();
+      ctx.strokeStyle = '#C8AA6E';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      
+      if (text) {
+        ctx.fillStyle = '#fff';
+        ctx.font = `bold ${textSize}px monospace`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(text, x, y);
+      }
+    }
+    
+    // ===========================
+    // Calculate pixel distance
+    // ===========================
+    function pixelDistance(x1, y1, x2, y2) {
+      const dx = x2 - x1;
+      const dy = y2 - y1;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+    
+    // ===========================
+    // Create grid
+    // ===========================
+    const grid = [];
+    const ROWS = 7;
+    const COLS = 7;
+    const OFFSET_X = 100;
+    const OFFSET_Y = 80;
+    
+    for (let r = 0; r < ROWS; r++) {
+      for (let c = 0; c < COLS; c++) {
+        const pos = offsetToPixel(r, c);
+        grid.push({ 
+          row: r, 
+          col: c, 
+          x: pos.x + OFFSET_X, 
+          y: pos.y + OFFSET_Y 
+        });
+      }
+    }
+    
+    let selectedNode = null;
+    
+    // ===========================
+    // Render
+    // ===========================
+    function render() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // 绘制连接线（可视化邻居关系）
+      if (selectedNode) {
+        const neighbors = getNeighbors(selectedNode.row, selectedNode.col);
+        ctx.strokeStyle = 'rgba(239, 68, 68, 0.3)';
+        ctx.lineWidth = 3;
+        
+        for (const [r, c] of neighbors) {
+          const neighbor = grid.find(n => n.row === r && n.col === c);
+          if (neighbor) {
+            ctx.beginPath();
+            ctx.moveTo(selectedNode.x, selectedNode.y);
+            ctx.lineTo(neighbor.x, neighbor.y);
+            ctx.stroke();
+          }
+        }
+      }
+      
+      // 绘制节点
+      for (const node of grid) {
+        let color = '#2a2a4a';
+        let text = `${node.row},${node.col}`;
+        let textSize = 11;
+        
+        if (selectedNode && selectedNode.row === node.row && selectedNode.col === node.col) {
+          color = '#4ade80';
+          text = 'X';
+          textSize = 20;
+        } else if (selectedNode) {
+          const neighbors = getNeighbors(selectedNode.row, selectedNode.col);
+          const isNeighbor = neighbors.some(([r, c]) => r === node.row && c === node.col);
+          if (isNeighbor) {
+            color = '#ef4444';
+            text = '✓';
+            textSize = 18;
+          }
+        }
+        
+        drawHex(node.x, node.y, HEX_SIZE * 0.85, color, text, textSize);
+      }
+    }
+    
+    // ===========================
+    // Click handler
+    // ===========================
+    canvas.addEventListener('click', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const clickY = e.clientY - rect.top;
+      
+      for (const node of grid) {
+        const dx = clickX - node.x;
+        const dy = clickY - node.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        
+        if (dist < HEX_SIZE * 0.85) {
+          selectedNode = node;
+          const neighbors = getNeighbors(node.row, node.col);
+          
+          // 诊断信息
+          let debugHTML = `
+            <h3>选中节点: (${node.row}, ${node.col})</h3>
+            <p><strong>行类型:</strong> ${node.row % 2 === 1 ? '奇数行' : '偶数行'}</p>
+            <p><strong>像素坐标:</strong> (${node.x.toFixed(1)}, ${node.y.toFixed(1)})</p>
+            <hr style="margin: 10px 0; border-color: rgba(255,255,255,0.3);">
+            <h4>理论邻居 (根据 getNeighbors 函数):</h4>
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr>
+                <th style="border: 1px solid #555; padding: 5px;">坐标</th>
+                <th style="border: 1px solid #555; padding: 5px;">存在?</th>
+                <th style="border: 1px solid #555; padding: 5px;">像素距离</th>
+                <th style="border: 1px solid #555; padding: 5px;">合理?</th>
+              </tr>
+          `;
+          
+          const expectedDistance = HEX_SIZE * 1.5; // 理论上相邻六边形中心距离
+          
+          for (const [r, c] of neighbors) {
+            const neighbor = grid.find(n => n.row === r && n.col === c);
+            if (neighbor) {
+              const dist = pixelDistance(node.x, node.y, neighbor.x, neighbor.y);
+              const isReasonable = Math.abs(dist - expectedDistance) < 5;
+              debugHTML += `
+                <tr>
+                  <td style="border: 1px solid #555; padding: 5px;">(${r}, ${c})</td>
+                  <td style="border: 1px solid #555; padding: 5px; color: #4ade80;">✓</td>
+                  <td style="border: 1px solid #555; padding: 5px;">${dist.toFixed(1)} px</td>
+                  <td style="border: 1px solid #555; padding: 5px; color: ${isReasonable ? '#4ade80' : '#ef4444'};">
+                    ${isReasonable ? '✓' : '✗'}
+                  </td>
+                </tr>
+              `;
+            } else {
+              debugHTML += `
+                <tr>
+                  <td style="border: 1px solid #555; padding: 5px;">(${r}, ${c})</td>
+                  <td style="border: 1px solid #555; padding: 5px; color: #ef4444;">✗ 超出边界</td>
+                  <td style="border: 1px solid #555; padding: 5px;">-</td>
+                  <td style="border: 1px solid #555; padding: 5px;">-</td>
+                </tr>
+              `;
+            }
+          }
+          
+          debugHTML += `
+            </table>
+            <p style="margin-top: 10px;"><strong>期望像素距离:</strong> ${expectedDistance.toFixed(1)} px</p>
+            <p><strong>诊断:</strong> 如果"合理?"列全是✓，说明邻居关系正确！</p>
+          `;
+          
+          document.getElementById('debug').innerHTML = debugHTML;
+          render();
+          return;
+        }
+      }
+    });
+    
+    render();
+    
+    // 默认选中 (4, 4)
+    setTimeout(() => {
+      const node = grid.find(n => n.row === 4 && n.col === 4);
+      if (node) {
+        selectedNode = node;
+        canvas.dispatchEvent(new MouseEvent('click', {
+          clientX: node.x + canvas.getBoundingClientRect().left,
+          clientY: node.y + canvas.getBoundingClientRect().top
+        }));
+      }
+    }, 100);
+  </script>
+</body>
+</html>
+
