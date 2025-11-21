@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>地图生成测试 - Legends of the Spire</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #0a0e27;
+      color: #c9aa71;
+      padding: 20px;
+    }
+    
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #f0e6d2;
+      text-shadow: 0 0 10px rgba(200, 170, 110, 0.5);
+    }
+    
+    .controls {
+      background: #1e2328;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      border: 2px solid #785a28;
+    }
+    
+    .controls button {
+      background: linear-gradient(to bottom, #c8aa6e, #785a28);
+      color: #0a0e27;
+      border: none;
+      padding: 10px 20px;
+      margin: 5px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 14px;
+      transition: all 0.3s;
+    }
+    
+    .controls button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 15px rgba(200, 170, 110, 0.7);
+    }
+    
+    .controls button:active {
+      transform: scale(0.95);
+    }
+    
+    .stats {
+      background: #1e2328;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      border: 2px solid #785a28;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+    }
+    
+    .stat-item {
+      text-align: center;
+    }
+    
+    .stat-label {
+      font-size: 12px;
+      color: #a09b8c;
+      margin-bottom: 5px;
+    }
+    
+    .stat-value {
+      font-size: 24px;
+      font-weight: bold;
+      color: #f0e6d2;
+    }
+    
+    .stat-value.success {
+      color: #00ff00;
+    }
+    
+    .stat-value.warning {
+      color: #ff9900;
+    }
+    
+    .stat-value.error {
+      color: #ff0000;
+    }
+    
+    #mapCanvas {
+      background: #0a0e27;
+      border: 3px solid #785a28;
+      border-radius: 10px;
+      box-shadow: 0 0 30px rgba(200, 170, 110, 0.3);
+      display: block;
+      margin: 0 auto;
+    }
+    
+    .legend {
+      background: #1e2328;
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 20px;
+      border: 2px solid #785a28;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+    
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .legend-color {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      border: 2px solid #c9aa71;
+    }
+    
+    .log-container {
+      background: #1e2328;
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 20px;
+      border: 2px solid #785a28;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    
+    .log-container pre {
+      font-size: 12px;
+      color: #a09b8c;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🗺️ 六边形地图生成测试</h1>
+    
+    <div class="controls">
+      <button onclick="generateMap(1)">生成 ACT1 地图 (10层)</button>
+      <button onclick="generateMap(2)">生成 ACT2 地图 (20层)</button>
+      <button onclick="generateMap(3)">生成 ACT3 地图 (30层)</button>
+      <button onclick="runBatchTest()">批量测试 (100次)</button>
+      <button onclick="clearLog()">清空日志</button>
+    </div>
+    
+    <div class="stats">
+      <div class="stat-item">
+        <div class="stat-label">当前ACT</div>
+        <div class="stat-value" id="currentAct">-</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">总节点数</div>
+        <div class="stat-value" id="totalNodes">-</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">最短路径</div>
+        <div class="stat-value" id="minSteps">-</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">最长路径</div>
+        <div class="stat-value" id="maxSteps">-</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">BOSS可达</div>
+        <div class="stat-value" id="reachable">-</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">生成耗时</div>
+        <div class="stat-value" id="generateTime">-</div>
+      </div>
+    </div>
+    
+    <canvas id="mapCanvas" width="1200" height="800"></canvas>
+    
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-color" style="background: #00ff00;"></div>
+        <span>起点 (START)</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color" style="background: #ff0000;"></div>
+        <span>BOSS</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color" style="background: #ff6600;"></div>
+        <span>战斗 (BATTLE)</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color" style="background: #00ccff;"></div>
+        <span>商店 (SHOP)</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color" style="background: #ffff00;"></div>
+        <span>事件 (EVENT)</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color" style="background: #00ff99;"></div>
+        <span>休息 (REST)</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-color" style="background: #ff00ff;"></div>
+        <span>宝箱 (CHEST)</span>
+      </div>
+    </div>
+    
+    <div class="log-container">
+      <pre id="logOutput">点击按钮开始生成地图...</pre>
+    </div>
+  </div>
+  
+  <script type="module">
+    import { generateGridMap } from './src/data/gridMapLayout_v2.js';
+    import { generateHexagonPath, offsetToPixel } from './src/utils/hexagonGrid.js';
+    
+    let currentMapData = null;
+    
+    // 节点类型颜色映射
+    const NODE_COLORS = {
+      START: '#00ff00',
+      BOSS: '#ff0000',
+      BATTLE: '#ff6600',
+      SHOP: '#00ccff',
+      EVENT: '#ffff00',
+      REST: '#00ff99',
+      CHEST: '#ff00ff'
+    };
+    
+    // 生成地图
+    window.generateMap = function(act) {
+      const startTime = performance.now();
+      
+      // 重定向console.log到页面
+      const originalLog = console.log;
+      const logMessages = [];
+      
+      console.log = function(...args) {
+        logMessages.push(args.join(' '));
+        originalLog.apply(console, args);
+      };
+      
+      try {
+        currentMapData = generateGridMap(act);
+        const endTime = performance.now();
+        const duration = (endTime - startTime).toFixed(2);
+        
+        // 恢复console.log
+        console.log = originalLog;
+        
+        // 更新统计数据
+        updateStats(currentMapData, act, duration);
+        
+        // 绘制地图
+        drawMap(currentMapData);
+        
+        // 更新日志
+        document.getElementById('logOutput').textContent = logMessages.join('\n');
+        
+        console.log(`✅ Map generated successfully in ${duration}ms`);
+      } catch (error) {
+        console.log = originalLog;
+        console.error('❌ Map generation failed:', error);
+        document.getElementById('logOutput').textContent = `ERROR: ${error.message}\n\n${error.stack}`;
+      }
+    };
+    
+    // 更新统计数据
+    function updateStats(mapData, act, duration) {
+      document.getElementById('currentAct').textContent = `ACT ${act}`;
+      document.getElementById('totalNodes').textContent = mapData.nodes.length;
+      document.getElementById('minSteps').textContent = mapData.stats.minSteps;
+      document.getElementById('maxSteps').textContent = mapData.stats.maxSteps;
+      document.getElementById('generateTime').textContent = `${duration} ms`;
+      
+      const reachableEl = document.getElementById('reachable');
+      reachableEl.textContent = mapData.stats.reachable ? '✅ 是' : '❌ 否';
+      reachableEl.className = mapData.stats.reachable ? 'stat-value success' : 'stat-value error';
+    }
+    
+    // 绘制地图
+    function drawMap(mapData) {
+      const canvas = document.getElementById('mapCanvas');
+      const ctx = canvas.getContext('2d');
+      
+      // 清空画布
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // 计算缩放比例和偏移（使地图居中）
+      const hexSize = 25; // 六边形大小
+      const padding = 50;
+      
+      // 计算地图边界
+      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+      mapData.nodes.forEach(node => {
+        const pos = offsetToPixel(node.row, node.col, hexSize);
+        minX = Math.min(minX, pos.x);
+        minY = Math.min(minY, pos.y);
+        maxX = Math.max(maxX, pos.x);
+        maxY = Math.max(maxY, pos.y);
+      });
+      
+      const mapWidth = maxX - minX;
+      const mapHeight = maxY - minY;
+      
+      // 计算偏移使地图居中
+      const offsetX = (canvas.width - mapWidth) / 2 - minX;
+      const offsetY = (canvas.height - mapHeight) / 2 - minY;
+      
+      // 绘制连接线（先绘制，作为背景）
+      ctx.strokeStyle = 'rgba(200, 170, 110, 0.3)';
+      ctx.lineWidth = 2;
+      
+      mapData.nodes.forEach(node => {
+        const startPos = offsetToPixel(node.row, node.col, hexSize);
+        const startX = startPos.x + offsetX;
+        const startY = startPos.y + offsetY;
+        
+        node.next.forEach(nextId => {
+          const nextNode = mapData.nodes.find(n => n.id === nextId);
+          if (nextNode) {
+            const endPos = offsetToPixel(nextNode.row, nextNode.col, hexSize);
+            const endX = endPos.x + offsetX;
+            const endY = endPos.y + offsetY;
+            
+            ctx.beginPath();
+            ctx.moveTo(startX, startY);
+            ctx.lineTo(endX, endY);
+            ctx.stroke();
+          }
+        });
+      });
+      
+      // 绘制节点
+      mapData.nodes.forEach(node => {
+        const pos = offsetToPixel(node.row, node.col, hexSize);
+        const centerX = pos.x + offsetX;
+        const centerY = pos.y + offsetY;
+        
+        // 绘制六边形
+        const hexPath = new Path2D(generateHexagonPath(centerX, centerY, hexSize));
+        
+        // 填充颜色
+        ctx.fillStyle = NODE_COLORS[node.type] || '#666666';
+        ctx.fill(hexPath);
+        
+        // 边框
+        ctx.strokeStyle = '#c9aa71';
+        ctx.lineWidth = 2;
+        ctx.stroke(hexPath);
+        
+        // 绘制节点ID（文字）
+        ctx.fillStyle = '#000000';
+        ctx.font = 'bold 10px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        const label = node.type === 'START' ? 'S' : node.type === 'BOSS' ? 'B' : node.row;
+        ctx.fillText(label, centerX, centerY);
+      });
+    }
+    
+    // 批量测试
+    window.runBatchTest = function() {
+      const iterations = 100;
+      let successCount = 0;
+      let failCount = 0;
+      const results = { 1: [], 2: [], 3: [] };
+      
+      console.log(`\n=== 开始批量测试 (${iterations} 次) ===`);
+      
+      for (let i = 0; i < iterations; i++) {
+        for (let act = 1; act <= 3; act++) {
+          try {
+            const mapData = generateGridMap(act);
+            
+            if (mapData.stats.reachable) {
+              successCount++;
+              results[act].push({
+                nodes: mapData.nodes.length,
+                minSteps: mapData.stats.minSteps,
+                maxSteps: mapData.stats.maxSteps
+              });
+            } else {
+              failCount++;
+              console.error(`❌ ACT${act} Iteration ${i + 1}: BOSS not reachable`);
+            }
+          } catch (error) {
+            failCount++;
+            console.error(`❌ ACT${act} Iteration ${i + 1}: ${error.message}`);
+          }
+        }
+      }
+      
+      console.log(`\n=== 测试完成 ===`);
+      console.log(`成功: ${successCount} / ${iterations * 3}`);
+      console.log(`失败: ${failCount} / ${iterations * 3}`);
+      console.log(`成功率: ${(successCount / (iterations * 3) * 100).toFixed(2)}%`);
+      
+      // 统计各ACT的平均数据
+      [1, 2, 3].forEach(act => {
+        const data = results[act];
+        if (data.length > 0) {
+          const avgNodes = (data.reduce((sum, d) => sum + d.nodes, 0) / data.length).toFixed(1);
+          const avgMinSteps = (data.reduce((sum, d) => sum + d.minSteps, 0) / data.length).toFixed(1);
+          const avgMaxSteps = (data.reduce((sum, d) => sum + d.maxSteps, 0) / data.length).toFixed(1);
+          
+          console.log(`\nACT${act} 平均数据:`);
+          console.log(`  节点数: ${avgNodes}`);
+          console.log(`  最短路径: ${avgMinSteps}`);
+          console.log(`  最长路径: ${avgMaxSteps}`);
+        }
+      });
+      
+      document.getElementById('logOutput').textContent = '批量测试完成！查看浏览器控制台以获取详细结果。';
+    };
+    
+    // 清空日志
+    window.clearLog = function() {
+      document.getElementById('logOutput').textContent = '日志已清空。';
+    };
+    
+    // 页面加载时自动生成ACT1地图
+    window.onload = function() {
+      generateMap(1);
+    };
+  </script>
+</body>
+</html>
+
