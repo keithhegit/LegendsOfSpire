@@ -644,7 +644,8 @@ export default function LegendsOfTheSpire() {
       }
   }, [view, currentHp, gold, currentFloor, currentAct]);
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
+      await unlockAudio(); // 解锁音频
       const s = localStorage.getItem(SAVE_KEY);
       if (s) {
           const data = JSON.parse(s);
@@ -657,11 +658,18 @@ export default function LegendsOfTheSpire() {
               // 如果 nodeMap 不存在，创建新的 Map
               restoredMapData.nodeMap = new Map();
           }
+          setBgmStarted(true); // 立即启动BGM
           setMapData(restoredMapData); setCurrentFloor(data.currentFloor); setCurrentAct(data.currentAct || 1); setMasterDeck(data.masterDeck); setChampion(data.champion); setCurrentHp(data.currentHp); setMaxHp(data.maxHp); setGold(data.gold); setRelics(data.relics); setBaseStr(data.baseStr); setActiveNode(data.activeNode); setUsedEnemies(data.usedEnemies); setView(data.view);
       }
   };
 
-  const handleNewGame = () => { localStorage.removeItem(SAVE_KEY); setHasSave(false); setView('CHAMPION_SELECT'); };
+  const handleNewGame = async () => { 
+      await unlockAudio(); // 解锁音频
+      localStorage.removeItem(SAVE_KEY); 
+      setHasSave(false); 
+      setBgmStarted(true); // 立即启动BGM
+      setView('CHAMPION_SELECT'); 
+  };
 
   const handleChampionSelect = (selectedChamp) => {
     // 播放英雄语音
