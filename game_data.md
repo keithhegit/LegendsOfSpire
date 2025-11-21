@@ -21,7 +21,9 @@
 | [BALANCE_FIXES_SUMMARY.md](./BALANCE_FIXES_SUMMARY.md) | 英雄技能平衡性修复汇总<br>• TwistedFate Q/R 费用调整<br>• Yasuo/Urgot R技能数值平衡<br>• Teemo/Riven 缺失技能补充 | 2025-11-21 |
 | [NEW_HERO_SKILL_IMPLEMENTATION_SUMMARY.md](./NEW_HERO_SKILL_IMPLEMENTATION_SUMMARY.md) | 8个被动技能实装总结<br>• 瑞文/盲僧/薇恩/劫/内瑟斯/艾瑞莉娅/锤石/卡特琳娜<br>• 代码实现细节和测试验证 | 2025-11-21 |
 | [PASSIVE_TEST_GUIDE.md](./PASSIVE_TEST_GUIDE.md) | 被动技能测试指南<br>• 20个被动技能测试步骤<br>• 触发条件和预期效果验证 | 2025-11-21 |
-| [SKILL_DESCRIPTION_AUDIT.md](./SKILL_DESCRIPTION_AUDIT.md) | **🔴 待修复**<br>技能描述一致性审计报告<br>• 文档 vs 游戏内 vs 代码逻辑对比<br>• 13/20 英雄需修正描述<br>• P0-P2 优先级修复计划 | 2025-11-21 |
+| [SKILL_DESCRIPTION_AUDIT.md](./SKILL_DESCRIPTION_AUDIT.md) | **✅ 已修复**<br>技能描述一致性审计报告<br>• 文档 vs 游戏内 vs 代码逻辑对比<br>• 13/20 英雄描述已修正<br>• P0-P2 优先级修复已完成 | 2025-11-21 |
+| [P0_P1_P2_FIXES_SUMMARY.md](./P0_P1_P2_FIXES_SUMMARY.md) | **✅ 修复总结**<br>P0-P2 优先级修复详细报告<br>• 永久成长机制实现 (内瑟斯/锤石/卡牌大师)<br>• 英雄ID修复 + 卡特琳娜逻辑修复<br>• 术语统一 + 描述完整性更新 | 2025-11-21 |
+| [PERMANENT_GROWTH_FIX_PLAN.md](./PERMANENT_GROWTH_FIX_PLAN.md) | 永久成长机制修复计划<br>• 问题分析和实现方案<br>• 验收标准和测试用例<br>• 后续优化建议 | 2025-11-21 |
 | [readme_version.md](./readme_version.md) | 版本迭代日志<br>• 分支功能对比（new_map vs new_mobile）<br>• Commit 历史记录<br>• 游戏机制演进说明 | 2025-11-21 |
 
 ---
@@ -36,22 +38,22 @@
 | **德莱厄斯** (Darius) | 90 | 3 | 出血：攻击给予1层虚弱 | DariusW, DariusE, Strike, Ignite | 战士/力量流 |
 | **拉克丝** (Lux) | 70 | 3 | 光芒四射：回合开始+1法力 | LuxQ, LuxE, Heal, Ignite | 法师/高费控制 |
 | **金克丝** (Jinx) | 75 | 3 | 爆发：回合开始手牌+1 | JinxQ, JinxW, Strike, Strike | 射手/连击爆发 |
-| **亚索** (Yasuo) | 78 | 3 | 浪客之道：暴击+10% | YasuoQ, YasuoE, Defend, Defend | 剑客/暴击流 |
+| **亚索** (Yasuo) | 78 | 3 | 浪客之道：攻击牌暴击几率+10% | YasuoQ, YasuoE, Defend, Defend | 剑客/暴击流 |
 | **娑娜** (Sona) | 72 | 3 | 能量弦：第3张卡+3护甲 | SonaQ, SonaW, Defend, Heal | 辅助/治疗 |
 | **艾克** (Ekko) | 82 | 3 | Z型共振：消耗卡+1力量 | EkkoQ, EkkoE, Defend, Ignite | 刺客/成长流 |
 | **塞拉斯** (Sylas) | 85 | 3 | 叛乱：技能牌恢复3HP | SylasQ, SylasW, Strike, Defend | 斗士/吸血 |
-| **厄加特** (Urgot) | 100 | 3 | 回火：战斗开始+15护甲 | UrgotQ, UrgotW, Defend, Defend | 坦克/高生命 |
-| **维克托** (Viktor) | 70 | 3 | 光荣进化：50%获得额外基础卡 | ViktorQ, ViktorE, Ignite, Heal | 法师/抽牌 |
-| **瑞文** (Riven) | 75 | 3 | 符文之刃：每打出3张攻击牌获得1点能量 | RivenQ, RivenE, Strike, Defend | 战士/连招 |
-| **卡牌大师** (TwistedFate) | 70 | 3 | 灌铅骰子：战斗胜利额外+15金币 | TwistedFateW, TwistedFateQ, Strike, Ignite | 法师/经济 |
-| **盲僧** (LeeSin) | 80 | 3 | 疾风骤雨：技能牌后下张攻击-1费 | LeeSinQ, LeeSinW, Strike, Defend | 战士/节奏 |
-| **薇恩** (Vayne) | 70 | 3 | 圣银弩箭：连续3次伤害额外10伤 | VayneQ, VayneE, Strike, Strike | 射手/单体 |
-| **提莫** (Teemo) | 65 | 3 | 游击战：回合开始随机给敌人2层虚弱 | TeemoQ, TeemoR, Strike, Ignite | 射手/DoT |
-| **劫** (Zed) | 75 | 3 | 影分身：首张攻击牌重复50%伤害 | ZedQ, ZedE, Strike, Strike | 刺客/爆发 |
-| **内瑟斯** (Nasus) | 85 | 3 | 汲魂痛击：击杀敌人+1力量 | NasusQ, NasusW, Strike, Defend | 战士/成长 |
-| **艾瑞莉娅** (Irelia) | 75 | 3 | 热诚：击杀敌人恢复1能量抽1牌 | IreliaQ, IreliaE, Strike, Defend | 战士/收割 |
-| **锤石** (Thresh) | 90 | 3 | 地狱诅咒：敌人死亡+2最大生命 | ThreshQ, ThreshW, Strike, Defend | 坦克/成长 |
-| **卡特琳娜** (Katarina) | 70 | 3 | 贪婪：每第4张攻击牌伤害翻倍 | KatarinaQ, KatarinaE, Strike, Strike | 刺客/计数器 |
+| **厄加特** (Urgot) | 100 | 3 | 回火：每场战斗开始时获得15点护甲 | UrgotQ, UrgotW, Defend, Defend | 坦克/高生命 |
+| **维克托** (Viktor) | 70 | 3 | 光荣进化：每回合开始时50%几率获得一张额外基础卡 | ViktorQ, ViktorE, Ignite, Heal | 法师/抽牌 |
+| **瑞文** (Riven) | 75 | 3 | 符文之刃：每打出3张攻击牌获得1点法力 | RivenQ, RivenW, Strike, Defend | 战士/连招 |
+| **卡牌大师** (TwistedFate) | 70 | 3 | 灌铅骰子：每次战斗胜利额外获得15金币 | TwistedFateW, TwistedFateQ, Strike, Ignite | 法师/经济 |
+| **盲僧** (LeeSin) | 80 | 3 | 疾风骤雨：打出技能牌后下一张攻击牌费用-1 | LeeSinQ, LeeSinW, Strike, Defend | 战士/节奏 |
+| **薇恩** (Vayne) | 70 | 3 | 圣银弩箭：对同一目标连续造成3次伤害额外造成10点伤害 | VayneQ, VayneE, Strike, Strike | 射手/单体 |
+| **提莫** (Teemo) | 65 | 3 | 游击战：每回合开始时给敌人施加2层虚弱 | TeemoQ, TeemoW, Strike, Ignite | 射手/DoT |
+| **劫** (Zed) | 75 | 3 | 影分身：每回合第一张攻击牌额外造成50%伤害 | ZedQ, ZedE, Strike, Strike | 刺客/爆发 |
+| **内瑟斯** (Nasus) | 85 | 3 | 汲魂痛击：每次用攻击牌击杀敌人永久获得1点力量 | NasusQ, NasusW, Strike, Defend | 战士/成长 |
+| **艾瑞莉娅** (Irelia) | 75 | 3 | 热诚：每次击杀敌人恢复1点法力并抽1张牌 | IreliaQ, IreliaE, Strike, Defend | 战士/收割 |
+| **锤石** (Thresh) | 90 | 3 | 地狱诅咒：每次击杀敌人永久增加2最大生命值 | ThreshQ, ThreshW, Strike, Defend | 坦克/成长 |
+| **卡特琳娜** (Katarina) | 70 | 3 | 贪婪：每回合每打出3张攻击牌后下一张攻击牌伤害翻倍 | KatarinaQ, KatarinaE, Strike, Strike | 刺客/计数器 |
 
 > **注**：已实装全部20位英雄！
 
@@ -573,18 +575,18 @@ const scaleEnemyStats = (enemy, floor, act) => {
 | **能量弦** (SonaPassive) | 娑娜 | 每回合第3张卡+3护甲 |
 | **Z型共振** (EkkoPassive) | 艾克 | 消耗卡+1力量 |
 | **叛乱** (SylasPassive) | 塞拉斯 | 技能牌回复3HP |
-| **回火** (UrgotPassive) | 厄加特 | 战斗开始+15护甲 |
-| **光荣进化** (ViktorPassive) | 维克托 | 回合开始50%获得额外基础卡 |
-| **符文之刃** (RivenPassive) | 瑞文 | 每打出3张攻击牌获得1点能量 |
-| **灌铅骰子** (TwistedFatePassive) | 卡牌大师 | 战斗胜利额外获得15金币 |
-| **疾风骤雨** (LeeSinPassive) | 盲僧 | 打出技能牌后下一张攻击牌-1费 |
-| **圣银弩箭** (VaynePassive) | 薇恩 | 对同一目标连续3次伤害额外10伤 |
-| **游击战** (TeemoPassive) | 提莫 | 回合开始随机给敌人2层虚弱 |
-| **影分身** (ZedPassive) | 劫 | 每回合第1张攻击牌重复50%伤害 |
-| **汲魂痛击** (NasusPassive) | 内瑟斯 | 用攻击牌击杀敌人+1力量 |
-| **热诚** (IreliaPassive) | 艾瑞莉娅 | 击杀敌人恢复1能量抽1牌 |
-| **地狱诅咒** (ThreshPassive) | 锤石 | 敌人死亡+2最大生命值 |
-| **贪婪** (KatarinaPassive) | 卡特琳娜 | 每第4张攻击牌伤害翻倍 |
+| **回火** (UrgotPassive) | 厄加特 | 每场战斗开始时获得 15 点护甲 |
+| **光荣进化** (ViktorPassive) | 维克托 | 每回合开始时，50% 几率获得一张额外基础卡 |
+| **符文之刃** (RivenPassive) | 瑞文 | 每打出 3 张攻击牌，获得 1 点法力 |
+| **灌铅骰子** (TwistedFatePassive) | 卡牌大师 | 每次战斗胜利额外获得 15 金币 |
+| **疾风骤雨** (LeeSinPassive) | 盲僧 | 打出技能牌后，下一张攻击牌费用 -1 |
+| **圣银弩箭** (VaynePassive) | 薇恩 | 对同一目标连续造成 3 次伤害时，额外造成 10 点伤害 |
+| **游击战** (TeemoPassive) | 提莫 | 每回合开始时，给敌人施加 2 层虚弱 |
+| **影分身** (ZedPassive) | 劫 | 每回合第一张攻击牌额外造成 50% 伤害 |
+| **汲魂痛击** (NasusPassive) | 内瑟斯 | 每次用攻击牌击杀敌人，永久获得 1 点力量 |
+| **热诚** (IreliaPassive) | 艾瑞莉娅 | 每次击杀敌人，恢复 1 点法力并抽 1 张牌 |
+| **地狱诅咒** (ThreshPassive) | 锤石 | 每次击杀敌人，永久增加 2 最大生命值 |
+| **贪婪** (KatarinaPassive) | 卡特琳娜 | 每回合每打出 3 张攻击牌后，下一张攻击牌伤害翻倍 |
 
 ---
 
@@ -663,6 +665,63 @@ const scaleEnemyStats = (enemy, floor, act) => {
 | **力量** (Strength) | 攻击+N | 可叠加 | 战斗内永久 |
 | **虚弱** (Weak) | 攻击×0.75 | 可叠加 | 每回合-1 |
 | **易伤** (Vulnerable) | 受伤×1.5 | 可叠加 | 每回合-1 |
+
+---
+
+## 被动技能详解
+
+### 触发时机分类
+
+#### 🎯 战斗开始触发
+- **盖伦** (GarenPassive): 战斗结束时恢复 6 HP
+- **厄加特** (UrgotPassive): 战斗开始时获得 15 点护甲
+
+#### ⚡ 回合开始触发
+- **拉克丝** (LuxPassive): 获得 1 点额外法力
+- **金克丝** (JinxPassive): 初始手牌 +1 (6张起手)
+- **维克托** (ViktorPassive): 50% 几率获得一张额外基础卡 (Strike/Defend)
+- **提莫** (TeemoPassive): 给敌人施加 2 层虚弱
+
+#### 🃏 打牌时触发
+- **娑娜** (SonaPassive): 每回合第 3 张卡获得 3 点护甲
+- **艾克** (EkkoPassive): 每次打出消耗卡获得 1 点力量
+- **塞拉斯** (SylasPassive): 每次打出技能牌回复 3 HP
+- **德莱厄斯** (DariusPassive): 每次攻击时给予敌人 1 层虚弱
+- **瑞文** (RivenPassive): 每打出 3 张攻击牌获得 1 点法力
+- **盲僧** (LeeSinPassive): 打出技能牌后，下一张攻击牌费用 -1
+- **劫** (ZedPassive): 每回合第一张攻击牌额外造成 50% 伤害
+- **卡特琳娜** (KatarinaPassive): 每打出 3 张攻击牌后，下一张攻击牌伤害翻倍
+
+#### ⚔️ 攻击命中时触发
+- **亚索** (YasuoPassive): 10% 几率暴击（伤害翻倍）
+- **薇恩** (VaynePassive): 对同一目标连续 3 次命中额外造成 10 点伤害
+
+#### 💀 击杀触发
+- **内瑟斯** (NasusPassive): 用攻击牌击杀敌人永久获得 1 点力量 ⭐
+- **艾瑞莉娅** (IreliaPassive): 击杀敌人恢复 1 点法力并抽 1 张牌
+- **锤石** (ThreshPassive): 击杀敌人永久增加 2 最大生命值 ⭐
+
+#### 🏆 战斗胜利触发
+- **卡牌大师** (TwistedFatePassive): 战斗胜利额外获得 15 金币 ⭐
+
+> **⭐ 标记说明**: 带星标的被动效果为**永久成长**机制，跨战斗保存，是游戏中的核心成长路线。
+
+---
+
+### 永久成长机制详解
+
+游戏中有 **3 位英雄** 拥有永久成长被动，是后期最强势的选择：
+
+| 英雄 | 成长属性 | 触发条件 | 理论上限 | 推荐玩法 |
+|------|----------|----------|----------|----------|
+| **内瑟斯** | 力量 +1 | 用攻击牌击杀敌人 | 无上限 | 叠Q流，优先选择攻击牌和击杀奖励 |
+| **锤石** | 最大HP +2 | 击杀任意敌人 | 无上限 | 坦克流，配合吸血遗物无敌 |
+| **卡牌大师** | 金币 +15 | 战斗胜利 | 无上限 | 经济流，快速购买高级遗物 |
+
+**成长速度对比** (假设 10 层地图，每层 1 个敌人):
+- 内瑟斯: +10 力量 (每次攻击 +10 伤害)
+- 锤石: +20 最大HP (从 90 → 110)
+- 卡牌大师: +150 金币 (可购买 1-2 个稀有遗物)
 
 ---
 

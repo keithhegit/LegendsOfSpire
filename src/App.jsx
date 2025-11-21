@@ -782,9 +782,32 @@ export default function LegendsOfTheSpire() {
       }
   };
 
-  const handleBattleWin = (remainingHp) => { 
+  const handleBattleWin = (battleResult) => { 
+      // 处理战斗结果（可能是旧格式的remainingHp数字，也可能是新格式的对象）
+      const result = typeof battleResult === 'number' 
+          ? { finalHp: battleResult, gainedStr: 0, gainedMaxHp: 0 }
+          : battleResult;
+      
+      // 盖伦被动：战斗结束恢复HP
       let passiveHeal = champion.relicId === "GarenPassive" ? 6 : 0; 
-      setCurrentHp(Math.min(maxHp, remainingHp + passiveHeal)); 
+      
+      // 内瑟斯被动：将战斗中获得的力量永久化
+      if (result.gainedStr > 0) {
+          setBaseStr(prev => prev + result.gainedStr);
+      }
+      
+      // 锤石被动：永久增加最大生命值
+      if (result.gainedMaxHp > 0) {
+          setMaxHp(prev => prev + result.gainedMaxHp);
+          passiveHeal += result.gainedMaxHp; // 最大HP增长也算作恢复
+      }
+      
+      // 卡牌大师被动：战斗胜利额外金币
+      if (champion && champion.relicId === "TwistedFatePassive") {
+          setGold(prev => prev + 15);
+      }
+      
+      setCurrentHp(Math.min(maxHp + (result.gainedMaxHp || 0), result.finalHp + passiveHeal)); 
       setView('REWARD'); 
   };
   const handleBuyCard = (card) => { setGold(prev => prev - card.price); setMasterDeck(prev => [...prev, card.id]); };

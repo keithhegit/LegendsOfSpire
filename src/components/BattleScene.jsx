@@ -215,8 +215,8 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
           let dmg = card.value + playerStatus.strength;
           if (playerStatus.weak > 0) dmg = Math.floor(dmg * 0.75);
           
-          // 卡特琳娜被动：每第4张攻击牌伤害翻倍
-          if (heroData.relicId === "KatarinaPassive" && katarinaAttackCount === 4) {
+          // 卡特琳娜被动：每打出3张攻击牌后，下一张(第4张)攻击牌伤害翻倍
+          if (heroData.relicId === "KatarinaPassive" && katarinaAttackCount === 3) {
               dmg = dmg * 2;
               setKatarinaAttackCount(0); // 重置计数器
           }
@@ -276,25 +276,34 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
   useEffect(() => { 
       if(enemyHp<=0) {
           // 敌人死亡时触发的被动
+          let battleResult = {
+              finalHp: playerHp,
+              gainedStr: 0,
+              gainedMaxHp: 0
+          };
           
-          // 内瑟斯被动：用攻击牌击杀获得1力量
+          // 内瑟斯被动：用攻击牌击杀获得1永久力量
           if (heroData.relicId === "NasusPassive" && lastPlayedCard && lastPlayedCard.type === 'ATTACK') {
+              const currentStr = playerStatus.strength;
+              const baseStrength = heroData.baseStr || 0;
+              battleResult.gainedStr = currentStr - baseStrength; // 计算本局获得的力量
               setPlayerStatus(s => ({ ...s, strength: s.strength + 1 }));
           }
           
-          // 艾瑞莉娅被动：击杀恢复1能量并抽1牌
+          // 艾瑞莉娅被动：击杀恢复1法力并抽1牌
           if (heroData.relicId === "IreliaPassive") {
               setPlayerMana(m => Math.min(initialMana, m + 1));
               drawCards(1);
           }
           
-          // 锤石被动：敌人死亡增加2HP（简化实现）
+          // 锤石被动：敌人死亡增加2最大生命值（记录增长值，由App.jsx处理）
           if (heroData.relicId === "ThreshPassive") {
-              setPlayerHp(h => h + 2);
+              battleResult.gainedMaxHp = 2;
+              setPlayerHp(h => h + 2); // 立即恢复2HP作为视觉反馈
           }
           
           playSfx('WIN');
-          setTimeout(()=>onWin(playerHp), 1000); 
+          setTimeout(()=>onWin(battleResult), 1000); 
       }
   }, [enemyHp]);
   
