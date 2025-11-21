@@ -135,58 +135,77 @@ const generateMainPath = (grid, gridRows, startNode, bossNode, act, usedEnemies,
   let currentRow = startNode.row;
   let currentCol = startNode.col;
 
-  const chooseHorizontalDir = () => {
-    const towardBoss = bossNode.col > currentCol ? 1 : bossNode.col < currentCol ? -1 : 0;
-    if (towardBoss === 0) {
-      return Math.random() < 0.5 ? 1 : -1;
+  const moveHorizontal = (dir) => {
+    const targetCol = currentCol + dir;
+    if (targetCol < 0 || targetCol >= GRID_COLS) {
+      return false;
     }
-    return Math.random() < 0.7 ? towardBoss : -towardBoss;
+    if (!grid[currentRow][targetCol]) {
+      const node = createNode(currentRow, targetCol, getRandomNodeType(currentRow, gridRows), null, act, usedEnemies);
+      grid[currentRow][targetCol] = node;
+      allNodes.push(node);
+    }
+    currentCol = targetCol;
+    currentNode = grid[currentRow][currentCol];
+    path.push(currentNode);
+    return true;
   };
 
-  while (currentRow < bossNode.row) {
-    // 0-2 次横向移动（保持一层内的左右摆动）
-    const lateralMoves = Math.random() < 0.5 ? 1 : 0;
-    for (let i = 0; i < lateralMoves; i++) {
-      const dir = chooseHorizontalDir();
-      let targetCol = currentCol + dir;
-      if (targetCol < 0 || targetCol >= GRID_COLS) continue;
-      if (!grid[currentRow][targetCol]) {
-        const node = createNode(currentRow, targetCol, getRandomNodeType(currentRow, gridRows), null, act, usedEnemies);
-        grid[currentRow][targetCol] = node;
-        allNodes.push(node);
-      }
-      currentCol = targetCol;
-      currentNode = grid[currentRow][currentCol];
-      path.push(currentNode);
-    }
-
+  const moveUpward = (targetCol) => {
     const nextRow = currentRow + 1;
-    const upwardOptions = [];
-
-    if (nextRow < gridRows) {
-      if (currentCol >= 0 && currentCol < GRID_COLS) upwardOptions.push(currentCol);
-      if (currentCol - 1 >= 0) upwardOptions.push(currentCol - 1);
-    }
-
-    let nextCol = upwardOptions.filter(c => c >= 0 && c < GRID_COLS);
-    if (nextCol.length === 0) {
-      nextCol = [Math.max(0, Math.min(GRID_COLS - 1, currentCol))];
-    }
-
-    nextCol = nextCol.sort((a, b) => Math.abs(a - bossNode.col) - Math.abs(b - bossNode.col))[0];
-
-    let nextNode = grid[nextRow][nextCol];
+    if (nextRow >= gridRows) return;
+    let nextNode = grid[nextRow][targetCol];
     if (!nextNode) {
-      nextNode = createNode(nextRow, nextCol, getRandomNodeType(nextRow, gridRows), null, act, usedEnemies);
-      grid[nextRow][nextCol] = nextNode;
+      nextNode = createNode(nextRow, targetCol, getRandomNodeType(nextRow, gridRows), null, act, usedEnemies);
+      grid[nextRow][targetCol] = nextNode;
       allNodes.push(nextNode);
     }
-
-    path.push(nextNode);
-    currentNode = nextNode;
     currentRow = nextRow;
-    currentCol = nextCol;
+    currentCol = targetCol;
+    currentNode = nextNode;
+    path.push(nextNode);
+  };
+
+  // 主路径先推进到 BOSS 楼层的前一层
+  while (currentRow < bossNode.row - 1) {
+    // 水平漂移 0~1 次，保持一定的 S 型
+    if (Math.random() < 0.6) {
+      const dir = bossNode.col > currentCol ? 1 : bossNode.col < currentCol ? -1 : (Math.random() < 0.5 ? 1 : -1);
+      moveHorizontal(dir);
+    }
+
+    // 向上移动（保持蜂窝邻接：同列或左一列）
+    const preferredCol = bossNode.col > currentCol ? currentCol : currentCol; // 默认同列
+    const options = [];
+    if (preferredCol >= 0 && preferredCol < GRID_COLS) options.push(preferredCol);
+    if (currentCol - 1 >= 0) options.push(currentCol - 1);
+    const nextCol = options.sort((a, b) => Math.abs(a - bossNode.col) - Math.abs(b - bossNode.col))[0] ?? Math.max(0, Math.min(GRID_COLS - 1, currentCol));
+    moveUpward(nextCol);
   }
+
+  // 现在处于 BOSS 楼层的前一层，横向调整到 bossCol 或 bossCol+1
+  while (!(currentCol === bossNode.col || currentCol === bossNode.col + 1)) {
+    const dir = currentCol < bossNode.col ? 1 : -1;
+    if (!moveHorizontal(dir)) break;
+  }
+
+  // 最终向上连接 BOSS
+  const finalCol = currentCol === bossNode.col ? bossNode.col : bossNode.col;
+  if (currentCol === bossNode.col + 1) {
+    // 需要先向左一步保证相邻
+    moveHorizontal(-1);
+  } else {
+    while (currentCol < bossNode.col) moveHorizontal(1);
+    while (currentCol > bossNode.col) moveHorizontal(-1);
+  }
+
+  currentRow = bossNode.row - 1;
+  moveUpward(bossNode.col);
+  // 确保使用实际的 bossNode 对象
+  const bossCell = bossNode;
+  grid[bossNode.row][bossNode.col] = bossCell;
+  currentNode = bossCell;
+  path.push(bossCell);
 
   console.log(`[主路径] 生成了 ${path.length} 个节点`);
   return path;
