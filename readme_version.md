@@ -11,8 +11,8 @@
 - **Shop Special:** "Mana +1" option (20% chance).
 - **Audio:** Basic SFX.
 
-### `new_map` (Current, Commit `f350035`+)
-**Status:** Active Development
+### `new_map` / `main` (Current, v0.8.0 - Commit `d04d179`)
+**Status:** Production Release ✅
 **Key Features:**
 - **Grid Map System:** 7x15 Grid with Fog of War, Pathfinding, and Node types (Battle, Event, Shop, Rest, Chest, Boss).
 - **Directed Acyclic Graph (DAG):** Map data structure migration.
@@ -24,10 +24,26 @@
   - Champion Select UI fixes (portraits, text).
   - Enhanced Fog of War visuals.
   - Drag-to-play card restoration.
+- **20 Heroes Complete:**
+  - 全部20位英雄被动技能实装
+  - 8个新被动技能实现（瑞文、盲僧、薇恩、劫、内瑟斯、艾瑞莉娅、锤石、卡特琳娜）
+  - 永久成长机制（3位成长型英雄）
+- **Audio System:**
+  - 音频解锁机制（绕过浏览器限制）
+  - 英雄语音支持（带映射表）
+  - 优雅的错误处理
+- **Toast Notifications:**
+  - 永久成长提示（力量/最大HP/金币）
+  - 3种配色主题
+  - Framer Motion 动画
 - **Bug Fixes:**
-  - Map serialization (fixing `new Map()` error).
-  - Null checks for cards/enemies/relics.
-  - Audio error handling.
+  - Map serialization (fixing `new Map()` error)
+  - Null checks for cards/enemies/relics
+  - Audio error handling
+  - Hero unlock issues (Thresh/Katarina)
+  - Block accumulation across turns
+  - Card upgrade logic
+  - Map generation connectivity
 
 ## Feature Restoration (Migrating from `new_mobile` to `new_map`)
 
@@ -46,7 +62,67 @@
 
 ## Commit Log (`new_map` Branch - Recent to Oldest)
 
-### Latest (2025-11-21)
+### v0.8.0 Release (2025-11-21)
+
+- `d04d179`: **🎉 release: v0.8.0 - Hero Skills & Growth System**
+  - **全部被动技能实装** (20/20)：实装了瑞文、盲僧、薇恩、劫、卡特琳娜、提莫、内瑟斯、艾瑞莉娅、锤石等8位英雄的被动技能
+  - **永久成长机制**：内瑟斯（击杀+1力量）、锤石（击杀+2最大HP）、卡牌大师（胜利+15金币）
+  - **Toast通知系统**：永久成长获得时显示Toast提示（力量/最大HP/金币）
+  - **R技能概率优化**：每个奖励槽位20%概率出现RARE卡
+  - **技能平衡调整**：TwistedFate Q/R、Yasuo R、Urgot R、Thresh Q等数值优化
+  - **商店扩展**：卡牌升级（100金）、法力上限+1（200金）
+  - **事件扩展**：随机卡牌升级选项
+  - **UI优化**：遗物图标移至英雄被动旁边、选人界面布局优化
+  - **音频系统**：实装音频解锁机制（绕过浏览器自动播放限制）
+  - **护甲机制修复**：护甲现在跨回合累积
+  - **英雄解锁修复**：统一ID（Thresh, Katarina），修复锁定问题
+
+- `eb0e434`: **feat(audio): Re-enable champion voice with graceful fallback**
+  - 重新启用英雄语音播放
+  - 添加静默错误处理
+
+- `17c2262`: **fix(audio): Temporarily disable champion voice until files are uploaded to R2**
+  - 创建 voiceMapping.js 用于ID到语音文件名映射
+  - 为后续语音文件上传做准备
+
+- `9628276` / `a1c292e`: **feat(audio): Audio unlock mechanism**
+  - 创建 audioContext.js 工具
+  - 实装 unlockAudio() 函数，播放静默音频解锁浏览器限制
+  - 集成到 handleNewGame 和 handleContinue
+
+- `a47293a`: **feat(audio): Restore champion voice with graceful error handling**
+  - 恢复英雄语音播放
+  - 优化错误处理逻辑
+
+- `6ef8958`: **fix: Remove duplicate Thresh_Hero and Katarina_Hero from CHAMPION_POOL**
+  - 修复英雄ID重复定义问题
+  - 删除旧ID（Thresh_Hero, Katarina_Hero）
+  - 添加新ID（Thresh, Katarina）
+
+- `0acaf73`: **feat(ux): Add permanent growth toast notifications and fix hero voice errors**
+  - 创建 Toast.jsx 组件
+  - 添加永久成长通知（3种配色：力量/最大HP/金币）
+  - 调整遗物图标位置
+
+- `b4fa632`: **fix(nasus): Fix permanent strength growth not persisting across battles**
+  - 修复内瑟斯被动，确保力量增长跨战斗保存
+  - 修改 battleResult.gainedStr 计算逻辑
+
+- `1fbcfb5`: **fix(critical): Fix Thresh/Katarina still showing as locked**
+  - 修复锤石/卡特琳娜锁定问题
+  - 添加 localStorage 数据迁移逻辑
+
+- `530755f`: **feat: Implement P0-P2 priority fixes for permanent growth and descriptions**
+  - 实装永久成长机制（内瑟斯/锤石/卡牌大师）
+  - 统一术语："能量" → "法力"
+  - 更新20个英雄被动描述
+
+- `6a55ae0`: **feat: Update R-skill probability and fix block accumulation**
+  - 提升R技能获取概率至20%
+  - 修复护甲累积机制（跨回合保留）
+  - 添加状态效果详细说明文档
+
+### Previous (2025-11-21)
 
 - `b55e302`: **🎉 docs: 全英雄实装文档完成 - 20位英雄数据手册**
   - 更新 `game_data.md` 添加10位新英雄详细信息
