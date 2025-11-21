@@ -129,20 +129,53 @@ function generateGridMapInternal(act = 1, usedEnemies = []) {
   
   console.log(`[Init] START at (${startRow}, ${startCol})`);
   
-  // 阶段2: 生成最短路径（直线）
+  // 阶段2: 生成最短路径（直线）- 使用正确的六边形邻居逻辑
   let currentNode = startNode;
   const mainPath = [startNode];
   
   for (let step = 1; step <= minSteps; step++) {
-    const targetRow = Math.min(currentNode.row + 1, gridRows - 1);
-    const colOffset = Math.floor(Math.random() * 3) - 1; // -1, 0, 1
-    let targetCol = currentNode.col + colOffset;
+    const targetRow = currentNode.row + 1; // 总是向下一行
+    
+    // 使用正确的六边形邻居计算
+    const isOddRow = currentNode.row % 2 === 1;
+    
+    // 随机选择：左前、正前、右前
+    const directions = ['forward-left', 'forward', 'forward-right'];
+    const randomDir = directions[Math.floor(Math.random() * directions.length)];
+    
+    let targetCol;
+    switch (randomDir) {
+      case 'forward-left':
+        targetCol = isOddRow ? currentNode.col : currentNode.col - 1;
+        break;
+      case 'forward':
+        targetCol = currentNode.col;
+        break;
+      case 'forward-right':
+        targetCol = isOddRow ? currentNode.col + 1 : currentNode.col;
+        break;
+    }
+    
+    // 边界检查
     targetCol = Math.max(0, Math.min(GRID_COLS - 1, targetCol));
     
-    // 如果位置被占用，找附近空位
+    // 如果位置被占用，尝试其他方向
     if (grid[targetRow][targetCol]) {
-      for (let offset = 1; offset < GRID_COLS; offset++) {
-        const testCol = (targetCol + offset) % GRID_COLS;
+      for (const dir of directions) {
+        let testCol;
+        switch (dir) {
+          case 'forward-left':
+            testCol = isOddRow ? currentNode.col : currentNode.col - 1;
+            break;
+          case 'forward':
+            testCol = currentNode.col;
+            break;
+          case 'forward-right':
+            testCol = isOddRow ? currentNode.col + 1 : currentNode.col;
+            break;
+        }
+        testCol = Math.max(0, Math.min(GRID_COLS - 1, testCol));
+        
         if (!grid[targetRow][testCol]) {
           targetCol = testCol;
           break;
