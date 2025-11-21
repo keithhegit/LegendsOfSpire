@@ -602,7 +602,23 @@ export default function LegendsOfTheSpire() {
   const [showCodex, setShowCodex] = useState(false);
   const [showDeck, setShowDeck] = useState(false); 
   
-  const [unlockedChamps, setUnlockedChamps] = useState(() => { try { const d = localStorage.getItem(UNLOCK_KEY); return d ? JSON.parse(d) : Object.keys(CHAMPION_POOL); } catch { return Object.keys(CHAMPION_POOL); } });
+  const [unlockedChamps, setUnlockedChamps] = useState(() => { 
+      try { 
+          const d = localStorage.getItem(UNLOCK_KEY); 
+          if (!d) return Object.keys(CHAMPION_POOL);
+          
+          let saved = JSON.parse(d);
+          // 修复旧版本的ID (Thresh_Hero -> Thresh, Katarina_Hero -> Katarina)
+          saved = saved.map(id => {
+              if (id === 'Thresh_Hero') return 'Thresh';
+              if (id === 'Katarina_Hero') return 'Katarina';
+              return id;
+          });
+          return saved;
+      } catch { 
+          return Object.keys(CHAMPION_POOL); 
+      } 
+  });
   const [hasSave, setHasSave] = useState(false);
   const [showUpdateLog, setShowUpdateLog] = useState(() => {
       const lastVersion = localStorage.getItem('last_version');

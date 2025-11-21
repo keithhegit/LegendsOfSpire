@@ -36,9 +36,8 @@ const ChampionSelect = ({ onChampionSelect, unlockedIds }) => {
             </div>
             <div className="flex flex-wrap gap-6 justify-center px-4">
                 {displayChamps.map(champ => {
-                    // 判断解锁逻辑
-                    const champId = Object.keys(CHAMPION_POOL).find(key => CHAMPION_POOL[key].name === champ.name);
-                    const isUnlocked = unlockedIds && unlockedIds.includes(champId);
+                    // 判断解锁逻辑：直接使用 champ.id，因为 displayChamps 已经是从 CHAMPION_POOL 中来的
+                    const isUnlocked = !unlockedIds || unlockedIds.length === 0 || unlockedIds.includes(champ.id);
                     
                     return (
                         <button 
