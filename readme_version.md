@@ -47,6 +47,18 @@
 ## Commit Log (`new_map` Branch - Recent to Oldest)
 
 ### Latest (2025-11-21)
+
+- `b55e302`: **🎉 docs: 全英雄实装文档完成 - 20位英雄数据手册**
+  - 更新 `game_data.md` 添加10位新英雄详细信息
+  - 包含所有英雄卡牌技能、数值、被动遗物
+  - 文档总计374行，覆盖82张卡牌、30个遗物
+  
+- `2fd8ed5`: **feat: 20英雄系统架构实装完成**
+  - 在 `champions.js` 添加10位新英雄数据
+  - 在 `cards.js` 添加40+张新英雄专属卡牌
+  - 在 `relics.js` 添加10个新英雄被动遗物
+  - 新英雄：瑞文、卡牌大师、盲僧、薇恩、提莫、劫、内瑟斯、艾瑞莉娅、锤石、卡特琳娜
+
 - `65138ef`: **fix: Remove duplicate onClick handler in Card.jsx causing double card play on drag**
   - 修复拖拽卡牌时触发两次 `onPlay` 的bug
   - 移除 `onClick` 事件，只保留 `onDragEnd` 拖拽交互
