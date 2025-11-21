@@ -57,4 +57,53 @@ export const CARD_DATABASE = {
   "ViktorQ": { id: "ViktorQ", hero: "Viktor", name: "能量转移", price: 40, type: "ATTACK", cost: 0, value: 3, block: 3, description: "造成 3 点伤害，获得 3 点护甲。", img: `${SPELL_URL}/ViktorPowerTransfer.png`, rarity: "COMMON" },
   "ViktorE": { id: "ViktorE", hero: "Viktor", name: "死亡射线", price: 100, type: "ATTACK", cost: 2, value: 18, description: "造成 18 点伤害。", img: `${SPELL_URL}/ViktorDeathRay.png`, rarity: "UNCOMMON" },
   "ViktorR": { id: "ViktorR", hero: "Viktor", name: "混乱风暴", price: 150, type: "ATTACK", cost: 3, value: 5, isMultiHit: true, hits: 6, description: "造成 6 次 5 点伤害。", img: `${SPELL_URL}/ViktorChaosStorm.png`, rarity: "RARE" },
+
+  // 瑞文
+  "RivenQ": { id: "RivenQ", hero: "Riven", name: "折翼之舞", price: 50, type: "ATTACK", cost: 0, value: 4, description: "造成 4 点伤害。", img: `${SPELL_URL}/RivenTriCleave.png`, rarity: "COMMON" },
+  "RivenE": { id: "RivenE", hero: "Riven", name: "勇往直前", price: 80, type: "SKILL", cost: 1, block: 5, effect: "DRAW", effectValue: 1, description: "获得 5 点护甲。抓取 1 张牌。", img: `${SPELL_URL}/RivenFeint.png`, rarity: "UNCOMMON" },
+  "RivenR": { id: "RivenR", hero: "Riven", name: "放逐之刃", price: 150, type: "ATTACK", cost: 3, value: 12, isMultiHit: true, hits: 3, description: "造成 3 次 12 点伤害。", img: `${SPELL_URL}/RivenFengShuiEngine.png`, rarity: "RARE" },
+
+  // 卡牌大师
+  "TwistedFateW": { id: "TwistedFateW", hero: "TwistedFate", name: "选牌", price: 60, type: "SKILL", cost: 1, effect: "DRAW", effectValue: 2, description: "获得随机一张红/黄/蓝牌 (简化: 抽2张)", img: `${SPELL_URL}/PickACard.png`, rarity: "COMMON" },
+  "TwistedFateQ": { id: "TwistedFateQ", hero: "TwistedFate", name: "万能牌", price: 90, type: "ATTACK", cost: 2, value: 8, description: "造成 8 点伤害 (群攻简化为单体)。", img: `${SPELL_URL}/WildCards.png`, rarity: "COMMON" },
+  "TwistedFateR": { id: "TwistedFateR", hero: "TwistedFate", name: "命运", price: 150, type: "SKILL", cost: 2, effect: "DRAW", effectValue: 3, description: "抓取 3 张牌。全图视野(简化为抽牌)。", img: `${SPELL_URL}/Destiny.png`, rarity: "RARE" },
+
+  // 盲僧
+  "LeeSinQ": { id: "LeeSinQ", hero: "LeeSin", name: "天音波", price: 50, type: "ATTACK", cost: 1, value: 6, effect: "VULNERABLE", effectValue: 1, description: "造成 6 点伤害。给予 1 层易伤。", img: `${SPELL_URL}/BlindMonkQOne.png`, rarity: "COMMON" },
+  "LeeSinW": { id: "LeeSinW", hero: "LeeSin", name: "金钟罩", price: 80, type: "SKILL", cost: 1, block: 8, description: "获得 8 点护甲。", img: `${SPELL_URL}/BlindMonkWOne.png`, rarity: "UNCOMMON" },
+  "LeeSinR": { id: "LeeSinR", hero: "LeeSin", name: "猛龙摆尾", price: 150, type: "ATTACK", cost: 2, value: 25, description: "造成 25 点伤害。击退效果(简化为单体高伤)。", img: `${SPELL_URL}/BlindMonkRKick.png`, rarity: "RARE" },
+
+  // 薇恩
+  "VayneQ": { id: "VayneQ", hero: "Vayne", name: "闪避突袭", price: 40, type: "ATTACK", cost: 0, value: 4, description: "造成 4 点伤害。", img: `${SPELL_URL}/VayneTumble.png`, rarity: "COMMON" },
+  "VayneE": { id: "VayneE", hero: "Vayne", name: "恶魔审判", price: 90, type: "ATTACK", cost: 2, value: 12, effect: "WEAK", effectValue: 2, description: "造成 12 点伤害。给予 2 层虚弱。", img: `${SPELL_URL}/VayneCondemn.png`, rarity: "UNCOMMON" },
+  "VayneR": { id: "VayneR", hero: "Vayne", name: "终极时刻", price: 150, type: "SKILL", cost: 2, effect: "STRENGTH", effectValue: 3, description: "获得 3 点力量。下一次攻击伤害+50%。", img: `${SPELL_URL}/VayneInquisition.png`, rarity: "RARE" },
+
+  // 提莫
+  "TeemoQ": { id: "TeemoQ", hero: "Teemo", name: "致盲吹箭", price: 50, type: "ATTACK", cost: 1, value: 5, effect: "WEAK", effectValue: 2, description: "造成 5 点伤害。给予 2 层虚弱。", img: `${SPELL_URL}/BlindingDart.png`, rarity: "COMMON" },
+  "TeemoR": { id: "TeemoR", hero: "Teemo", name: "种蘑菇", price: 80, type: "SKILL", cost: 1, effect: "VULNERABLE", effectValue: 4, exhaust: true, description: "给予 4 层易伤。消耗。", img: `${SPELL_URL}/TeemoRCast.png`, rarity: "UNCOMMON" },
+
+  // 劫
+  "ZedQ": { id: "ZedQ", hero: "Zed", name: "影奥义！诸刃", price: 50, type: "ATTACK", cost: 1, value: 8, description: "造成 8 点伤害。", img: `${SPELL_URL}/ZedQ.png`, rarity: "COMMON" },
+  "ZedE": { id: "ZedE", hero: "Zed", name: "影奥义！鬼斩", price: 80, type: "ATTACK", cost: 1, value: 4, effect: "DRAW", effectValue: 1, description: "造成 4 点伤害。抓取 1 张牌。", img: `${SPELL_URL}/ZedE.png`, rarity: "UNCOMMON" },
+  "ZedR": { id: "ZedR", hero: "Zed", name: "禁奥义！瞬狱影杀阵", price: 150, type: "ATTACK", cost: 3, value: 35, description: "造成 35 点伤害。标记爆发(简化为高伤)。", img: `${SPELL_URL}/ZedR.png`, rarity: "RARE" },
+
+  // 内瑟斯
+  "NasusQ": { id: "NasusQ", hero: "Nasus", name: "汲魂痛击", price: 50, type: "ATTACK", cost: 1, value: 6, description: "造成 6 点伤害。", img: `${SPELL_URL}/NasusQ.png`, rarity: "COMMON" },
+  "NasusW": { id: "NasusW", hero: "Nasus", name: "枯萎", price: 80, type: "SKILL", cost: 1, effect: "WEAK", effectValue: 3, description: "给予 3 层虚弱。", img: `${SPELL_URL}/NasusW.png`, rarity: "UNCOMMON" },
+  "NasusR": { id: "NasusR", hero: "Nasus", name: "死神降临", price: 150, type: "SKILL", cost: 3, effect: "STRENGTH", effectValue: 5, value: 20, type: "ATTACK", description: "获得 5 点力量，造成 20 点伤害。", img: `${SPELL_URL}/NasusR.png`, rarity: "RARE" },
+
+  // 艾瑞莉娅
+  "IreliaQ": { id: "IreliaQ", hero: "Irelia", name: "利刃冲击", price: 50, type: "ATTACK", cost: 1, value: 8, description: "造成 8 点伤害。", img: `${SPELL_URL}/IreliaQ.png`, rarity: "COMMON" },
+  "IreliaE": { id: "IreliaE", hero: "Irelia", name: "比翼双刃", price: 80, type: "SKILL", cost: 1, effect: "VULNERABLE", effectValue: 2, description: "给予 2 层易伤。", img: `${SPELL_URL}/IreliaE.png`, rarity: "UNCOMMON" },
+  "IreliaR": { id: "IreliaR", hero: "Irelia", name: "先锋之刃", price: 150, type: "ATTACK", cost: 3, value: 8, isMultiHit: true, hits: 4, description: "造成 4 次 8 点伤害。", img: `${SPELL_URL}/IreliaR.png`, rarity: "RARE" },
+
+  // 锤石
+  "ThreshQ": { id: "ThreshQ", hero: "Thresh", name: "死亡判决", price: 80, type: "ATTACK", cost: 2, value: 10, effect: "VULNERABLE", effectValue: 1, description: "造成 10 点伤害。给予 1 层易伤。", img: `${SPELL_URL}/ThreshQ.png`, rarity: "COMMON" },
+  "ThreshW": { id: "ThreshW", hero: "Thresh", name: "魂引之灯", price: 70, type: "SKILL", cost: 1, block: 10, effect: "DRAW", effectValue: 1, description: "获得 10 点护甲。抓取 1 张牌。", img: `${SPELL_URL}/ThreshW.png`, rarity: "UNCOMMON" },
+  "ThreshR": { id: "ThreshR", hero: "Thresh", name: "幽冥监牢", price: 150, type: "SKILL", cost: 2, effect: "WEAK", effectValue: 3, effectValue2: 3, description: "给予敌人 3 层虚弱和 3 层易伤。", img: `${SPELL_URL}/ThreshR.png`, rarity: "RARE" },
+
+  // 卡特琳娜
+  "KatarinaQ": { id: "KatarinaQ", hero: "Katarina", name: "弹射之刃", price: 50, type: "ATTACK", cost: 1, value: 4, isMultiHit: true, hits: 3, description: "造成 3 次 4 点伤害。", img: `${SPELL_URL}/KatarinaQ.png`, rarity: "COMMON" },
+  "KatarinaE": { id: "KatarinaE", hero: "Katarina", name: "瞬步", price: 40, type: "ATTACK", cost: 0, value: 3, effect: "DRAW", effectValue: 1, description: "造成 3 点伤害。抓取 1 张牌。", img: `${SPELL_URL}/KatarinaE.png`, rarity: "UNCOMMON" },
+  "KatarinaR": { id: "KatarinaR", hero: "Katarina", name: "死亡莲华", price: 150, type: "ATTACK", cost: 3, value: 6, isMultiHit: true, hits: 6, description: "造成 6 次 6 点伤害。", img: `${SPELL_URL}/KatarinaR.png`, rarity: "RARE" },
 };

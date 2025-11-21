@@ -12,6 +12,18 @@ export const RELIC_DATABASE = {
   "SylasPassive": { id: "SylasPassive", name: "叛乱", description: "每次打出技能牌时，回复 3 点生命值", rarity: "PASSIVE", img: `${PASSIVE_URL}/SylasP.png` },
   "UrgotPassive": { id: "UrgotPassive", name: "回火", description: "战斗开始时获得 15 点临时护甲", rarity: "PASSIVE", img: `${PASSIVE_URL}/Urgot_Passive.png` },
   "ViktorPassive": { id: "ViktorPassive", name: "光荣进化", description: "回合开始时，50% 几率获得一张额外基础卡", rarity: "PASSIVE", img: `${PASSIVE_URL}/Viktor_Passive.png` },
+  
+  // 第二批英雄被动 (11-20)
+  "RivenPassive": { id: "RivenPassive", name: "符文之刃", description: "每打出3张攻击牌，获得1点能量", rarity: "PASSIVE", img: `${PASSIVE_URL}/RivenRunicBlades.png` },
+  "TwistedFatePassive": { id: "TwistedFatePassive", name: "灌铅骰子", description: "战斗胜利额外获得 15 金币", rarity: "PASSIVE", img: `${PASSIVE_URL}/CardMaster_SealFate.png` },
+  "LeeSinPassive": { id: "LeeSinPassive", name: "疾风骤雨", description: "打出技能牌后，下一张攻击牌费用-1", rarity: "PASSIVE", img: `${PASSIVE_URL}/LeeSinPassive.png` },
+  "VaynePassive": { id: "VaynePassive", name: "圣银弩箭", description: "对同一目标连续造成3次伤害时，额外造成10伤", rarity: "PASSIVE", img: `${PASSIVE_URL}/Vayne_SilveredBolts.png` },
+  "TeemoPassive": { id: "TeemoPassive", name: "游击战", description: "回合开始时，随机给一名敌人施加 2 层虚弱", rarity: "PASSIVE", img: `${PASSIVE_URL}/Teemo_P.png` },
+  "ZedPassive": { id: "ZedPassive", name: "影分身", description: "每回合第一张攻击牌会重复施放一次(50%伤害)", rarity: "PASSIVE", img: `${PASSIVE_URL}/Zed_Passive.png` },
+  "NasusPassive": { id: "NasusPassive", name: "汲魂痛击", description: "每次用攻击牌击杀敌人，获得1点力量", rarity: "PASSIVE", img: `${PASSIVE_URL}/Nasus_Passive.png` },
+  "IreliaPassive": { id: "IreliaPassive", name: "热诚", description: "每次击杀敌人，恢复 1 点能量并抽 1 张牌", rarity: "PASSIVE", img: `${PASSIVE_URL}/Irelia_Passive.png` },
+  "ThreshPassive": { id: "ThreshPassive", name: "地狱诅咒", description: "敌人死亡增加 2 最大生命值", rarity: "PASSIVE", img: `${PASSIVE_URL}/Thresh_Passive.png` },
+  "KatarinaPassive": { id: "KatarinaPassive", name: "贪婪", description: "每回合打出的每第 4 张攻击牌伤害翻倍", rarity: "PASSIVE", img: `${PASSIVE_URL}/Katarina_Passive.png` },
 
   // 通用遗物
   "DoransShield": { id: "DoransShield", name: "多兰之盾", price: 100, rarity: "COMMON", description: "战斗开始时获得 6 点护甲。", img: `${ITEM_URL}/1054.png`, onBattleStart: (state) => ({ ...state, block: state.block + 6 }) },
