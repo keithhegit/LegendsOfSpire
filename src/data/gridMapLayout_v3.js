@@ -296,8 +296,13 @@ function generateGridMapInternal(act = 1, usedEnemies = []) {
         }
         targetCol = Math.max(0, Math.min(GRID_COLS - 1, targetCol));
         
-        // 行数可以相同或±1
-        let targetRow = correspondingMainNode.row + Math.floor(Math.random() * 3) - 1; // -1, 0, +1
+        // 行数：只能向前（row + 1）或同行，不能向后
+        // 修复：确保绕路节点不会在主路径之前的行
+        let targetRow = correspondingMainNode.row; // 默认同行
+        // 50%概率向前一行（使绕路链向BOSS方向延伸）
+        if (Math.random() < 0.5 && correspondingMainNode.row < gridRows - 1) {
+          targetRow = correspondingMainNode.row + 1;
+        }
         targetRow = Math.max(1, Math.min(gridRows - 2, targetRow));
         
         // 检查是否被占用
