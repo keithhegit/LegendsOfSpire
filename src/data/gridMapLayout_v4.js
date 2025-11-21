@@ -131,19 +131,29 @@ const generateMainPath = (grid, gridRows, startNode, bossNode, act, usedEnemies,
   
   // 从起点逐步向BOSS方向生成节点
   for (let row = 1; row < gridRows - 1; row++) {
-    // 目标：向BOSS列靠近
+    // 目标：向BOSS列靠近（但增加横向摆动）
     const targetCol = bossNode.col;
     const colDiff = targetCol - currentNode.col;
     
-    // 选择下一个列（逐步靠近BOSS，带随机性）
+    // 选择下一个列（增加横向探索）
     let nextCol;
+    const rand = Math.random();
+    
     if (Math.abs(colDiff) <= 1) {
-      // 已经很接近，随机选择±1
-      nextCol = currentNode.col + (Math.random() < 0.5 ? -1 : 1);
+      // 已经接近BOSS列，增加横向摆动幅度，创造"S型"路径
+      if (rand < 0.3) {
+        nextCol = currentNode.col - 2; // 大幅左移
+      } else if (rand < 0.6) {
+        nextCol = currentNode.col + 2; // 大幅右移
+      } else {
+        nextCol = currentNode.col + (Math.random() < 0.5 ? -1 : 1); // 小幅移动
+      }
     } else {
-      // 70%朝BOSS方向，30%随机
-      if (Math.random() < 0.7) {
+      // 还未接近BOSS，60%朝目标方向，40%横向探索
+      if (rand < 0.6) {
         nextCol = currentNode.col + Math.sign(colDiff);
+      } else if (rand < 0.8) {
+        nextCol = currentNode.col + (Math.random() < 0.5 ? -2 : 2); // 横向跳跃
       } else {
         nextCol = currentNode.col + (Math.random() < 0.5 ? -1 : 1);
       }
@@ -176,25 +186,44 @@ const generateMainPath = (grid, gridRows, startNode, bossNode, act, usedEnemies,
 // 填充额外节点
 // ===========================
 const fillAdditionalNodes = (grid, gridRows, targetCount, act, usedEnemies, allNodes) => {
-  const attempts = targetCount * 3; // 防止死循环
+  const attempts = targetCount * 5; // 增加尝试次数
   let added = 0;
   
-  for (let i = 0; i < attempts && allNodes.length < targetCount; i++) {
-    // 随机选择位置（避开顶部和底部边缘）
+  // 策略1: 在主路径附近填充（占70%）
+  const mainPathFillCount = Math.floor((targetCount - allNodes.length) * 0.7);
+  for (let i = 0; i < attempts && added < mainPathFillCount; i++) {
+    // 随机选择一个已有节点
+    const existingNode = allNodes[Math.floor(Math.random() * allNodes.length)];
+    
+    // 在其周围2格范围内随机放置节点
+    const row = existingNode.row + Math.floor(Math.random() * 5) - 2; // ±2
+    const col = existingNode.col + Math.floor(Math.random() * 5) - 2; // ±2
+    
+    // 边界检查
+    if (row < 1 || row >= gridRows - 1 || col < 1 || col >= GRID_COLS - 1) continue;
+    if (grid[row][col]) continue;
+    
+    // 创建节点
+    const nodeType = getRandomNodeType(row, gridRows);
+    const node = createNode(row, col, nodeType, null, act, usedEnemies);
+    grid[row][col] = node;
+    allNodes.push(node);
+    added++;
+  }
+  
+  // 策略2: 随机填充（占30%）
+  const randomFillCount = targetCount - allNodes.length;
+  for (let i = 0; i < attempts && added < randomFillCount; i++) {
     const row = 1 + Math.floor(Math.random() * (gridRows - 2));
     const col = 1 + Math.floor(Math.random() * (GRID_COLS - 2));
     
-    // 如果已有节点，跳过
     if (grid[row][col]) continue;
     
-    // 检查是否有相邻节点（避免孤岛）
+    // 80%概率要求有相邻节点
     const neighbors = getHexNeighbors(row, col, gridRows, GRID_COLS);
     const hasNeighbor = neighbors.some(([r, c]) => grid[r][c]);
+    if (!hasNeighbor && Math.random() > 0.2) continue;
     
-    // 30%概率允许无相邻节点（创造探索空间）
-    if (!hasNeighbor && Math.random() > 0.3) continue;
-    
-    // 创建节点
     const nodeType = getRandomNodeType(row, gridRows);
     const node = createNode(row, col, nodeType, null, act, usedEnemies);
     grid[row][col] = node;

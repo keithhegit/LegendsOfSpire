@@ -40,10 +40,14 @@ export function axialToPixel(q, r, hexSize = HEX_SIZE) {
 
 /**
  * Offset坐标 -> Pixel坐标（快捷方法）
+ * 使用 flat-top 布局（平顶朝上）
  */
 export function offsetToPixel(row, col, hexSize = HEX_SIZE) {
-  const { q, r } = offsetToAxial(row, col);
-  return axialToPixel(q, r, hexSize);
+  // Flat-top hexagon layout
+  const isOddRow = row % 2 === 1;
+  const x = hexSize * Math.sqrt(3) * (col + (isOddRow ? 0.5 : 0));
+  const y = hexSize * 1.5 * row;
+  return { x, y };
 }
 
 /**
@@ -145,9 +149,9 @@ export function hexDistance(row1, col1, row2, col2) {
 export function generateHexagonPath(centerX, centerY, size = HEX_SIZE) {
   const points = [];
   
-  // 生成6个顶点（从12点钟方向开始，顺时针）
+  // 生成6个顶点（flat-top布局，从3点钟方向开始，顺时针）
   for (let i = 0; i < 6; i++) {
-    const angleDeg = 60 * i - 30; // -30度偏移，使顶点在上方
+    const angleDeg = 60 * i; // 0度起始，平顶朝上
     const angleRad = (Math.PI / 180) * angleDeg;
     const x = centerX + size * Math.cos(angleRad);
     const y = centerY + size * Math.sin(angleRad);
