@@ -166,17 +166,31 @@ export function generateGridMap(act = 1, usedEnemies = []) {
   // 新策略：生成长链绕路，每条链有3-6个节点
   let currentNodeCount = nodes.length;
   
-  // 计算需要多少条绕路链（增加数量！）
-  const targetDetourChains = Math.ceil((maxSteps - minSteps) / 3); // 目标增加的步数 / 每条链平均长度
+  // 计算需要多少条绕路链（ACT3特殊处理！）
+  let targetDetourChains = Math.ceil((maxSteps - minSteps) / 3); // 目标增加的步数 / 每条链平均长度
+  let chainLengthMin = 3;
+  let chainLengthMax = 6;
+  let nodesPerStepProb = 0.6; // 60%概率每步生成2个节点
+  
+  // ACT3特殊优化：增加绕路密度
+  if (act === 3) {
+    targetDetourChains = Math.ceil((maxSteps - minSteps) / 2.5); // 更多的链
+    chainLengthMin = 4; // 更长的链
+    chainLengthMax = 8;
+    nodesPerStepProb = 0.75; // 75%概率每步生成2个节点
+    console.log(`[ACT3 BOOST] Increased detour density: longer chains (${chainLengthMin}-${chainLengthMax}), more nodes per step (${nodesPerStepProb * 100}%)`);
+  }
+  
   const numDetourChains = Math.min(targetDetourChains, Math.floor(minSteps / 2)); // 不超过主路径长度的一半
   const detourChains = []; // 存储 { startNode, endNode, nodes, startStep, endStep }
   
   console.log(`[Detours] Targeting ${numDetourChains} detour chains to add ${maxSteps - minSteps} extra steps`);
   
   for (let chain = 0; chain < numDetourChains && currentNodeCount < targetNodeCount; chain++) {
-    // 随机选择主路径的起点和终点（跨越3-6步，增加长度！）
-    const chainStartStep = 2 + Math.floor(Math.random() * (minSteps - 8));
-    const chainLength = 3 + Math.floor(Math.random() * 4); // 3-6步跨度（增加！）
+    // 随机选择主路径的起点和终点（使用动态长度）
+    const maxStart = Math.max(2, minSteps - (chainLengthMax + 2));
+    const chainStartStep = 2 + Math.floor(Math.random() * maxStart);
+    const chainLength = chainLengthMin + Math.floor(Math.random() * (chainLengthMax - chainLengthMin + 1));
     const chainEndStep = Math.min(chainStartStep + chainLength, minSteps - 2);
     
     const chainStartNode = mainPath[chainStartStep];
@@ -194,8 +208,8 @@ export function generateGridMap(act = 1, usedEnemies = []) {
       const step = chainStartStep + i;
       const correspondingMainNode = mainPath[step];
       
-      // 关键改进：每个step生成1-2个节点
-      const nodesPerStep = Math.random() < 0.6 ? 2 : 1; // 60%概率生成2个节点
+      // 关键改进：每个step生成1-2个节点（使用动态概率）
+      const nodesPerStep = Math.random() < nodesPerStepProb ? 2 : 1;
       
       for (let nodeIdx = 0; nodeIdx < nodesPerStep && currentNodeCount < targetNodeCount; nodeIdx++) {
       
@@ -294,8 +308,9 @@ export function generateGridMap(act = 1, usedEnemies = []) {
     
     if (stepsToBreak <= 1) continue; // 跨度太小，不断开
     
-    // 30%概率断开这个区段的部分连接（降低概率！）
-    if (Math.random() < 0.3) {
+    // 根据ACT调整断开概率（ACT3更激进）
+    const breakChance = act === 3 ? 0.4 : 0.3;
+    if (Math.random() < breakChance) {
       // 只断开1-2个连接，不是全部
       const numToBreak = Math.min(2, Math.floor(stepsToBreak / 2));
       
