@@ -329,11 +329,15 @@ const GridMapView_v3 = ({ mapData, onNodeSelect, activeNode, currentFloor, act, 
           points={hexPath}
           fill={isExplored ? 'rgba(255,255,255,0.1)' : color}
           fillOpacity={isExplored ? 1 : (isAvailable ? 0.8 : (isLocked ? 0.2 : 0.3))}
-          stroke={isCurrent ? '#fff' : (isAvailable ? '#C8AA6E' : (isLocked ? 'rgba(100,100,100,0.5)' : 'rgba(255,255,255,0.2)'))}
+          stroke={
+            isCurrent ? '#fff' : 
+            isAvailable ? '#C8AA6E' : 
+            isLocked ? 'rgba(100,100,100,0.5)' : 
+            'rgba(255,255,255,0.2)'
+          }
           strokeWidth={isCurrent ? 4 : (isAvailable ? 3 : 1)}
           style={{ cursor: (isAvailable && !isLocked) ? 'pointer' : 'default' }}
           onClick={() => {
-            // 只有可用且未锁定的节点才能点击
             if (isAvailable && !isLocked) {
               onNodeSelect(node);
             }

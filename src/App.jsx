@@ -795,9 +795,26 @@ export default function LegendsOfTheSpire() {
               return; // 不是可用邻居，不能选择
           }
           
-          // 三选一锁定逻辑：锁定其他未选择的选项
+          // 【关键修复】三选一锁定逻辑：只锁定UI实际显示的3个选项中的未选择选项
+          // 必须与GridMapView_v3.jsx的getAvailableNodes()逻辑完全一致
+          let displayedChoices = availableNeighbors;
+          if (availableNeighbors.length > 3) {
+              // 使用与UI相同的排序和哈希逻辑
+              const sorted = [...availableNeighbors].sort((a, b) => {
+                  const seedA = `${a.row}-${a.col}`;
+                  const seedB = `${b.row}-${b.col}`;
+                  return seedA.localeCompare(seedB);
+              });
+              const hash = (activeNode.row * 1000 + activeNode.col) % sorted.length;
+              displayedChoices = [];
+              for (let i = 0; i < 3; i++) {
+                  displayedChoices.push(sorted[(hash + i) % sorted.length]);
+              }
+          }
+          
+          // 只锁定UI显示的3个选项中的未选择选项
           const newLockedChoices = new Set(lockedChoices);
-          availableNeighbors.forEach(n => {
+          displayedChoices.forEach(n => {
               if (n.row !== node.row || n.col !== node.col) {
                   newLockedChoices.add(`${n.row}-${n.col}`);
               }
