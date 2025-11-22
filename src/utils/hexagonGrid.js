@@ -183,8 +183,10 @@ export function rotate90CCW(row, col, maxRows, maxCols) {
 }
 
 /**
- * 旋转后的坐标转像素（横版布局）
- * @param {number} row - 原始row（垂直方向）
+ * 旋转后的坐标转像素（横版布局：左边起点，右边BOSS）
+ * 逆时针旋转90度：测试页面的竖直布局 → 游戏的横向布局
+ * 
+ * @param {number} row - 原始row（垂直方向，从上0到下maxRows-1）
  * @param {number} col - 原始col（水平方向）
  * @param {number} maxRows - 原始最大行数
  * @param {number} maxCols - 原始最大列数
@@ -192,16 +194,17 @@ export function rotate90CCW(row, col, maxRows, maxCols) {
  * @returns {{x: number, y: number}} - 像素坐标
  */
 export function offsetToPixelRotated(row, col, maxRows, maxCols, hexSize = HEX_SIZE) {
-  // 旋转90度：新row = 原col, 新col = 原row
-  // 旋转后，row是水平方向（从左到右），col是垂直方向（从上到下）
-  // 对于flat-top六边形：
-  // - 水平方向（row）：使用 hexSize * 1.5 的间距
-  // - 垂直方向（col）：使用 hexSize * sqrt(3) 的间距
-  const rotatedRow = col;  // 原col变成水平方向
-  const rotatedCol = row;  // 原row变成垂直方向
+  // 逆时针旋转90度后：
+  // - 原row（垂直，0在上）→ 新x（水平，0在左）
+  // - 原col（水平）→ 新y（垂直）
   
-  const x = hexSize * 1.5 * rotatedRow;
-  const y = hexSize * Math.sqrt(3) * rotatedCol;
+  // 对于flat-top六边形横向排列（pointy方向向左右）：
+  // x方向（row）：水平间距 = hexSize * 1.5
+  // y方向（col）：垂直间距 = hexSize * sqrt(3)，偶数行需要偏移半个间距
+  
+  const x = hexSize * 1.5 * row;  // row是水平方向（左→右）
+  const y = hexSize * Math.sqrt(3) * (col + (row % 2) * 0.5);  // col是垂直方向，偶数行错开
+  
   return { x, y };
 }
 
