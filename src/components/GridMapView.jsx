@@ -22,6 +22,9 @@ const GridMapView = ({ mapData, onNodeSelect, activeNode, currentFloor, act, loc
   const MIN_VIEW_WIDTH = 1200;
   const MIN_VIEW_HEIGHT = 800;
   const PADDING = 120;
+  const FOG_FILL = 'rgba(20, 24, 48, 0.92)';
+  const FOG_STROKE = 'rgba(125, 150, 210, 0.45)';
+  const FOG_CONNECTION = 'rgba(120, 140, 200, 0.22)';
 
   const { positionMap, bounds, contentWidth, contentHeight } = useMemo(() => {
     if (!mapData) {
@@ -259,11 +262,15 @@ const GridMapView = ({ mapData, onNodeSelect, activeNode, currentFloor, act, loc
     
     return (
       <g key={key} transform={`translate(${x}, ${y})`}>
-        {isExplored && (() => {
+        {(isExplored || isFogged) && (() => {
           const neighbors = getHexNeighbors(node.row, node.col, totalFloors, GRID_COLS);
           return neighbors.map(([r, c]) => {
             const neighbor = grid[r][c];
-            if (!neighbor || !exploredNodes.has(`${r}-${c}`)) return null;
+            if (!neighbor) return null;
+            const shouldRenderConnection = isExplored
+              ? exploredNodes.has(`${r}-${c}`)
+              : true;
+            if (!shouldRenderConnection) return null;
             
             const nPos = positionMap.get(`${r}-${c}`);
             if (!nPos) return null;
@@ -277,8 +284,8 @@ const GridMapView = ({ mapData, onNodeSelect, activeNode, currentFloor, act, loc
                 y1={0}
                 x2={nx - x}
                 y2={ny - y}
-                stroke="rgba(200, 170, 110, 0.3)"
-                strokeWidth="2"
+                stroke={isExplored ? 'rgba(200, 170, 110, 0.3)' : FOG_CONNECTION}
+                strokeWidth={isExplored ? 2 : 1}
               />
             );
           });
@@ -288,15 +295,15 @@ const GridMapView = ({ mapData, onNodeSelect, activeNode, currentFloor, act, loc
           points={hexPath}
           fill={
             isFogged
-              ? 'rgba(5, 8, 25, 0.9)'
+              ? FOG_FILL
               : isExplored
-                ? 'rgba(255,255,255,0.1)'
+                ? 'rgba(255,255,255,0.08)'
                 : color
           }
-          fillOpacity={isFogged ? 1 : (isExplored ? 1 : (isAvailable ? 0.8 : (isLocked ? 0.2 : 0.3)))}
+          fillOpacity={isFogged ? 0.95 : (isExplored ? 1 : (isAvailable ? 0.85 : (isLocked ? 0.25 : 0.4)))}
           stroke={
             isFogged
-              ? 'rgba(90, 100, 140, 0.35)'
+              ? FOG_STROKE
               : isCurrent ? '#fff' : 
                 isAvailable ? '#C8AA6E' : 
                 isLocked ? 'rgba(100,100,100,0.5)' : 
@@ -315,7 +322,7 @@ const GridMapView = ({ mapData, onNodeSelect, activeNode, currentFloor, act, loc
           <polygon
             points={hexPath}
             fill="url(#fogGradient)"
-            opacity={0.85}
+            opacity={0.9}
             stroke="none"
           />
         )}
@@ -404,8 +411,8 @@ const GridMapView = ({ mapData, onNodeSelect, activeNode, currentFloor, act, loc
             }).join(' ')} />
           </clipPath>
           <linearGradient id="fogGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="rgba(8,10,26,0.9)" />
-            <stop offset="100%" stopColor="rgba(3,5,15,0.95)" />
+            <stop offset="0%" stopColor="rgba(30,34,70,0.85)" />
+            <stop offset="100%" stopColor="rgba(10,12,28,0.95)" />
           </linearGradient>
         </defs>
         
