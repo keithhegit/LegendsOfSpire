@@ -1,8 +1,8 @@
-﻿/**
- * 鍏竟褰㈣嚜鐢辨帰绱㈠湴鍥捐鍥?
- * - 妯増甯冨眬锛堝乏璧峰彸缁堬級
- * - 鎴樹簤杩烽浘锛氭湭鎺㈢储鍖哄煙浠ヨ糠闆捐鐩栦絾浠嶆樉绀虹粨鏋?
- * - 鏀寔鎷栨嫿銆佸眳涓€佹斁澶ц妭鐐瑰浘鏍?
+/**
+ * 六边形自由探索地图视图
+ * - 横版布局（左起右终）
+ * - 战争迷雾：未探索区域以迷雾覆盖但仍显示结构
+ * - 支持拖拽、居中、放大节点图标
  */
 
 import React, { useState, useRef, useEffect, useMemo } from 'react';
@@ -18,13 +18,13 @@ const GridMapView = ({ mapData, onNodeSelect, activeNode, currentFloor, act, loc
   const [exploredNodes, setExploredNodes] = useState(new Set());
   
   const HEX_SIZE = 45;
-  const ICON_SCALE = 1.15;
+  const ICON_SCALE = 1.3;
   const MIN_VIEW_WIDTH = 1200;
   const MIN_VIEW_HEIGHT = 800;
   const PADDING = 120;
-  const FOG_FILL = 'rgba(20, 24, 48, 0.92)';
-  const FOG_STROKE = 'rgba(125, 150, 210, 0.45)';
-  const FOG_CONNECTION = 'rgba(120, 140, 200, 0.22)';
+  const FOG_FILL = 'rgba(60, 70, 110, 0.85)';
+  const FOG_STROKE = 'rgba(190, 205, 255, 0.55)';
+  const FOG_CONNECTION = 'rgba(180, 195, 255, 0.35)';
 
   const { positionMap, bounds, contentWidth, contentHeight } = useMemo(() => {
     if (!mapData) {
@@ -68,13 +68,17 @@ const GridMapView = ({ mapData, onNodeSelect, activeNode, currentFloor, act, loc
   const VIEW_WIDTH = Math.max(MIN_VIEW_WIDTH, contentWidth + PADDING * 2);
   const VIEW_HEIGHT = Math.max(MIN_VIEW_HEIGHT, contentHeight + PADDING * 2);
   
-  // 鍒濇鍔犺浇鏃惰嚜鍔ㄥ眳涓暣寮犲湴鍥撅紝鏂逛究鐜╁棰勮鍏ㄨ矊
-  useEffect(() => {
-    if (!mapData) return;
+  const previewOffset = useMemo(() => {
     const offsetX = VIEW_WIDTH / 2 - (contentWidth / 2 + PADDING);
     const offsetY = VIEW_HEIGHT / 2 - (contentHeight / 2 + PADDING);
-    setDragOffset({ x: offsetX, y: offsetY });
-  }, [mapData, contentWidth, contentHeight, VIEW_WIDTH, VIEW_HEIGHT]);
+    return { x: offsetX, y: offsetY };
+  }, [VIEW_WIDTH, VIEW_HEIGHT, contentWidth, contentHeight]);
+  
+  // 初次加载时自动居中整张地图，方便玩家预览全貌
+  useEffect(() => {
+    if (!mapData) return;
+    setDragOffset(previewOffset);
+  }, [mapData, previewOffset]);
   
   useEffect(() => {
     if (mapData && mapData.startNode && exploredNodes.size === 0) {
@@ -91,7 +95,7 @@ const GridMapView = ({ mapData, onNodeSelect, activeNode, currentFloor, act, loc
   if (!mapData || !mapData.grid) {
     return (
       <div className="flex items-center justify-center h-full">
-        <div className="text-[#C8AA6E] text-xl">鍦板浘鏁版嵁鍔犺浇涓?..</div>
+        <div className="text-[#C8AA6E] text-xl">地图数据加载中...</div>
       </div>
     );
   }
@@ -235,6 +239,10 @@ const GridMapView = ({ mapData, onNodeSelect, activeNode, currentFloor, act, loc
     });
   };
   
+  const handlePreviewAll = () => {
+    setDragOffset(previewOffset);
+  };
+  
   const renderHexNode = (node) => {
     const key = `${node.row}-${node.col}`;
     const pos = positionMap.get(key);
@@ -327,6 +335,16 @@ const GridMapView = ({ mapData, onNodeSelect, activeNode, currentFloor, act, loc
           />
         )}
         
+        {isFogged && (
+          <polygon
+            points={hexPath}
+            fill="none"
+            stroke="rgba(255,255,255,0.08)"
+            strokeWidth={2}
+            filter="url(#fogGlow)"
+          />
+        )}
+        
         {icon && (
           <image
             href={icon}
@@ -336,7 +354,7 @@ const GridMapView = ({ mapData, onNodeSelect, activeNode, currentFloor, act, loc
             height={HEX_SIZE * ICON_SCALE}
             clipPath="url(#hexClip)"
             opacity={
-              isFogged ? 0 :
+              isFogged ? 0.15 :
               isExplored ? 0.6 : (isAvailable ? 1 : (isLocked ? 0.2 : 0.4))
             }
             pointerEvents="none"
@@ -353,7 +371,7 @@ const GridMapView = ({ mapData, onNodeSelect, activeNode, currentFloor, act, loc
             textAnchor="middle"
             dominantBaseline="central"
           >
-            鉁?
+            ✕
           </text>
         )}
         
@@ -367,7 +385,7 @@ const GridMapView = ({ mapData, onNodeSelect, activeNode, currentFloor, act, loc
             textAnchor="middle"
             dominantBaseline="central"
           >
-            鉁?
+            ✓
           </text>
         )}
       </g>
@@ -411,27 +429,40 @@ const GridMapView = ({ mapData, onNodeSelect, activeNode, currentFloor, act, loc
             }).join(' ')} />
           </clipPath>
           <linearGradient id="fogGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="rgba(30,34,70,0.85)" />
-            <stop offset="100%" stopColor="rgba(10,12,28,0.95)" />
+            <stop offset="0%" stopColor="rgba(70,80,130,0.9)" />
+            <stop offset="100%" stopColor="rgba(30,35,70,0.95)" />
           </linearGradient>
+          <filter id="fogGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="2.5" />
+          </filter>
         </defs>
         
         {mapData.nodes.map(node => renderHexNode(node))}
       </svg>
       
-      <motion.button
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        onClick={centerMap}
-        className="absolute bottom-4 right-4 bg-[#C8AA6E] text-[#0a0e27] px-4 py-2 rounded-lg font-bold shadow-lg"
-      >
-        馃幆 灞呬腑鍦板浘
-      </motion.button>
+      <div className="absolute bottom-4 right-4 flex gap-3">
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={handlePreviewAll}
+          className="bg-[#343a6e] text-white px-4 py-2 rounded-lg font-bold shadow-lg border border-white/10"
+        >
+          🌌 预览全图
+        </motion.button>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={centerMap}
+          className="bg-[#C8AA6E] text-[#0a0e27] px-4 py-2 rounded-lg font-bold shadow-lg"
+        >
+          🎯 居中节点
+        </motion.button>
+      </div>
       
       <div className="absolute top-4 left-4 bg-black/80 px-4 py-2 rounded-lg border border-[#C8AA6E]/30">
         <div className="text-[#C8AA6E] text-sm">
-          <div>宸叉帰绱? {exploredNodes.size} / {mapData.nodes.length}</div>
-          <div>鍙€夋柟鍚? {availableNodes.length}</div>
+          <div>已探索: {exploredNodes.size} / {mapData.nodes.length}</div>
+          <div>可选方向: {availableNodes.length}</div>
         </div>
       </div>
     </div>
@@ -439,5 +470,4 @@ const GridMapView = ({ mapData, onNodeSelect, activeNode, currentFloor, act, loc
 };
 
 export default GridMapView;
-
 
