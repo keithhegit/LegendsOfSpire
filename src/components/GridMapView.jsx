@@ -1,8 +1,8 @@
-/**
- * 六边形自由探索地图视图
- * - 横版布局（左起右终）
- * - 战争迷雾：未探索区域以迷雾覆盖但仍显示结构
- * - 支持拖拽、居中、放大节点图标
+﻿/**
+ * 鍏竟褰㈣嚜鐢辨帰绱㈠湴鍥捐鍥?
+ * - 妯増甯冨眬锛堝乏璧峰彸缁堬級
+ * - 鎴樹簤杩烽浘锛氭湭鎺㈢储鍖哄煙浠ヨ糠闆捐鐩栦絾浠嶆樉绀虹粨鏋?
+ * - 鏀寔鎷栨嫿銆佸眳涓€佹斁澶ц妭鐐瑰浘鏍?
  */
 
 import React, { useState, useRef, useEffect, useMemo } from 'react';
@@ -65,7 +65,7 @@ const GridMapView = ({ mapData, onNodeSelect, activeNode, currentFloor, act, loc
   const VIEW_WIDTH = Math.max(MIN_VIEW_WIDTH, contentWidth + PADDING * 2);
   const VIEW_HEIGHT = Math.max(MIN_VIEW_HEIGHT, contentHeight + PADDING * 2);
   
-  // 初次加载时自动居中整张地图，方便玩家预览全貌
+  // 鍒濇鍔犺浇鏃惰嚜鍔ㄥ眳涓暣寮犲湴鍥撅紝鏂逛究鐜╁棰勮鍏ㄨ矊
   useEffect(() => {
     if (!mapData) return;
     const offsetX = VIEW_WIDTH / 2 - (contentWidth / 2 + PADDING);
@@ -88,7 +88,7 @@ const GridMapView = ({ mapData, onNodeSelect, activeNode, currentFloor, act, loc
   if (!mapData || !mapData.grid) {
     return (
       <div className="flex items-center justify-center h-full">
-        <div className="text-[#C8AA6E] text-xl">地图数据加载中...</div>
+        <div className="text-[#C8AA6E] text-xl">鍦板浘鏁版嵁鍔犺浇涓?..</div>
       </div>
     );
   }
@@ -346,7 +346,7 @@ const GridMapView = ({ mapData, onNodeSelect, activeNode, currentFloor, act, loc
             textAnchor="middle"
             dominantBaseline="central"
           >
-            ✕
+            鉁?
           </text>
         )}
         
@@ -360,7 +360,7 @@ const GridMapView = ({ mapData, onNodeSelect, activeNode, currentFloor, act, loc
             textAnchor="middle"
             dominantBaseline="central"
           >
-            ✓
+            鉁?
           </text>
         )}
       </g>
@@ -418,13 +418,13 @@ const GridMapView = ({ mapData, onNodeSelect, activeNode, currentFloor, act, loc
         onClick={centerMap}
         className="absolute bottom-4 right-4 bg-[#C8AA6E] text-[#0a0e27] px-4 py-2 rounded-lg font-bold shadow-lg"
       >
-        🎯 居中地图
+        馃幆 灞呬腑鍦板浘
       </motion.button>
       
       <div className="absolute top-4 left-4 bg-black/80 px-4 py-2 rounded-lg border border-[#C8AA6E]/30">
         <div className="text-[#C8AA6E] text-sm">
-          <div>已探索: {exploredNodes.size} / {mapData.nodes.length}</div>
-          <div>可选方向: {availableNodes.length}</div>
+          <div>宸叉帰绱? {exploredNodes.size} / {mapData.nodes.length}</div>
+          <div>鍙€夋柟鍚? {availableNodes.length}</div>
         </div>
       </div>
     </div>
@@ -432,4 +432,5 @@ const GridMapView = ({ mapData, onNodeSelect, activeNode, currentFloor, act, loc
 };
 
 export default GridMapView;
+
 
