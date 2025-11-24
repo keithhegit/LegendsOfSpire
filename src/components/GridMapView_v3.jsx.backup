@@ -1,4 +1,4 @@
-﻿/**
+/**
  * ===========================
  * 六边形自由探索地图视图 v3
  * ===========================
@@ -21,9 +21,8 @@ const GridMapView_v3 = ({ mapData, onNodeSelect, activeNode, currentFloor, act, 
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [exploredNodes, setExploredNodes] = useState(new Set());
-
+  
   const HEX_SIZE = 45;
-  const ICON_SCALE = 1.15;
   const MIN_VIEW_WIDTH = 1200;
   const MIN_VIEW_HEIGHT = 800;
   const PADDING = 120;
@@ -35,8 +34,6 @@ const GridMapView_v3 = ({ mapData, onNodeSelect, activeNode, currentFloor, act, 
         bounds: { minX: 0, minY: 0, maxX: 0, maxY: 0 },
         contentWidth: MIN_VIEW_WIDTH,
         contentHeight: MIN_VIEW_HEIGHT,
-
-
       };
     }
 
@@ -72,27 +69,21 @@ const GridMapView_v3 = ({ mapData, onNodeSelect, activeNode, currentFloor, act, 
 
   const VIEW_WIDTH = Math.max(MIN_VIEW_WIDTH, contentWidth + PADDING * 2);
   const VIEW_HEIGHT = Math.max(MIN_VIEW_HEIGHT, contentHeight + PADDING * 2);
-
-  const previewOffset = useMemo(() => {
-    const offsetX = VIEW_WIDTH / 2 - (contentWidth / 2 + PADDING);
-    const offsetY = VIEW_HEIGHT / 2 - (contentHeight / 2 + PADDING);
-    return { x: offsetX, y: offsetY };
-  }, [VIEW_WIDTH, VIEW_HEIGHT, contentWidth, contentHeight]);
-
+  
   // 初始化已探索节点（起点）
   useEffect(() => {
     if (mapData && mapData.startNode && exploredNodes.size === 0) {
       setExploredNodes(new Set([`${mapData.startNode.row}-${mapData.startNode.col}`]));
     }
   }, [mapData]);
-
+  
   // 更新已探索节点
   useEffect(() => {
     if (activeNode) {
       setExploredNodes(prev => new Set([...prev, `${activeNode.row}-${activeNode.col}`]));
     }
   }, [activeNode]);
-
+  
   if (!mapData || !mapData.grid) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -100,39 +91,39 @@ const GridMapView_v3 = ({ mapData, onNodeSelect, activeNode, currentFloor, act, 
       </div>
     );
   }
-
+  
   const { grid, totalFloors, startNode, bossNode } = mapData;
   const GRID_COLS = grid[0]?.length || 11;
-
+  
   // ===========================
   // 获取可探索的相邻节点（三选一逻辑）
   // ===========================
   const getAvailableNodes = () => {
     if (!activeNode) return [];
-
+    
     const neighbors = getHexNeighbors(activeNode.row, activeNode.col, totalFloors, GRID_COLS);
     const allAvailable = [];
-
+    
     // 收集所有未探索的邻居，排除已锁定的选项
     for (const [r, c] of neighbors) {
       const neighbor = grid[r][c];
       if (!neighbor) continue;
-
+      
       const nodeKey = `${r}-${c}`;
       // 排除已探索的节点
       if (exploredNodes.has(nodeKey)) continue;
-
+      
       // 排除已锁定的选项（永久锁定，不能选择）
       if (lockedChoices.has(nodeKey)) continue;
-
+      
       allAvailable.push(neighbor);
     }
-
+    
     // 三选一逻辑：如果可用节点≤3个，全部显示；如果>3个，随机选择3个
     if (allAvailable.length <= 3) {
       return allAvailable;
     }
-
+    
     // 随机选择3个（使用稳定的随机种子，基于节点位置）
     // 为了确保每次渲染时选择相同的3个节点，我们使用节点位置作为排序依据
     const shuffled = [...allAvailable].sort((a, b) => {
@@ -140,26 +131,26 @@ const GridMapView_v3 = ({ mapData, onNodeSelect, activeNode, currentFloor, act, 
       const seedB = `${b.row}-${b.col}`;
       return seedA.localeCompare(seedB);
     });
-
+    
     // 使用简单的哈希函数基于activeNode位置生成"随机"索引
     const hash = (activeNode.row * 1000 + activeNode.col) % shuffled.length;
     const selected = [];
     for (let i = 0; i < 3; i++) {
       selected.push(shuffled[(hash + i) % shuffled.length]);
     }
-
+    
     return selected;
   };
-
+  
   // ===========================
   // 获取已锁定的选项（三选一中被排除的选项）
   // ===========================
   const getLockedNodes = () => {
     if (!activeNode) return new Set();
-
+    
     const neighbors = getHexNeighbors(activeNode.row, activeNode.col, totalFloors, GRID_COLS);
     const allAvailable = [];
-
+    
     // 收集所有未探索的邻居
     for (const [r, c] of neighbors) {
       const neighbor = grid[r][c];
@@ -167,16 +158,16 @@ const GridMapView_v3 = ({ mapData, onNodeSelect, activeNode, currentFloor, act, 
         allAvailable.push(neighbor);
       }
     }
-
+    
     // 如果可用节点≤3个，没有锁定的选项
     if (allAvailable.length <= 3) {
       return new Set();
     }
-
+    
     // 获取已选择的3个选项
     const selected = getAvailableNodes();
     const selectedSet = new Set(selected.map(n => `${n.row}-${n.col}`));
-
+    
     // 返回被锁定的选项（所有可用节点中，不在selectedSet中的）
     const locked = new Set();
     for (const node of allAvailable) {
@@ -185,47 +176,47 @@ const GridMapView_v3 = ({ mapData, onNodeSelect, activeNode, currentFloor, act, 
         locked.add(key);
       }
     }
-
+    
     return locked;
   };
-
+  
   // ===========================
   // 获取可见节点（战争迷雾）
   // ===========================
   const getVisibleNodes = () => {
     const visible = new Set();
-
+    
     // 所有已探索的节点都可见
     for (const key of exploredNodes) {
       visible.add(key);
-
+      
       // 获取该节点的相邻节点（战争迷雾边缘）
       const [row, col] = key.split('-').map(Number);
       const neighbors = getHexNeighbors(row, col, totalFloors, GRID_COLS);
-
+      
       for (const [r, c] of neighbors) {
         if (grid[r][c]) {
           visible.add(`${r}-${c}`);
         }
       }
     }
-
+    
     return visible;
   };
-
+  
   const availableNodes = getAvailableNodes();
   const availableSet = new Set(availableNodes.map(n => `${n.row}-${n.col}`));
   const lockedSet = getLockedNodes();
   // 合并lockedChoices（从App.jsx传入的已锁定选项）
   const allLockedSet = new Set([...lockedSet, ...Array.from(lockedChoices).map(key => typeof key === 'string' ? key : `${key.row}-${key.col}`)]);
   const visibleSet = getVisibleNodes();
-
+  
   // ===========================
   // 获取节点图标
   // ===========================
   const getMapIcon = (node) => {
     if (!node) return null;
-
+    
     if (node.type === 'BOSS') {
       if (act === 1) return `${CDN_URL}/img/champion/Darius.png`;
       if (act === 2) return `${CDN_URL}/img/champion/Viego.png`;
@@ -240,14 +231,14 @@ const GridMapView_v3 = ({ mapData, onNodeSelect, activeNode, currentFloor, act, 
     }
     return null;
   };
-
+  
   // ===========================
   // 获取节点颜色
   // ===========================
   const getNodeColor = (node) => {
     if (node.row === startNode.row && node.col === startNode.col) return '#4ade80';
     if (node.row === bossNode.row && node.col === bossNode.col) return '#ef4444';
-
+    
     switch (node.type) {
       case 'BATTLE': return '#dc2626';
       case 'SHOP': return '#f59e0b';
@@ -257,13 +248,13 @@ const GridMapView_v3 = ({ mapData, onNodeSelect, activeNode, currentFloor, act, 
       default: return '#6b7280';
     }
   };
-
+  
   // ===========================
   // 居中地图
   // ===========================
   const centerMap = () => {
     if (!activeNode) return;
-
+    
     const pos = positionMap.get(`${activeNode.row}-${activeNode.col}`);
     if (!pos) return;
     const nodeX = pos.x - bounds.minX + PADDING;
@@ -273,12 +264,7 @@ const GridMapView_v3 = ({ mapData, onNodeSelect, activeNode, currentFloor, act, 
       y: VIEW_HEIGHT / 2 - nodeY
     });
   };
-
-  // 预览全图 - 回到初始全图视图
-  const handlePreviewAll = () => {
-    setDragOffset(previewOffset);
-  };
-
+  
   // ===========================
   // 渲染六边形节点
   // ===========================
@@ -286,23 +272,22 @@ const GridMapView_v3 = ({ mapData, onNodeSelect, activeNode, currentFloor, act, 
     const key = `${node.row}-${node.col}`;
     const pos = positionMap.get(key);
     if (!pos) return null;
-
+    
     const isExplored = exploredNodes.has(key);
     const isAvailable = availableSet.has(key);
     const isLocked = allLockedSet.has(key);
     const isCurrent = activeNode && node.row === activeNode.row && node.col === activeNode.col;
     const isVisible = visibleSet.has(key);
-
-    // 战争迷雾：不可见的节点显示为迷雾状态
-    // if (!isVisible) return null;
-    const isFogged = !isVisible;
-
+    
+    // 战争迷雾：不可见的节点不渲染
+    if (!isVisible) return null;
+    
     const x = pos.x - bounds.minX + PADDING + dragOffset.x;
     const y = pos.y - bounds.minY + PADDING + dragOffset.y;
-
+    
     const color = getNodeColor(node);
     const icon = getMapIcon(node);
-
+    
     // 六边形路径
     const hexPath = Array.from({ length: 6 }, (_, i) => {
       const angle = Math.PI / 3 * i;
@@ -310,7 +295,7 @@ const GridMapView_v3 = ({ mapData, onNodeSelect, activeNode, currentFloor, act, 
       const hy = HEX_SIZE * 0.85 * Math.sin(angle);
       return `${hx},${hy}`;
     }).join(' ');
-
+    
     return (
       <g key={key} transform={`translate(${x}, ${y})`}>
         {/* 连接线（只显示已探索节点之间的连接） */}
@@ -319,12 +304,12 @@ const GridMapView_v3 = ({ mapData, onNodeSelect, activeNode, currentFloor, act, 
           return neighbors.map(([r, c]) => {
             const neighbor = grid[r][c];
             if (!neighbor || !exploredNodes.has(`${r}-${c}`)) return null;
-
+            
             const nPos = positionMap.get(`${r}-${c}`);
             if (!nPos) return null;
             const nx = nPos.x - bounds.minX + PADDING + dragOffset.x;
             const ny = nPos.y - bounds.minY + PADDING + dragOffset.y;
-
+            
             return (
               <line
                 key={`${key}-${r}-${c}`}
@@ -338,44 +323,43 @@ const GridMapView_v3 = ({ mapData, onNodeSelect, activeNode, currentFloor, act, 
             );
           });
         })()}
-
+        
         {/* 六边形背景 */}
         <polygon
           points={hexPath}
-          fill={isFogged ? 'url(#fogGradient)' : (isExplored ? 'rgba(255,255,255,0.1)' : color)}
-          fillOpacity={isFogged ? 0.8 : (isExplored ? 1 : (isAvailable ? 0.8 : (isLocked ? 0.2 : 0.3)))}
+          fill={isExplored ? 'rgba(255,255,255,0.1)' : color}
+          fillOpacity={isExplored ? 1 : (isAvailable ? 0.8 : (isLocked ? 0.2 : 0.3))}
           stroke={
-            isFogged ? 'rgba(255,255,255,0.05)' :
-              isCurrent ? '#fff' :
-                isAvailable ? '#C8AA6E' :
-                  isLocked ? 'rgba(100,100,100,0.5)' :
-                    'rgba(255,255,255,0.2)'
+            isCurrent ? '#fff' : 
+            isAvailable ? '#C8AA6E' : 
+            isLocked ? 'rgba(100,100,100,0.5)' : 
+            'rgba(255,255,255,0.2)'
           }
           strokeWidth={isCurrent ? 4 : (isAvailable ? 3 : 1)}
-          style={{ cursor: (isAvailable && !isLocked && !isFogged) ? 'pointer' : 'default' }}
+          style={{ cursor: (isAvailable && !isLocked) ? 'pointer' : 'default' }}
           onClick={() => {
-            if (isAvailable && !isLocked && !isFogged) {
+            if (isAvailable && !isLocked) {
               onNodeSelect(node);
             }
           }}
         />
-
+        
         {/* 节点图标 */}
         {icon && (
           <image
             href={icon}
-            x={-HEX_SIZE * ICON_SCALE * 0.5}
-            y={-HEX_SIZE * ICON_SCALE * 0.5}
-            width={HEX_SIZE * ICON_SCALE}
-            height={HEX_SIZE * ICON_SCALE}
+            x={-HEX_SIZE * 0.5}
+            y={-HEX_SIZE * 0.5}
+            width={HEX_SIZE}
+            height={HEX_SIZE}
             clipPath="url(#hexClip)"
-            opacity={isFogged ? 0 : (isExplored ? 0.6 : (isAvailable ? 1 : (isLocked ? 0.2 : 0.4)))}
+            opacity={isExplored ? 0.6 : (isAvailable ? 1 : (isLocked ? 0.2 : 0.4))}
             pointerEvents="none"
           />
         )}
-
+        
         {/* 锁定标记（三选一中被排除的选项） */}
-        {isLocked && !isExplored && !isFogged && (
+        {isLocked && !isExplored && (
           <text
             x="0"
             y="0"
@@ -388,7 +372,7 @@ const GridMapView_v3 = ({ mapData, onNodeSelect, activeNode, currentFloor, act, 
             ✕
           </text>
         )}
-
+        
         {/* 已探索标记 */}
         {isExplored && node !== activeNode && (
           <text
@@ -406,9 +390,9 @@ const GridMapView_v3 = ({ mapData, onNodeSelect, activeNode, currentFloor, act, 
       </g>
     );
   };
-
+  
   return (
-    <div
+    <div 
       ref={containerRef}
       className="relative w-full h-full overflow-hidden bg-[#0a0e27]"
       style={{ width: VIEW_WIDTH, height: VIEW_HEIGHT, margin: '0 auto' }}
@@ -436,10 +420,6 @@ const GridMapView_v3 = ({ mapData, onNodeSelect, activeNode, currentFloor, act, 
         onMouseLeave={() => setIsDragging(false)}
       >
         <defs>
-          <linearGradient id="fogGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#1a1a2e" stopOpacity="0.9" />
-            <stop offset="100%" stopColor="#0f0f1a" stopOpacity="0.95" />
-          </linearGradient>
           <clipPath id="hexClip">
             <polygon points={Array.from({ length: 6 }, (_, i) => {
               const angle = Math.PI / 3 * i;
@@ -449,32 +429,21 @@ const GridMapView_v3 = ({ mapData, onNodeSelect, activeNode, currentFloor, act, 
             }).join(' ')} />
           </clipPath>
         </defs>
-
+        
         {/* 渲染所有可见节点 */}
         {mapData.nodes.map(node => renderHexNode(node))}
       </svg>
-
+      
       {/* 居中按钮 */}
-      {/* 按钮组 */}
-      <div className="absolute bottom-4 right-4 flex flex-col gap-2">
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={handlePreviewAll}
-          className="bg-[#C8AA6E] text-[#0a0e27] px-4 py-2 rounded-lg font-bold shadow-lg"
-        >
-          预览全图
-        </motion.button>
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={centerMap}
-          className="bg-[#C8AA6E] text-[#0a0e27] px-4 py-2 rounded-lg font-bold shadow-lg"
-        >
-          居中节点
-        </motion.button>
-      </div>
-
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={centerMap}
+        className="absolute bottom-4 right-4 bg-[#C8AA6E] text-[#0a0e27] px-4 py-2 rounded-lg font-bold shadow-lg"
+      >
+        🎯 居中地图
+      </motion.button>
+      
       {/* 探索信息 */}
       <div className="absolute top-4 left-4 bg-black/80 px-4 py-2 rounded-lg border border-[#C8AA6E]/30">
         <div className="text-[#C8AA6E] text-sm">
