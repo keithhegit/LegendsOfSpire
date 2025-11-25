@@ -148,8 +148,8 @@ const applyHoles = (grid, gridRows, gridCols, mainPath, act) => {
       for (let c = centerCol; c < centerCol + hole.width && c < gridCols; c++) {
         if (grid[r] && grid[r][c]) {
           const key = `${r}-${c}`;
-          // 保护主路径节点
-          if (!mainPathSet.has(key)) {
+          // ✅ 改进: 保护主路径 + 主路径邻居
+          if (!mainPathSet.has(key) && !mainPathNeighbors.has(key)) {
             removed.push([r, c]);
             grid[r][c] = null;
           }
@@ -289,17 +289,28 @@ export const generateGridMap = (act, usedEnemies = [], attempt = 0) => {
   // ===========================
   // 原因：生成阶段的死胡同检测过于严格，导致大量可行地图被拒绝
   // 解决：依靠运行时的三选一锁定逻辑来避免死胡同（App.jsx + GridMapView_v3.jsx）
-  /*
+  // ===========================
+  // Step 6.5: 检测死胡同节点(重新启用)
+  // ===========================
+  // 改进: 在挖空之后重新检测死胡同，确保三选一机制下所有路径都通向BOSS
   const deadEnds = detectDeadEnds(grid, gridRows, startNode, bossNode, allNodes);
   if (deadEnds.length > 0) {
     console.warn(`⚠️ 检测到 ${deadEnds.length} 个死胡同节点，第 ${attempt + 1} 次尝试失败`);
-    if (attempt < 4) {
+    if (attempt < 5) { // 增加重试次数到5次
+      console.log(`⚠️ 重新生成地图 (尝试 ${attempt + 2}/6)...`);
       return generateGridMap(act, usedEnemies, attempt + 1);
     }
     console.warn('⚠️ 多次生成失败，使用fallback生成线性地图');
     return generateFallbackMap(act, usedEnemies);
   }
-  */
+  
+    if (attempt < 5) { // 增加重试次数到5次
+      console.log(`⚠️ 重新生成地图 (尝试 ${attempt + 2}/6)...`);
+      return generateGridMap(act, usedEnemies, attempt + 1);
+    }
+    console.warn('⚠️ 多次生成失败，使用fallback生成线性地图');
+    return generateFallbackMap(act, usedEnemies);
+  }
   
   // ===========================
   // Step 7: BFS验证BOSS可达性
@@ -312,7 +323,8 @@ export const generateGridMap = (act, usedEnemies = [], attempt = 0) => {
   
   if (!reachable) {
     console.warn(`⚠️ BOSS不可达！第 ${attempt + 1} 次尝试失败`);
-    if (attempt < 4) {
+    if (attempt < 5) { // 增加重试次数到5次
+      console.log(`⚠️ 重新生成地图 (尝试 ${attempt + 2}/6)...`);
       return generateGridMap(act, usedEnemies, attempt + 1);
     }
     console.warn('⚠️ 多次生成失败，使用fallback生成线性地图');
