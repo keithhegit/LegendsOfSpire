@@ -3,10 +3,10 @@ import { motion } from 'framer-motion';
 import { Sparkles, UserSquare } from 'lucide-react';
 import { authService } from '../services/authService';
 
-const EMAIL_PATTERN = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+const ACCOUNT_PATTERN = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
 
 const LoginView = ({ onLogin }) => {
-  const [email, setEmail] = useState('');
+  const [account, setAccount] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
@@ -15,7 +15,7 @@ const LoginView = ({ onLogin }) => {
   const [isRegistering, setIsRegistering] = useState(false);
   const [username, setUsername] = useState('');
   const helperText = useMemo(() => {
-    if (errors.email) return errors.email;
+    if (errors.account) return errors.account;
     if (errors.password) return errors.password;
     return isRegistering
       ? 'Registering requires a username and 8+ alphanumeric credentials.'
@@ -24,8 +24,8 @@ const LoginView = ({ onLogin }) => {
 
   const validate = () => {
     const nextErrors = {};
-    if (!EMAIL_PATTERN.test(email.trim())) {
-      nextErrors.email = 'Email requires 8+ letters and numbers.';
+    if (!ACCOUNT_PATTERN.test(account.trim())) {
+      nextErrors.account = 'Account requires 8+ letters and numbers.';
     }
     if (!EMAIL_PATTERN.test(password)) {
       nextErrors.password = 'Password requires 8+ letters and numbers.';
@@ -42,9 +42,10 @@ const LoginView = ({ onLogin }) => {
     setSubmitting(true);
     setServerError('');
     try {
+      const normalized = account.trim();
       const user = isRegistering
-        ? await authService.register(username || email.split('@')[0], email, password)
-        : await authService.login(email, password);
+        ? await authService.register(username || normalized, normalized, password)
+        : await authService.login(normalized, password);
       onLogin?.(user);
     } catch (error) {
       setServerError(error.message);
@@ -118,22 +119,22 @@ const LoginView = ({ onLogin }) => {
               </label>
             )}
             <label className="flex flex-col text-slate-300 text-xs uppercase tracking-[0.4em]">
-              Email
+              Account
                 <input
                   type="text"
-                  placeholder="name@example.com"
-                  value={email}
+                  placeholder="Enter your account"
+                  value={account}
                   onChange={(event) => {
-                    setEmail(event.target.value);
-                    setErrors((prev) => ({ ...prev, email: undefined }));
+                    setAccount(event.target.value);
+                    setErrors((prev) => ({ ...prev, account: undefined }));
                   }}
-                  className={`mt-2 bg-transparent border border-white/20 rounded-2xl px-4 py-3 text-lg outline-none transition focus:border-amber-400 focus:ring-2 focus:ring-amber-400/30 ${errors.email ? 'border-red-500 focus:ring-red-500/40' : ''}`}
-                  aria-label="Email"
-                  aria-invalid={errors.email ? 'true' : 'false'}
+                  className={`mt-2 bg-transparent border border-white/20 rounded-2xl px-4 py-3 text-lg outline-none transition focus:border-amber-400 focus:ring-2 focus:ring-amber-400/30 ${errors.account ? 'border-red-500 focus:ring-red-500/40' : ''}`}
+                  aria-label="Account"
+                  aria-invalid={errors.account ? 'true' : 'false'}
                 />
-                {errors.email && (
+                {errors.account && (
                   <span className="text-[10px] font-semibold text-red-400 uppercase tracking-[0.3em] mt-1">
-                    {errors.email}
+                    {errors.account}
                   </span>
                 )}
               </label>

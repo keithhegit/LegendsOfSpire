@@ -577,6 +577,7 @@ export default function LegendsOfTheSpire() {
     });
     const [loginComplete, setLoginComplete] = useState(false);
     const [currentUser, setCurrentUser] = useState(null);
+    const [currentUser, setCurrentUser] = useState(null);
     const [bgmStarted, setBgmStarted] = useState(false);
 
     useEffect(() => { const savedData = localStorage.getItem(SAVE_KEY); if (savedData) setHasSave(true); }, []);
@@ -587,50 +588,94 @@ export default function LegendsOfTheSpire() {
             setLoginComplete(true);
         }
     }, []);
+    useEffect(() => {
+        const storedUser = authService.getCurrentUser();
+        if (storedUser) {
+            setCurrentUser(storedUser);
+            setLoginComplete(true);
+        }
+    }, []);
+
+    const getSaveKey = (user) => user ? `${SAVE_KEY}_${user.email}` : SAVE_KEY;
+
+    const serializeMapData = () => {
+        const serializable = {
+            ...mapData,
+            nodeMap: mapData.nodeMap instanceof Map
+                ? Object.fromEntries(mapData.nodeMap)
+                : mapData.nodeMap
+        };
+        return serializable;
+    };
 
     useEffect(() => {
-        if (view !== 'MENU' && view !== 'CHAMPION_SELECT' && view !== 'GAMEOVER' && view !== 'VICTORY_ALL') {
-            // 序列化 mapData，将 Map 转换为普通对象以便 JSON.stringify
-            const serializableMapData = {
-                ...mapData,
-                nodeMap: mapData.nodeMap instanceof Map
-                    ? Object.fromEntries(mapData.nodeMap)
-                    : mapData.nodeMap
-            };
-            localStorage.setItem(SAVE_KEY, JSON.stringify({ view, mapData: serializableMapData, currentFloor, currentAct, masterDeck, champion, currentHp, maxHp, gold, relics, baseStr, activeNode, usedEnemies }));
+        if ([ 'MENU', 'CHAMPION_SELECT', 'GAMEOVER', 'VICTORY_ALL' ].includes(view)) return;
+        const serializableMapData = serializeMapData();
+        const key = getSaveKey(currentUser);
+        localStorage.setItem(key, JSON.stringify({ view, mapData: serializableMapData, currentFloor, currentAct, masterDeck, champion, currentHp, maxHp, gold, relics, baseStr, activeNode, usedEnemies }));
+    }, [view, currentHp, gold, currentFloor, currentAct, champion, masterDeck, relics, baseStr, activeNode, usedEnemies, currentUser]);
+
+    const applySaveData = (data) => {
+        if (!data) return;
+        const restoredMapData = { ...data.mapData };
+        if (restoredMapData.nodeMap && !(restoredMapData.nodeMap instanceof Map)) {
+            restoredMapData.nodeMap = new Map(Object.entries(restoredMapData.nodeMap));
+        } else if (!restoredMapData.nodeMap) {
+            restoredMapData.nodeMap = new Map();
         }
-    }, [view, currentHp, gold, currentFloor, currentAct]);
+        setBgmStarted(true);
+        setMapData(restoredMapData);
+        setCurrentFloor(data.currentFloor);
+        setCurrentAct(data.currentAct || 1);
+        setMasterDeck(data.masterDeck);
+        setChampion(data.champion);
+        setCurrentHp(data.currentHp);
+        setMaxHp(data.maxHp);
+        setGold(data.gold);
+        setRelics(data.relics);
+        setBaseStr(data.baseStr);
+        setActiveNode(data.activeNode);
+        setUsedEnemies(data.usedEnemies);
+        setView(data.view);
+    };
 
     const handleContinue = async () => {
-        await unlockAudio(); // 解锁音频
-        const s = localStorage.getItem(SAVE_KEY);
+        await unlockAudio();
+        const s = localStorage.getItem(getSaveKey(currentUser));
         if (s) {
             const data = JSON.parse(s);
-            // 恢复 nodeMap：如果它是普通对象，转换为 Map
-            const restoredMapData = { ...data.mapData };
-            if (restoredMapData.nodeMap && !(restoredMapData.nodeMap instanceof Map)) {
-                // 如果 nodeMap 是普通对象，转换为 Map
-                restoredMapData.nodeMap = new Map(Object.entries(restoredMapData.nodeMap));
-            } else if (!restoredMapData.nodeMap) {
-                // 如果 nodeMap 不存在，创建新的 Map
-                restoredMapData.nodeMap = new Map();
-            }
-            setBgmStarted(true); // 立即启动BGM
-            setMapData(restoredMapData); setCurrentFloor(data.currentFloor); setCurrentAct(data.currentAct || 1); setMasterDeck(data.masterDeck); setChampion(data.champion); setCurrentHp(data.currentHp); setMaxHp(data.maxHp); setGold(data.gold); setRelics(data.relics); setBaseStr(data.baseStr); setActiveNode(data.activeNode); setUsedEnemies(data.usedEnemies); setView(data.view);
+            applySaveData(data);
         }
     };
 
     const handleNewGame = async () => {
         await unlockAudio(); // 解锁音频
         localStorage.removeItem(SAVE_KEY);
+        if (currentUser) {
+            localStorage.removeItem(getSaveKey(currentUser));
+        }
         setHasSave(false);
         setBgmStarted(true); // 立即启动BGM
         setView('CHAMPION_SELECT');
     };
 
+    const restoreUserSave = (user) => {
+        const key = getSaveKey(user);
+        const stored = localStorage.getItem(key);
+        if (stored) {
+            applySaveData(JSON.parse(stored));
+            setHasSave(true);
+            return true;
+        }
+        return false;
+    };
+
     const handleLoginSuccess = async (user) => {
-        await handleNewGame();
         setCurrentUser(user);
+        const restored = restoreUserSave(user);
+        if (!restored) {
+            await handleNewGame();
+        }
         setLoginComplete(true);
     };
 
@@ -994,7 +1039,7 @@ export default function LegendsOfTheSpire() {
     const renderUserPanel = () => {
         if (!currentUser) return null;
         return (
-            <div className="absolute top-4 right-4 z-[120] flex items-center gap-3 bg-gradient-to-r from-black/70 to-slate-900/70 px-4 py-2 rounded-full border border-white/20 shadow-[0_0_30px_rgba(0,0,0,0.7)] text-sm text-white">
+            <div className="absolute top-4 right-5 z-[120] flex items-center gap-3 bg-gradient-to-r from-black/70 to-slate-900/70 px-4 py-2 rounded-full border border-white/20 shadow-[0_0_30px_rgba(0,0,0,0.7)] text-sm text-white">
                 <div className="flex items-center gap-2">
                     <UserSquare className="w-5 h-5 text-amber-400" />
                     <div className="flex flex-col text-xs uppercase tracking-[0.3em] text-right">
@@ -1010,10 +1055,35 @@ export default function LegendsOfTheSpire() {
         )
     };
 
+    const handleResetProgress = () => {
+        if (!currentUser) return;
+        if (!window.confirm('重置会清除该账号现有进度并重新进入选人，请确认继续。')) return;
+        localStorage.removeItem(getSaveKey(currentUser));
+        setHasSave(false);
+        setMapData({ grid: [], nodes: [], nodeMap: new Map() });
+        setActiveNode(null);
+        setChampion(null);
+        setView('CHAMPION_SELECT');
+    };
+
     return (
         <div className="relative h-screen w-full bg-[#091428] font-sans select-none overflow-hidden">
             <AudioPlayer src={bgmStarted || view !== 'MENU' ? getCurrentBgm() : null} />
             {renderUserPanel()}
+            {view !== 'GAMEOVER' && view !== 'VICTORY_ALL' && view !== 'MENU' && view !== 'CHAMPION_SELECT' && champion && (
+            {view === 'MAP' && currentUser && (
+                <div className="absolute top-24 right-5 z-[115] flex flex-col items-end gap-1 text-right">
+                    <button
+                        onClick={handleResetProgress}
+                        className="px-3 py-1 rounded-full border border-red-500 text-red-200 bg-black/60 hover:bg-red-500/20 transition text-xs uppercase tracking-[0.4em]"
+                    >
+                        RESET PROGRESS
+                    </button>
+                    <p className="text-[10px] uppercase tracking-[0.3em] text-red-400">
+                        This clears your current map and forces a new champion pick.
+                    </p>
+                </div>
+            )}
             {view !== 'GAMEOVER' && view !== 'VICTORY_ALL' && view !== 'MENU' && view !== 'CHAMPION_SELECT' && champion && (
                 <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-black to-transparent z-50 flex items-center justify-between px-8 pointer-events-none">
                     <div className="flex items-center gap-6 pointer-events-auto">
