@@ -1,27 +1,305 @@
-import { CDN_URL, LOADING_URL } from './constants';
+import { CDN_URL, LOADING_URL } from './constants.js';
 
 export const CHAMPION_POOL = {
-  "Garen": { id: "Garen", name: "盖伦", title: "德玛西亚之力", maxHp: 80, maxMana: 3, avatar: `${CDN_URL}/img/champion/Garen.png`, img: `${LOADING_URL}/Garen_0.jpg`, passive: "坚韧: 战斗结束时恢复 6 HP", relicId: "GarenPassive", initialCards: ["GarenQ", "GarenW", "Ignite", "Defend"], description: "德玛西亚的重装战士，擅长叠甲和持续作战。", baseStr: 0 },
-  "Darius": { id: "Darius", name: "德莱厄斯", title: "诺克萨斯之手", maxHp: 90, maxMana: 3, avatar: `${CDN_URL}/img/champion/Darius.png`, img: `${LOADING_URL}/Darius_0.jpg`, passive: "出血: 每次攻击时，给予敌人 1 层虚弱", relicId: "DariusPassive", initialCards: ["DariusW", "DariusE", "Strike", "Ignite"], description: "诺克萨斯的象征，依靠力量和流血效果压制敌人。", baseStr: 0 },
-  "Lux": { id: "Lux", name: "拉克丝", title: "光辉女郎", maxHp: 70, maxMana: 3, avatar: `${CDN_URL}/img/champion/Lux.png`, img: `${LOADING_URL}/Lux_0.jpg`, passive: "光芒四射: 每回合开始时获得 1 点法力", relicId: "LuxPassive", initialCards: ["LuxQ", "LuxE", "Heal", "Ignite"], description: "法师英雄，擅长利用额外法力打出高费控制牌。", baseStr: 0 },
-  "Jinx": { id: "Jinx", name: "金克丝", title: "暴走萝莉", maxHp: 75, maxMana: 3, avatar: `${CDN_URL}/img/champion/Jinx.png`, img: `${LOADING_URL}/Jinx_0.jpg`, passive: "爆发: 每回合初始手牌数量+1", relicId: "JinxPassive", initialCards: ["JinxQ", "JinxW", "Strike", "Strike"], description: "高爆发射手，通过快速抽牌和连击造成伤害。", baseStr: 0 },
-  "Yasuo": { id: "Yasuo", name: "亚索", title: "疾风剑豪", maxHp: 78, maxMana: 3, avatar: `${CDN_URL}/img/champion/Yasuo.png`, img: `${LOADING_URL}/Yasuo_0.jpg`, passive: "浪客之道: 攻击牌暴击几率 +10%", relicId: "YasuoPassive", initialCards: ["YasuoQ", "YasuoE", "Defend", "Defend"], description: "高机动性剑客，利用连击和暴击进行爆发输出。", baseStr: 0 },
-  "Sona": { id: "Sona", name: "娑娜", title: "琴瑟仙女", maxHp: 72, maxMana: 3, avatar: `${CDN_URL}/img/champion/Sona.png`, img: `${LOADING_URL}/Sona_0.jpg`, passive: "能量弦: 每回合打出第三张卡时，获得 3 点临时护甲", relicId: "SonaPassive", initialCards: ["SonaQ", "SonaW", "Defend", "Heal"], description: "辅助英雄，专注于恢复和团队增益。", baseStr: 0 },
-  "Ekko": { id: "Ekko", name: "艾克", title: "时间刺客", maxHp: 82, maxMana: 3, avatar: `${CDN_URL}/img/champion/Ekko.png`, img: `${LOADING_URL}/Ekko_0.jpg`, passive: "Z型驱动共振: 每次打出消耗卡时，获得 1 点力量", relicId: "EkkoPassive", initialCards: ["EkkoQ", "EkkoE", "Defend", "Ignite"], description: "高爆发刺客，利用消耗卡牌的机制快速成长。", baseStr: 0 },
-  "Sylas": { id: "Sylas", name: "塞拉斯", title: "解脱者", maxHp: 85, maxMana: 3, avatar: `${CDN_URL}/img/champion/Sylas.png`, img: `${LOADING_URL}/Sylas_0.jpg`, passive: "叛乱: 每次打出技能牌时，回复 3 点生命值", relicId: "SylasPassive", initialCards: ["SylasQ", "SylasW", "Strike", "Defend"], description: "斗士英雄，通过频繁打出技能获得生存优势。", baseStr: 0 },
-  "Urgot": { id: "Urgot", name: "厄加特", title: "无畏战车", maxHp: 100, maxMana: 3, avatar: `${CDN_URL}/img/champion/Urgot.png`, img: `${LOADING_URL}/Urgot_0.jpg`, passive: "回火: 每场战斗开始时获得 15 点护甲", relicId: "UrgotPassive", initialCards: ["UrgotQ", "UrgotW", "Defend", "Defend"], description: "坦克英雄，拥有高生命值和强力防御。", baseStr: 0 },
-  "Viktor": { id: "Viktor", name: "维克托", title: "机械先驱", maxHp: 70, maxMana: 3, avatar: `${CDN_URL}/img/champion/Viktor.png`, img: `${LOADING_URL}/Viktor_0.jpg`, passive: "光荣进化: 每回合开始时，50% 几率获得一张额外基础卡", relicId: "ViktorPassive", initialCards: ["ViktorQ", "ViktorE", "Ignite", "Heal"], description: "高科技法师，擅长通过快速滤牌获得优势。", baseStr: 0 },
-  
-  // 第二批英雄 (11-20)
-  "Riven": { id: "Riven", name: "瑞文", title: "放逐之刃", maxHp: 75, maxMana: 3, avatar: `${CDN_URL}/img/champion/Riven.png`, img: `${LOADING_URL}/Riven_0.jpg`, passive: "符文之刃: 每打出 3 张攻击牌，获得 1 点法力", relicId: "RivenPassive", initialCards: ["RivenQ", "RivenW", "Strike", "Defend"], description: "连招型战士，通过连续攻击积累法力。", baseStr: 0 },
-  "TwistedFate": { id: "TwistedFate", name: "卡牌大师", title: "崔斯特", maxHp: 70, maxMana: 3, avatar: `${CDN_URL}/img/champion/TwistedFate.png`, img: `${LOADING_URL}/TwistedFate_0.jpg`, passive: "灌铅骰子: 每次战斗胜利额外获得 15 金币", relicId: "TwistedFatePassive", initialCards: ["TwistedFateW", "TwistedFateQ", "Strike", "Ignite"], description: "经济型法师，通过额外金币获得装备优势。", baseStr: 0 },
-  "LeeSin": { id: "LeeSin", name: "盲僧", title: "李青", maxHp: 80, maxMana: 3, avatar: `${CDN_URL}/img/champion/LeeSin.png`, img: `${LOADING_URL}/LeeSin_0.jpg`, passive: "疾风骤雨: 打出技能牌后，下一张攻击牌费用 -1", relicId: "LeeSinPassive", initialCards: ["LeeSinQ", "LeeSinW", "Strike", "Defend"], description: "节奏型战士，通过技能和攻击的配合打出连招。", baseStr: 0 },
-  "Vayne": { id: "Vayne", name: "薇恩", title: "暗夜猎手", maxHp: 70, maxMana: 3, avatar: `${CDN_URL}/img/champion/Vayne.png`, img: `${LOADING_URL}/Vayne_0.jpg`, passive: "圣银弩箭: 对同一目标连续造成 3 次伤害时，额外造成 10 点伤害", relicId: "VaynePassive", initialCards: ["VayneQ", "VayneE", "Strike", "Strike"], description: "单体爆发射手，专注于对单一目标的持续输出。", baseStr: 0 },
-  "Teemo": { id: "Teemo", name: "提莫", title: "迅捷斥候", maxHp: 65, maxMana: 3, avatar: `${CDN_URL}/img/champion/Teemo.png`, img: `${LOADING_URL}/Teemo_0.jpg`, passive: "游击战: 每回合开始时，给敌人施加 2 层虚弱", relicId: "TeemoPassive", initialCards: ["TeemoQ", "TeemoW", "Strike", "Ignite"], description: "DoT型射手，通过虚弱和易伤削弱敌人。", baseStr: 0 },
-  "Zed": { id: "Zed", name: "劫", title: "影流之主", maxHp: 75, maxMana: 3, avatar: `${CDN_URL}/img/champion/Zed.png`, img: `${LOADING_URL}/Zed_0.jpg`, passive: "影分身: 每回合第一张攻击牌额外造成 50% 伤害", relicId: "ZedPassive", initialCards: ["ZedQ", "ZedE", "Strike", "Strike"], description: "爆发型刺客，通过复制攻击造成巨额伤害。", baseStr: 0 },
-  "Nasus": { id: "Nasus", name: "内瑟斯", title: "沙漠死神", maxHp: 85, maxMana: 3, avatar: `${CDN_URL}/img/champion/Nasus.png`, img: `${LOADING_URL}/Nasus_0.jpg`, passive: "汲魂痛击: 每次用攻击牌击杀敌人，永久获得 1 点力量", relicId: "NasusPassive", initialCards: ["NasusQ", "NasusW", "Strike", "Defend"], description: "无限成长型战士，通过击杀敌人永久提升力量。", baseStr: 0 },
-  "Irelia": { id: "Irelia", name: "艾瑞莉娅", title: "刀锋舞者", maxHp: 75, maxMana: 3, avatar: `${CDN_URL}/img/champion/Irelia.png`, img: `${LOADING_URL}/Irelia_0.jpg`, passive: "热诚: 每次击杀敌人，恢复 1 点法力并抽 1 张牌", relicId: "IreliaPassive", initialCards: ["IreliaQ", "IreliaE", "Strike", "Defend"], description: "收割型战士，通过击杀重置和抽牌形成连击。", baseStr: 0 },
-  "Thresh": { id: "Thresh", name: "锤石", title: "魂锁典狱长", maxHp: 90, maxMana: 3, avatar: `${CDN_URL}/img/champion/Thresh.png`, img: `${LOADING_URL}/Thresh_0.jpg`, passive: "地狱诅咒: 每次击杀敌人，永久增加 2 最大生命值", relicId: "ThreshPassive", initialCards: ["ThreshQ", "ThreshW", "Strike", "Defend"], description: "成长型坦克，通过击杀敌人永久提升生命上限。", baseStr: 0 },
-  "Katarina": { id: "Katarina", name: "卡特琳娜", title: "不祥之刃", maxHp: 70, maxMana: 3, avatar: `${CDN_URL}/img/champion/Katarina.png`, img: `${LOADING_URL}/Katarina_0.jpg`, passive: "贪婪: 每回合每打出 3 张攻击牌后，下一张攻击牌伤害翻倍", relicId: "KatarinaPassive", initialCards: ["KatarinaQ", "KatarinaE", "Strike", "Strike"], description: "计数器型刺客，通过连击触发高额爆发伤害。", baseStr: 0 },
+  Garen: {
+    id: 'Garen',
+    name: '盖伦',
+    title: '德玛西亚之力',
+    maxHp: 80,
+    maxMana: 3,
+    baseStr: 0,
+    avatar: `${CDN_URL}/img/champion/Garen.png`,
+    img: `${LOADING_URL}/Garen_0.jpg`,
+    passive: '坚韧：战斗结束恢复6HP',
+    relicId: 'GarenPassive',
+    initialCards: ['GarenQ', 'GarenW', 'GarenE', 'Strike', 'Defend', 'Neutral_009', 'Neutral_031'],
+    description: '坦克/斩杀，稳定的护甲与斩杀窗口'
+  },
+
+  Darius: {
+    id: 'Darius',
+    name: '德莱厄斯',
+    title: '诺克萨斯之手',
+    maxHp: 85,
+    maxMana: 3,
+    baseStr: 0,
+    avatar: `${CDN_URL}/img/champion/Darius.png`,
+    img: `${LOADING_URL}/Darius_0.jpg`,
+    passive: '出血：每次攻击给予1层流血',
+    relicId: 'DariusPassive',
+    initialCards: ['DariusQ', 'DariusW', 'DariusE', 'Strike', 'Defend', 'Neutral_001', 'Neutral_052'],
+    description: '高爆发流血叠层，填补补刀与续战'
+  },
+
+  Lux: {
+    id: 'Lux',
+    name: '拉克丝',
+    title: '光之魔法师',
+    maxHp: 70,
+    maxMana: 3,
+    baseStr: 0,
+    avatar: `${CDN_URL}/img/champion/Lux.png`,
+    img: `${LOADING_URL}/Lux_0.jpg`,
+    passive: '法力回流：偶发获得1点法力',
+    relicId: 'LuxPassive',
+    initialCards: ['LuxQ', 'LuxW', 'LuxE', 'Strike', 'Defend', 'Neutral_009', 'Neutral_012'],
+    description: '法术循环保守，依赖手牌节奏产出高伤'
+  },
+
+  Jinx: {
+    id: 'Jinx',
+    name: '金克丝',
+    title: '爆裂枪手',
+    maxHp: 68,
+    maxMana: 3,
+    baseStr: 0,
+    avatar: `${CDN_URL}/img/champion/Jinx.png`,
+    img: `${LOADING_URL}/Jinx_0.jpg`,
+    passive: '暴走：打出数张牌后短时增伤',
+    relicId: 'JinxPassive',
+    initialCards: ['JinxQ', 'JinxW', 'JinxE', 'Strike', 'Defend', 'Neutral_027', 'Neutral_028'],
+    description: '爆发单体收割，依赖标记与斩杀'
+  },
+
+  Yasuo: {
+    id: 'Yasuo',
+    name: '亚索',
+    title: '浪客之道',
+    maxHp: 72,
+    maxMana: 3,
+    baseStr: 0,
+    avatar: `${CDN_URL}/img/champion/Yasuo.png`,
+    img: `${LOADING_URL}/Yasuo_0.jpg`,
+    passive: '风之身法：暴击相关机制',
+    relicId: 'YasuoPassive',
+    initialCards: ['YasuoQ', 'YasuoW', 'YasuoE', 'Strike', 'Defend', 'Neutral_036', 'Neutral_056'],
+    description: '连击型，依赖攻击衔接与暴击'
+  },
+
+  Sona: {
+    id: 'Sona',
+    name: '娑娜',
+    title: '琴瑟仙女',
+    maxHp: 65,
+    maxMana: 3,
+    baseStr: 0,
+    avatar: `${CDN_URL}/img/champion/Sona.png`,
+    img: `${LOADING_URL}/Sona_0.jpg`,
+    passive: '旋律回响：打出牌会触发小额回复或护甲',
+    relicId: 'SonaPassive',
+    initialCards: ['SonaQ', 'SonaW', 'SonaE', 'Strike', 'Defend', 'Neutral_009', 'Neutral_033'],
+    description: '支援/节奏法，兼具自保与拆节奏'
+  },
+
+  Ekko: {
+    id: 'Ekko',
+    name: '艾克',
+    title: '时间刺客',
+    maxHp: 66,
+    maxMana: 3,
+    baseStr: 0,
+    avatar: `${CDN_URL}/img/champion/Ekko.png`,
+    img: `${LOADING_URL}/Ekko_0.jpg`,
+    passive: '时间涌动：回溯连携奖励',
+    relicId: 'EkkoPassive',
+    initialCards: ['EkkoQ', 'EkkoW', 'EkkoE', 'Strike', 'Defend', 'Neutral_025', 'Neutral_016'],
+    description: '连携高收益，适合抓时机的刺客'
+  },
+
+  Sylas: {
+    id: 'Sylas',
+    name: '塞拉斯',
+    title: '叛逆者',
+    maxHp: 78,
+    maxMana: 3,
+    baseStr: 0,
+    avatar: `${CDN_URL}/img/champion/Sylas.png`,
+    img: `${LOADING_URL}/Sylas_0.jpg`,
+    passive: '吸血：技能触发小量治疗',
+    relicId: 'SylasPassive',
+    initialCards: ['SylasQ', 'SylasW', 'SylasE', 'Strike', 'Defend', 'Neutral_053', 'Neutral_034'],
+    description: '战斗续航与反打，控场能力强'
+  },
+
+  Urgot: {
+    id: 'Urgot',
+    name: '厄加特',
+    title: '深海毒魔',
+    maxHp: 92,
+    maxMana: 3,
+    baseStr: 0,
+    avatar: `${CDN_URL}/img/champion/Urgot.png`,
+    img: `${LOADING_URL}/Urgot_0.jpg`,
+    passive: '装甲转换：自带大量护甲',
+    relicId: 'UrgotPassive',
+    initialCards: ['UrgotQ', 'UrgotW', 'UrgotE', 'Strike', 'Defend', 'Neutral_031', 'Neutral_103'],
+    description: '硬控坦克，自伤换高爆发'
+  },
+
+  Viktor: {
+    id: 'Viktor',
+    name: '维克托',
+    title: '机械先驱',
+    maxHp: 68,
+    maxMana: 3,
+    baseStr: 0,
+    avatar: `${CDN_URL}/img/champion/Viktor.png`,
+    img: `${LOADING_URL}/Viktor_0.jpg`,
+    passive: '进化：长线发育获得增益',
+    relicId: 'ViktorPassive',
+    initialCards: ['ViktorQ', 'ViktorW', 'ViktorE', 'Strike', 'Defend', 'Neutral_012', 'Neutral_052'],
+    description: '发育型法师，依靠卡组搭配成长'
+  },
+
+  Riven: {
+    id: 'Riven',
+    name: '瑞文',
+    title: '流浪剑客',
+    maxHp: 74,
+    maxMana: 3,
+    baseStr: 0,
+    avatar: `${CDN_URL}/img/champion/Riven.png`,
+    img: `${LOADING_URL}/Riven_0.jpg`,
+    passive: '气合：攻击连打获得小额法力/护甲',
+    relicId: 'RivenPassive',
+    initialCards: ['RivenQ', 'RivenW', 'RivenE', 'Strike', 'Defend', 'Neutral_056', 'Neutral_033'],
+    description: '高连段压力，擅长短回合爆发'
+  },
+
+  CardMaster: {
+    id: 'CardMaster',
+    name: '卡牌大师',
+    title: '赌徒',
+    maxHp: 70,
+    maxMana: 3,
+    baseStr: 0,
+    avatar: `${CDN_URL}/img/champion/TwistedFate.png`,
+    img: `${LOADING_URL}/TwistedFate_0.jpg`,
+    passive: '金库：战斗胜利增加金币',
+    relicId: 'CardMasterPassive',
+    initialCards: ['CardMasterQ', 'CardMasterW', 'CardMasterE', 'Strike', 'Defend', 'Neutral_011', 'Neutral_015'],
+    description: '经济导向，可通过金币换强或赌局'
+  },
+
+  LeeSin: {
+    id: 'LeeSin',
+    name: '盲僧',
+    title: '疾风之拳',
+    maxHp: 76,
+    maxMana: 3,
+    baseStr: 0,
+    avatar: `${CDN_URL}/img/champion/LeeSin.png`,
+    img: `${LOADING_URL}/LeeSin_0.jpg`,
+    passive: '连环：完成连招获得费用优惠',
+    relicId: 'LeeSinPassive',
+    initialCards: ['LeeQ', 'LeeW', 'LeeE', 'Strike', 'Defend', 'Neutral_025', 'Neutral_036'],
+    description: '连招型拳师，控制与连段兼备'
+  },
+
+  Vayne: {
+    id: 'Vayne',
+    name: '薇恩',
+    title: '誓约猎人',
+    maxHp: 66,
+    maxMana: 3,
+    baseStr: 0,
+    avatar: `${CDN_URL}/img/champion/Vayne.png`,
+    img: `${LOADING_URL}/Vayne_0.jpg`,
+    passive: '猎人之印：连续对目标伤害触发真伤',
+    relicId: 'VaynePassive',
+    initialCards: ['VayneQ', 'VayneE', 'VaynePassive', 'Strike', 'Defend', 'Neutral_070', 'Neutral_110'],
+    description: '刺客/收割，适合小血量斩杀'
+  },
+
+  Teemo: {
+    id: 'Teemo',
+    name: '提莫',
+    title: '游击手',
+    maxHp: 65,
+    maxMana: 3,
+    baseStr: 0,
+    avatar: `${CDN_URL}/img/champion/Teemo.png`,
+    img: `${LOADING_URL}/Teemo_0.jpg`,
+    passive: '蘑菇：对单体放标记并触发伤害',
+    relicId: 'TeemoPassive',
+    initialCards: ['TeemoQ', 'TeemoW', 'TeemoE', 'Strike', 'Defend', 'Neutral_027', 'Neutral_116'],
+    description: '毒系耗血/标记触发玩法'
+  },
+
+  Zed: {
+    id: 'Zed',
+    name: '劫',
+    title: '影之刺客',
+    maxHp: 68,
+    maxMana: 3,
+    baseStr: 0,
+    avatar: `${CDN_URL}/img/champion/Zed.png`,
+    img: `${LOADING_URL}/Zed_0.jpg`,
+    passive: '影分身：复制下一次攻击（分身伤害折半）',
+    relicId: 'ZedPassive',
+    initialCards: ['ZedQ', 'ZedW', 'ZedE', 'Strike', 'Defend', 'Neutral_023', 'Neutral_030'],
+    description: '影分身与连击，标准刺客'
+  },
+
+  Nasus: {
+    id: 'Nasus',
+    name: '内瑟斯',
+    title: '汲魂巨兽',
+    maxHp: 85,
+    maxMana: 3,
+    baseStr: 0,
+    avatar: `${CDN_URL}/img/champion/Nasus.png`,
+    img: `${LOADING_URL}/Nasus_0.jpg`,
+    passive: '补刀成长：用卡击杀时获得永久力量',
+    relicId: 'NasusPassive',
+    initialCards: ['NasusQ', 'NasusW', 'NasusE', 'Strike', 'Defend', 'Neutral_017', 'Neutral_021'],
+    description: '补刀成长型，越打越强'
+  },
+
+  Irelia: {
+    id: 'Irelia',
+    name: '艾瑞莉娅',
+    title: '秩序先锋',
+    maxHp: 72,
+    maxMana: 3,
+    baseStr: 0,
+    avatar: `${CDN_URL}/img/champion/Irelia.png`,
+    img: `${LOADING_URL}/Irelia_0.jpg`,
+    passive: '斩杀回春：击杀恢复法力并抽牌',
+    relicId: 'IreliaPassive',
+    initialCards: ['IreliaQ', 'IreliaW', 'IreliaE', 'Strike', 'Defend', 'Neutral_010', 'Neutral_110'],
+    description: '机动斩杀，节奏奖励明显'
+  },
+
+  Thresh: {
+    id: 'Thresh',
+    name: '锤石',
+    title: '幽魂守望',
+    maxHp: 88,
+    maxMana: 3,
+    baseStr: 0,
+    avatar: `${CDN_URL}/img/champion/Thresh.png`,
+    img: `${LOADING_URL}/Thresh_0.jpg`,
+    passive: '灯笼守望：击杀提升最大生命',
+    relicId: 'ThreshPassive',
+    initialCards: ['ThreshQ', 'ThreshW', 'ThreshE', 'Strike', 'Defend', 'Neutral_032', 'Neutral_072'],
+    description: '控制/回复向，适合拖延与单体控制'
+  },
+
+  Katarina: {
+    id: 'Katarina',
+    name: '卡特琳娜',
+    title: '不祥之刃',
+    maxHp: 68,
+    maxMana: 3,
+    baseStr: 0,
+    avatar: `${CDN_URL}/img/champion/Katarina.png`,
+    img: `${LOADING_URL}/Katarina_0.jpg`,
+    passive: '连斩爆发：连击获得翻倍收益',
+    relicId: 'KatarinaPassive',
+    initialCards: ['KatarinaQ', 'KatarinaW', 'KatarinaE', 'Strike', 'Defend', 'Neutral_057', 'Neutral_093'],
+    description: '连击爆发型刺客'
+  }
 };
 
+export default CHAMPION_POOL;
