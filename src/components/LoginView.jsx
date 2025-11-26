@@ -27,7 +27,7 @@ const LoginView = ({ onLogin }) => {
     if (!ACCOUNT_PATTERN.test(account.trim())) {
       nextErrors.account = 'Account requires 8+ letters and numbers.';
     }
-    if (!EMAIL_PATTERN.test(password)) {
+    if (!ACCOUNT_PATTERN.test(password)) {
       nextErrors.password = 'Password requires 8+ letters and numbers.';
     }
     setErrors(nextErrors);

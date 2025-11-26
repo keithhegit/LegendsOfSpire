@@ -580,17 +580,9 @@ export default function LegendsOfTheSpire() {
     const [loginComplete, setLoginComplete] = useState(false);
     const [currentUser, setCurrentUser] = useState(null);
     const [showDeadEndPrompt, setShowDeadEndPrompt] = useState(false);
-    const [currentUser, setCurrentUser] = useState(null);
     const [bgmStarted, setBgmStarted] = useState(false);
 
     useEffect(() => { const savedData = localStorage.getItem(SAVE_KEY); if (savedData) setHasSave(true); }, []);
-    useEffect(() => {
-        const storedUser = authService.getCurrentUser();
-        if (storedUser) {
-            setCurrentUser(storedUser);
-            setLoginComplete(true);
-        }
-    }, []);
     useEffect(() => {
         const storedUser = authService.getCurrentUser();
         if (storedUser) {
