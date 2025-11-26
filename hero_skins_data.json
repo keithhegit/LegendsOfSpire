@@ -1,0 +1,1949 @@
+{
+  "Garen": {
+    "name": "Garen",
+    "title": "The Might of Demacia",
+    "skins": [
+      {
+        "id": "86000",
+        "num": 0,
+        "name": "default",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Garen_0.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Garen_0.jpg"
+      },
+      {
+        "id": "86001",
+        "num": 1,
+        "name": "Sanguine Garen",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Garen_1.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Garen_1.jpg"
+      },
+      {
+        "id": "86002",
+        "num": 2,
+        "name": "Desert Trooper Garen",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Garen_2.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Garen_2.jpg"
+      },
+      {
+        "id": "86003",
+        "num": 3,
+        "name": "Commando Garen",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Garen_3.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Garen_3.jpg"
+      },
+      {
+        "id": "86004",
+        "num": 4,
+        "name": "Dreadknight Garen",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Garen_4.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Garen_4.jpg"
+      },
+      {
+        "id": "86005",
+        "num": 5,
+        "name": "Rugged Garen",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Garen_5.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Garen_5.jpg"
+      },
+      {
+        "id": "86006",
+        "num": 6,
+        "name": "Steel Legion Garen",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Garen_6.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Garen_6.jpg"
+      },
+      {
+        "id": "86010",
+        "num": 10,
+        "name": "Rogue Admiral Garen",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Garen_10.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Garen_10.jpg"
+      },
+      {
+        "id": "86011",
+        "num": 11,
+        "name": "Warring Kingdoms Garen",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Garen_11.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Garen_11.jpg"
+      },
+      {
+        "id": "86013",
+        "num": 13,
+        "name": "God-King Garen",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Garen_13.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Garen_13.jpg"
+      },
+      {
+        "id": "86014",
+        "num": 14,
+        "name": "Demacia Vice Garen",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Garen_14.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Garen_14.jpg"
+      },
+      {
+        "id": "86022",
+        "num": 22,
+        "name": "Mecha Kingdoms Garen",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Garen_22.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Garen_22.jpg"
+      },
+      {
+        "id": "86023",
+        "num": 23,
+        "name": "Prestige Mecha Kingdoms Garen",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Garen_23.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Garen_23.jpg"
+      },
+      {
+        "id": "86024",
+        "num": 24,
+        "name": "Battle Academia Garen",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Garen_24.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Garen_24.jpg"
+      },
+      {
+        "id": "86033",
+        "num": 33,
+        "name": "Mythmaker Garen",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Garen_33.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Garen_33.jpg"
+      }
+    ]
+  },
+  "Darius": {
+    "name": "Darius",
+    "title": "the Hand of Noxus",
+    "skins": [
+      {
+        "id": "122000",
+        "num": 0,
+        "name": "default",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Darius_0.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Darius_0.jpg"
+      },
+      {
+        "id": "122001",
+        "num": 1,
+        "name": "Lord Darius",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Darius_1.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Darius_1.jpg"
+      },
+      {
+        "id": "122002",
+        "num": 2,
+        "name": "Bioforge Darius",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Darius_2.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Darius_2.jpg"
+      },
+      {
+        "id": "122003",
+        "num": 3,
+        "name": "Woad King Darius",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Darius_3.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Darius_3.jpg"
+      },
+      {
+        "id": "122004",
+        "num": 4,
+        "name": "Dunkmaster Darius",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Darius_4.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Darius_4.jpg"
+      },
+      {
+        "id": "122008",
+        "num": 8,
+        "name": "Academy Darius",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Darius_8.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Darius_8.jpg"
+      },
+      {
+        "id": "122014",
+        "num": 14,
+        "name": "Dreadnova Darius",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Darius_14.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Darius_14.jpg"
+      },
+      {
+        "id": "122015",
+        "num": 15,
+        "name": "God-King Darius",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Darius_15.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Darius_15.jpg"
+      },
+      {
+        "id": "122016",
+        "num": 16,
+        "name": "High Noon Darius",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Darius_16.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Darius_16.jpg"
+      },
+      {
+        "id": "122024",
+        "num": 24,
+        "name": "Lunar Beast Darius",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Darius_24.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Darius_24.jpg"
+      },
+      {
+        "id": "122033",
+        "num": 33,
+        "name": "Crime City Nightmare Darius",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Darius_33.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Darius_33.jpg"
+      },
+      {
+        "id": "122043",
+        "num": 43,
+        "name": "Spirit Blossom Darius",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Darius_43.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Darius_43.jpg"
+      }
+    ]
+  },
+  "Lux": {
+    "name": "Lux",
+    "title": "the Lady of Luminosity",
+    "skins": [
+      {
+        "id": "99000",
+        "num": 0,
+        "name": "default",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Lux_0.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Lux_0.jpg"
+      },
+      {
+        "id": "99001",
+        "num": 1,
+        "name": "Sorceress Lux",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Lux_1.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Lux_1.jpg"
+      },
+      {
+        "id": "99002",
+        "num": 2,
+        "name": "Spellthief Lux",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Lux_2.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Lux_2.jpg"
+      },
+      {
+        "id": "99003",
+        "num": 3,
+        "name": "Commando Lux",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Lux_3.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Lux_3.jpg"
+      },
+      {
+        "id": "99004",
+        "num": 4,
+        "name": "Imperial Lux",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Lux_4.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Lux_4.jpg"
+      },
+      {
+        "id": "99005",
+        "num": 5,
+        "name": "Steel Legion Lux",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Lux_5.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Lux_5.jpg"
+      },
+      {
+        "id": "99006",
+        "num": 6,
+        "name": "Star Guardian Lux",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Lux_6.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Lux_6.jpg"
+      },
+      {
+        "id": "99007",
+        "num": 7,
+        "name": "Elementalist Lux",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Lux_7.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Lux_7.jpg"
+      },
+      {
+        "id": "99008",
+        "num": 8,
+        "name": "Lunar Empress Lux",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Lux_8.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Lux_8.jpg"
+      },
+      {
+        "id": "99014",
+        "num": 14,
+        "name": "Pajama Guardian Lux",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Lux_14.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Lux_14.jpg"
+      },
+      {
+        "id": "99015",
+        "num": 15,
+        "name": "Battle Academia Lux",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Lux_15.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Lux_15.jpg"
+      },
+      {
+        "id": "99016",
+        "num": 16,
+        "name": "Prestige Battle Academia Lux",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Lux_16.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Lux_16.jpg"
+      },
+      {
+        "id": "99017",
+        "num": 17,
+        "name": "Dark Cosmic Lux",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Lux_17.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Lux_17.jpg"
+      },
+      {
+        "id": "99018",
+        "num": 18,
+        "name": "Cosmic Lux",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Lux_18.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Lux_18.jpg"
+      },
+      {
+        "id": "99019",
+        "num": 19,
+        "name": "Space Groove Lux",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Lux_19.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Lux_19.jpg"
+      },
+      {
+        "id": "99029",
+        "num": 29,
+        "name": "Porcelain Lux",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Lux_29.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Lux_29.jpg"
+      },
+      {
+        "id": "99039",
+        "num": 39,
+        "name": "Prestige Battle Academia Lux (2022)",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Lux_39.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Lux_39.jpg"
+      },
+      {
+        "id": "99040",
+        "num": 40,
+        "name": "Prestige Porcelain Lux",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Lux_40.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Lux_40.jpg"
+      },
+      {
+        "id": "99042",
+        "num": 42,
+        "name": "Empyrean Lux",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Lux_42.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Lux_42.jpg"
+      }
+    ]
+  },
+  "Jinx": {
+    "name": "Jinx",
+    "title": "the Loose Cannon",
+    "skins": [
+      {
+        "id": "222000",
+        "num": 0,
+        "name": "default",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Jinx_0.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Jinx_0.jpg"
+      },
+      {
+        "id": "222001",
+        "num": 1,
+        "name": "Crime City Jinx",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Jinx_1.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Jinx_1.jpg"
+      },
+      {
+        "id": "222002",
+        "num": 2,
+        "name": "Firecracker Jinx",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Jinx_2.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Jinx_2.jpg"
+      },
+      {
+        "id": "222003",
+        "num": 3,
+        "name": "Zombie Slayer Jinx",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Jinx_3.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Jinx_3.jpg"
+      },
+      {
+        "id": "222004",
+        "num": 4,
+        "name": "Star Guardian Jinx",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Jinx_4.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Jinx_4.jpg"
+      },
+      {
+        "id": "222012",
+        "num": 12,
+        "name": "Ambitious Elf Jinx",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Jinx_12.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Jinx_12.jpg"
+      },
+      {
+        "id": "222013",
+        "num": 13,
+        "name": "Odyssey Jinx",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Jinx_13.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Jinx_13.jpg"
+      },
+      {
+        "id": "222020",
+        "num": 20,
+        "name": "PROJECT: Jinx",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Jinx_20.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Jinx_20.jpg"
+      },
+      {
+        "id": "222029",
+        "num": 29,
+        "name": "Heartseeker Jinx",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Jinx_29.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Jinx_29.jpg"
+      },
+      {
+        "id": "222037",
+        "num": 37,
+        "name": "Arcane Jinx",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Jinx_37.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Jinx_37.jpg"
+      },
+      {
+        "id": "222038",
+        "num": 38,
+        "name": "Battle Cat Jinx",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Jinx_38.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Jinx_38.jpg"
+      },
+      {
+        "id": "222040",
+        "num": 40,
+        "name": "Prestige Battle Cat Jinx",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Jinx_40.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Jinx_40.jpg"
+      }
+    ]
+  },
+  "Yasuo": {
+    "name": "Yasuo",
+    "title": "the Unforgiven",
+    "skins": [
+      {
+        "id": "157000",
+        "num": 0,
+        "name": "default",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yasuo_0.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Yasuo_0.jpg"
+      },
+      {
+        "id": "157001",
+        "num": 1,
+        "name": "High Noon Yasuo",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yasuo_1.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Yasuo_1.jpg"
+      },
+      {
+        "id": "157002",
+        "num": 2,
+        "name": "PROJECT: Yasuo",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yasuo_2.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Yasuo_2.jpg"
+      },
+      {
+        "id": "157003",
+        "num": 3,
+        "name": "Blood Moon Yasuo",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yasuo_3.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Yasuo_3.jpg"
+      },
+      {
+        "id": "157009",
+        "num": 9,
+        "name": "Nightbringer Yasuo",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yasuo_9.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Yasuo_9.jpg"
+      },
+      {
+        "id": "157010",
+        "num": 10,
+        "name": "Odyssey Yasuo",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yasuo_10.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Yasuo_10.jpg"
+      },
+      {
+        "id": "157017",
+        "num": 17,
+        "name": "Battle Boss Yasuo",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yasuo_17.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Yasuo_17.jpg"
+      },
+      {
+        "id": "157018",
+        "num": 18,
+        "name": "True Damage Yasuo",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yasuo_18.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Yasuo_18.jpg"
+      },
+      {
+        "id": "157035",
+        "num": 35,
+        "name": "Prestige True Damage Yasuo",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yasuo_35.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Yasuo_35.jpg"
+      },
+      {
+        "id": "157036",
+        "num": 36,
+        "name": "Spirit Blossom Yasuo",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yasuo_36.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Yasuo_36.jpg"
+      },
+      {
+        "id": "157045",
+        "num": 45,
+        "name": "Sea Dog Yasuo",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yasuo_45.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Yasuo_45.jpg"
+      },
+      {
+        "id": "157054",
+        "num": 54,
+        "name": "Truth Dragon Yasuo",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yasuo_54.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Yasuo_54.jpg"
+      },
+      {
+        "id": "157055",
+        "num": 55,
+        "name": "Dream Dragon Yasuo",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Yasuo_55.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Yasuo_55.jpg"
+      }
+    ]
+  },
+  "Sona": {
+    "name": "Sona",
+    "title": "Maven of the Strings",
+    "skins": [
+      {
+        "id": "37000",
+        "num": 0,
+        "name": "default",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Sona_0.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Sona_0.jpg"
+      },
+      {
+        "id": "37001",
+        "num": 1,
+        "name": "Muse Sona",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Sona_1.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Sona_1.jpg"
+      },
+      {
+        "id": "37002",
+        "num": 2,
+        "name": "Pentakill Sona",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Sona_2.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Sona_2.jpg"
+      },
+      {
+        "id": "37003",
+        "num": 3,
+        "name": "Silent Night Sona",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Sona_3.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Sona_3.jpg"
+      },
+      {
+        "id": "37004",
+        "num": 4,
+        "name": "Guqin Sona",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Sona_4.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Sona_4.jpg"
+      },
+      {
+        "id": "37005",
+        "num": 5,
+        "name": "Arcade Sona",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Sona_5.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Sona_5.jpg"
+      },
+      {
+        "id": "37006",
+        "num": 6,
+        "name": "DJ Sona",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Sona_6.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Sona_6.jpg"
+      },
+      {
+        "id": "37007",
+        "num": 7,
+        "name": "Sweetheart Sona",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Sona_7.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Sona_7.jpg"
+      },
+      {
+        "id": "37009",
+        "num": 9,
+        "name": "Odyssey Sona",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Sona_9.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Sona_9.jpg"
+      },
+      {
+        "id": "37017",
+        "num": 17,
+        "name": "PsyOps Sona",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Sona_17.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Sona_17.jpg"
+      },
+      {
+        "id": "37026",
+        "num": 26,
+        "name": "Pentakill III: Lost Chapter Sona",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Sona_26.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Sona_26.jpg"
+      },
+      {
+        "id": "37035",
+        "num": 35,
+        "name": "Star Guardian Sona",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Sona_35.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Sona_35.jpg"
+      }
+    ]
+  },
+  "Ekko": {
+    "name": "Ekko",
+    "title": "the Boy Who Shattered Time",
+    "skins": [
+      {
+        "id": "245000",
+        "num": 0,
+        "name": "default",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ekko_0.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Ekko_0.jpg"
+      },
+      {
+        "id": "245001",
+        "num": 1,
+        "name": "Sandstorm Ekko",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ekko_1.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Ekko_1.jpg"
+      },
+      {
+        "id": "245002",
+        "num": 2,
+        "name": "Academy Ekko",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ekko_2.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Ekko_2.jpg"
+      },
+      {
+        "id": "245003",
+        "num": 3,
+        "name": "PROJECT: Ekko",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ekko_3.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Ekko_3.jpg"
+      },
+      {
+        "id": "245011",
+        "num": 11,
+        "name": "SKT T1 Ekko",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ekko_11.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Ekko_11.jpg"
+      },
+      {
+        "id": "245012",
+        "num": 12,
+        "name": "Trick or Treat Ekko",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ekko_12.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Ekko_12.jpg"
+      },
+      {
+        "id": "245019",
+        "num": 19,
+        "name": "True Damage Ekko",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ekko_19.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Ekko_19.jpg"
+      },
+      {
+        "id": "245028",
+        "num": 28,
+        "name": "Pulsefire Ekko",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ekko_28.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Ekko_28.jpg"
+      },
+      {
+        "id": "245036",
+        "num": 36,
+        "name": "Firelight Ekko",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ekko_36.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Ekko_36.jpg"
+      },
+      {
+        "id": "245045",
+        "num": 45,
+        "name": "Star Guardian Ekko",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ekko_45.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Ekko_45.jpg"
+      },
+      {
+        "id": "245046",
+        "num": 46,
+        "name": "Prestige Star Guardian Ekko",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ekko_46.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Ekko_46.jpg"
+      }
+    ]
+  },
+  "Sylas": {
+    "name": "Sylas",
+    "title": "the Unshackled",
+    "skins": [
+      {
+        "id": "517000",
+        "num": 0,
+        "name": "default",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Sylas_0.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Sylas_0.jpg"
+      },
+      {
+        "id": "517001",
+        "num": 1,
+        "name": "Lunar Wraith Sylas",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Sylas_1.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Sylas_1.jpg"
+      },
+      {
+        "id": "517008",
+        "num": 8,
+        "name": "Freljord Sylas",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Sylas_8.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Sylas_8.jpg"
+      },
+      {
+        "id": "517013",
+        "num": 13,
+        "name": "PROJECT: Sylas",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Sylas_13.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Sylas_13.jpg"
+      },
+      {
+        "id": "517014",
+        "num": 14,
+        "name": "Prestige PROJECT: Sylas",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Sylas_14.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Sylas_14.jpg"
+      },
+      {
+        "id": "517024",
+        "num": 24,
+        "name": "Battle Wolf Sylas",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Sylas_24.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Sylas_24.jpg"
+      },
+      {
+        "id": "517034",
+        "num": 34,
+        "name": "Ashen Slayer Sylas",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Sylas_34.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Sylas_34.jpg"
+      }
+    ]
+  },
+  "Urgot": {
+    "name": "Urgot",
+    "title": "the Dreadnought",
+    "skins": [
+      {
+        "id": "6000",
+        "num": 0,
+        "name": "default",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Urgot_0.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Urgot_0.jpg"
+      },
+      {
+        "id": "6001",
+        "num": 1,
+        "name": "Giant Enemy Crabgot",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Urgot_1.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Urgot_1.jpg"
+      },
+      {
+        "id": "6002",
+        "num": 2,
+        "name": "Butcher Urgot",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Urgot_2.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Urgot_2.jpg"
+      },
+      {
+        "id": "6003",
+        "num": 3,
+        "name": "Battlecast Urgot",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Urgot_3.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Urgot_3.jpg"
+      },
+      {
+        "id": "6009",
+        "num": 9,
+        "name": "High Noon Urgot",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Urgot_9.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Urgot_9.jpg"
+      },
+      {
+        "id": "6015",
+        "num": 15,
+        "name": "Pajama Guardian Cosplay Urgot",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Urgot_15.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Urgot_15.jpg"
+      },
+      {
+        "id": "6023",
+        "num": 23,
+        "name": "Fright Night Urgot",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Urgot_23.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Urgot_23.jpg"
+      }
+    ]
+  },
+  "Viktor": {
+    "name": "Viktor",
+    "title": "the Machine Herald",
+    "skins": [
+      {
+        "id": "112000",
+        "num": 0,
+        "name": "default",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Viktor_0.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Viktor_0.jpg"
+      },
+      {
+        "id": "112001",
+        "num": 1,
+        "name": "Full Machine Viktor",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Viktor_1.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Viktor_1.jpg"
+      },
+      {
+        "id": "112002",
+        "num": 2,
+        "name": "Prototype Viktor",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Viktor_2.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Viktor_2.jpg"
+      },
+      {
+        "id": "112003",
+        "num": 3,
+        "name": "Creator Viktor",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Viktor_3.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Viktor_3.jpg"
+      },
+      {
+        "id": "112004",
+        "num": 4,
+        "name": "Death Sworn Viktor",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Viktor_4.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Viktor_4.jpg"
+      },
+      {
+        "id": "112005",
+        "num": 5,
+        "name": "PsyOps Viktor",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Viktor_5.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Viktor_5.jpg"
+      },
+      {
+        "id": "112014",
+        "num": 14,
+        "name": "High Noon Viktor",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Viktor_14.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Viktor_14.jpg"
+      }
+    ]
+  },
+  "Riven": {
+    "name": "Riven",
+    "title": "the Exile",
+    "skins": [
+      {
+        "id": "92000",
+        "num": 0,
+        "name": "default",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Riven_0.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Riven_0.jpg"
+      },
+      {
+        "id": "92001",
+        "num": 1,
+        "name": "Redeemed Riven",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Riven_1.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Riven_1.jpg"
+      },
+      {
+        "id": "92002",
+        "num": 2,
+        "name": "Crimson Elite Riven",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Riven_2.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Riven_2.jpg"
+      },
+      {
+        "id": "92003",
+        "num": 3,
+        "name": "Battle Bunny Riven",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Riven_3.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Riven_3.jpg"
+      },
+      {
+        "id": "92004",
+        "num": 4,
+        "name": "Championship Riven",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Riven_4.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Riven_4.jpg"
+      },
+      {
+        "id": "92005",
+        "num": 5,
+        "name": "Dragonblade Riven",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Riven_5.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Riven_5.jpg"
+      },
+      {
+        "id": "92006",
+        "num": 6,
+        "name": "Arcade Riven",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Riven_6.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Riven_6.jpg"
+      },
+      {
+        "id": "92007",
+        "num": 7,
+        "name": "Championship Riven 2016",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Riven_7.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Riven_7.jpg"
+      },
+      {
+        "id": "92016",
+        "num": 16,
+        "name": "Dawnbringer Riven",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Riven_16.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Riven_16.jpg"
+      },
+      {
+        "id": "92018",
+        "num": 18,
+        "name": "Pulsefire Riven",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Riven_18.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Riven_18.jpg"
+      },
+      {
+        "id": "92020",
+        "num": 20,
+        "name": "Valiant Sword Riven",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Riven_20.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Riven_20.jpg"
+      },
+      {
+        "id": "92022",
+        "num": 22,
+        "name": "Prestige Valiant Sword Riven",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Riven_22.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Riven_22.jpg"
+      },
+      {
+        "id": "92023",
+        "num": 23,
+        "name": "Spirit Blossom Riven",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Riven_23.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Riven_23.jpg"
+      },
+      {
+        "id": "92034",
+        "num": 34,
+        "name": "Sentinel Riven",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Riven_34.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Riven_34.jpg"
+      },
+      {
+        "id": "92044",
+        "num": 44,
+        "name": "Battle Bunny Prime Riven",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Riven_44.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Riven_44.jpg"
+      },
+      {
+        "id": "92045",
+        "num": 45,
+        "name": "Prestige Valiant Sword Riven (2022)",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Riven_45.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Riven_45.jpg"
+      }
+    ]
+  },
+  "TwistedFate": {
+    "name": "Twisted Fate",
+    "title": "the Card Master",
+    "skins": [
+      {
+        "id": "4000",
+        "num": 0,
+        "name": "default",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/TwistedFate_0.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/TwistedFate_0.jpg"
+      },
+      {
+        "id": "4001",
+        "num": 1,
+        "name": "PAX Twisted Fate",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/TwistedFate_1.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/TwistedFate_1.jpg"
+      },
+      {
+        "id": "4002",
+        "num": 2,
+        "name": "Jack of Hearts Twisted Fate",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/TwistedFate_2.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/TwistedFate_2.jpg"
+      },
+      {
+        "id": "4003",
+        "num": 3,
+        "name": "The Magnificent Twisted Fate",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/TwistedFate_3.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/TwistedFate_3.jpg"
+      },
+      {
+        "id": "4004",
+        "num": 4,
+        "name": "Tango Twisted Fate",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/TwistedFate_4.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/TwistedFate_4.jpg"
+      },
+      {
+        "id": "4005",
+        "num": 5,
+        "name": "High Noon Twisted Fate",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/TwistedFate_5.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/TwistedFate_5.jpg"
+      },
+      {
+        "id": "4006",
+        "num": 6,
+        "name": "Musketeer Twisted Fate",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/TwistedFate_6.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/TwistedFate_6.jpg"
+      },
+      {
+        "id": "4007",
+        "num": 7,
+        "name": "Underworld Twisted Fate",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/TwistedFate_7.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/TwistedFate_7.jpg"
+      },
+      {
+        "id": "4008",
+        "num": 8,
+        "name": "Red Card Twisted Fate",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/TwistedFate_8.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/TwistedFate_8.jpg"
+      },
+      {
+        "id": "4009",
+        "num": 9,
+        "name": "Cutpurse Twisted Fate",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/TwistedFate_9.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/TwistedFate_9.jpg"
+      },
+      {
+        "id": "4010",
+        "num": 10,
+        "name": "Blood Moon Twisted Fate",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/TwistedFate_10.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/TwistedFate_10.jpg"
+      },
+      {
+        "id": "4011",
+        "num": 11,
+        "name": "Pulsefire Twisted Fate",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/TwistedFate_11.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/TwistedFate_11.jpg"
+      },
+      {
+        "id": "4013",
+        "num": 13,
+        "name": "Odyssey Twisted Fate",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/TwistedFate_13.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/TwistedFate_13.jpg"
+      },
+      {
+        "id": "4023",
+        "num": 23,
+        "name": "DWG Twisted Fate",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/TwistedFate_23.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/TwistedFate_23.jpg"
+      },
+      {
+        "id": "4025",
+        "num": 25,
+        "name": "Crime City Nightmare Twisted Fate",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/TwistedFate_25.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/TwistedFate_25.jpg"
+      },
+      {
+        "id": "4036",
+        "num": 36,
+        "name": "Space Groove Twisted Fate",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/TwistedFate_36.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/TwistedFate_36.jpg"
+      }
+    ]
+  },
+  "LeeSin": {
+    "name": "Lee Sin",
+    "title": "the Blind Monk",
+    "skins": [
+      {
+        "id": "64000",
+        "num": 0,
+        "name": "default",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/LeeSin_0.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/LeeSin_0.jpg"
+      },
+      {
+        "id": "64001",
+        "num": 1,
+        "name": "Traditional Lee Sin",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/LeeSin_1.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/LeeSin_1.jpg"
+      },
+      {
+        "id": "64002",
+        "num": 2,
+        "name": "Acolyte Lee Sin",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/LeeSin_2.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/LeeSin_2.jpg"
+      },
+      {
+        "id": "64003",
+        "num": 3,
+        "name": "Dragon Fist Lee Sin",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/LeeSin_3.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/LeeSin_3.jpg"
+      },
+      {
+        "id": "64004",
+        "num": 4,
+        "name": "Muay Thai Lee Sin",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/LeeSin_4.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/LeeSin_4.jpg"
+      },
+      {
+        "id": "64005",
+        "num": 5,
+        "name": "Pool Party Lee Sin",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/LeeSin_5.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/LeeSin_5.jpg"
+      },
+      {
+        "id": "64006",
+        "num": 6,
+        "name": "SKT T1 Lee Sin",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/LeeSin_6.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/LeeSin_6.jpg"
+      },
+      {
+        "id": "64010",
+        "num": 10,
+        "name": "Knockout Lee Sin",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/LeeSin_10.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/LeeSin_10.jpg"
+      },
+      {
+        "id": "64011",
+        "num": 11,
+        "name": "God Fist Lee Sin",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/LeeSin_11.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/LeeSin_11.jpg"
+      },
+      {
+        "id": "64012",
+        "num": 12,
+        "name": "Playmaker Lee Sin",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/LeeSin_12.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/LeeSin_12.jpg"
+      },
+      {
+        "id": "64027",
+        "num": 27,
+        "name": "Nightbringer Lee Sin",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/LeeSin_27.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/LeeSin_27.jpg"
+      },
+      {
+        "id": "64028",
+        "num": 28,
+        "name": "Prestige Nightbringer Lee Sin",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/LeeSin_28.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/LeeSin_28.jpg"
+      },
+      {
+        "id": "64029",
+        "num": 29,
+        "name": "FPX Lee Sin",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/LeeSin_29.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/LeeSin_29.jpg"
+      },
+      {
+        "id": "64031",
+        "num": 31,
+        "name": "Storm Dragon Lee Sin",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/LeeSin_31.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/LeeSin_31.jpg"
+      },
+      {
+        "id": "64039",
+        "num": 39,
+        "name": "Prestige Nightbringer Lee Sin (2022)",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/LeeSin_39.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/LeeSin_39.jpg"
+      },
+      {
+        "id": "64041",
+        "num": 41,
+        "name": "Zenith Games Lee Sin",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/LeeSin_41.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/LeeSin_41.jpg"
+      }
+    ]
+  },
+  "Vayne": {
+    "name": "Vayne",
+    "title": "the Night Hunter",
+    "skins": [
+      {
+        "id": "67000",
+        "num": 0,
+        "name": "default",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Vayne_0.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Vayne_0.jpg"
+      },
+      {
+        "id": "67001",
+        "num": 1,
+        "name": "Vindicator Vayne",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Vayne_1.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Vayne_1.jpg"
+      },
+      {
+        "id": "67002",
+        "num": 2,
+        "name": "Aristocrat Vayne",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Vayne_2.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Vayne_2.jpg"
+      },
+      {
+        "id": "67003",
+        "num": 3,
+        "name": "Dragonslayer Vayne",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Vayne_3.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Vayne_3.jpg"
+      },
+      {
+        "id": "67004",
+        "num": 4,
+        "name": "Heartseeker Vayne",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Vayne_4.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Vayne_4.jpg"
+      },
+      {
+        "id": "67005",
+        "num": 5,
+        "name": "SKT T1 Vayne",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Vayne_5.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Vayne_5.jpg"
+      },
+      {
+        "id": "67006",
+        "num": 6,
+        "name": "Arclight Vayne",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Vayne_6.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Vayne_6.jpg"
+      },
+      {
+        "id": "67010",
+        "num": 10,
+        "name": "Soulstealer Vayne",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Vayne_10.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Vayne_10.jpg"
+      },
+      {
+        "id": "67011",
+        "num": 11,
+        "name": "PROJECT: Vayne",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Vayne_11.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Vayne_11.jpg"
+      },
+      {
+        "id": "67012",
+        "num": 12,
+        "name": "Firecracker Vayne",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Vayne_12.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Vayne_12.jpg"
+      },
+      {
+        "id": "67013",
+        "num": 13,
+        "name": "Prestige Firecracker Vayne",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Vayne_13.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Vayne_13.jpg"
+      },
+      {
+        "id": "67014",
+        "num": 14,
+        "name": "Spirit Blossom Vayne",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Vayne_14.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Vayne_14.jpg"
+      },
+      {
+        "id": "67015",
+        "num": 15,
+        "name": "FPX Vayne",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Vayne_15.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Vayne_15.jpg"
+      },
+      {
+        "id": "67025",
+        "num": 25,
+        "name": "Sentinel Vayne",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Vayne_25.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Vayne_25.jpg"
+      },
+      {
+        "id": "67032",
+        "num": 32,
+        "name": "Battle Bat Vayne",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Vayne_32.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Vayne_32.jpg"
+      },
+      {
+        "id": "67033",
+        "num": 33,
+        "name": "Prestige Firecracker Vayne (2022)",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Vayne_33.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Vayne_33.jpg"
+      }
+    ]
+  },
+  "Teemo": {
+    "name": "Teemo",
+    "title": "the Swift Scout",
+    "skins": [
+      {
+        "id": "17000",
+        "num": 0,
+        "name": "default",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Teemo_0.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Teemo_0.jpg"
+      },
+      {
+        "id": "17001",
+        "num": 1,
+        "name": "Happy Elf Teemo",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Teemo_1.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Teemo_1.jpg"
+      },
+      {
+        "id": "17002",
+        "num": 2,
+        "name": "Recon Teemo",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Teemo_2.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Teemo_2.jpg"
+      },
+      {
+        "id": "17003",
+        "num": 3,
+        "name": "Badger Teemo",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Teemo_3.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Teemo_3.jpg"
+      },
+      {
+        "id": "17004",
+        "num": 4,
+        "name": "Astronaut Teemo",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Teemo_4.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Teemo_4.jpg"
+      },
+      {
+        "id": "17005",
+        "num": 5,
+        "name": "Cottontail Teemo",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Teemo_5.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Teemo_5.jpg"
+      },
+      {
+        "id": "17006",
+        "num": 6,
+        "name": "Super Teemo",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Teemo_6.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Teemo_6.jpg"
+      },
+      {
+        "id": "17007",
+        "num": 7,
+        "name": "Panda Teemo",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Teemo_7.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Teemo_7.jpg"
+      },
+      {
+        "id": "17008",
+        "num": 8,
+        "name": "Omega Squad Teemo",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Teemo_8.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Teemo_8.jpg"
+      },
+      {
+        "id": "17014",
+        "num": 14,
+        "name": "Little Devil Teemo",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Teemo_14.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Teemo_14.jpg"
+      },
+      {
+        "id": "17018",
+        "num": 18,
+        "name": "Beemo",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Teemo_18.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Teemo_18.jpg"
+      },
+      {
+        "id": "17025",
+        "num": 25,
+        "name": "Spirit Blossom Teemo",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Teemo_25.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Teemo_25.jpg"
+      },
+      {
+        "id": "17027",
+        "num": 27,
+        "name": "Prestige Spirit Blossom Teemo",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Teemo_27.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Teemo_27.jpg"
+      },
+      {
+        "id": "17037",
+        "num": 37,
+        "name": "Firecracker Teemo",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Teemo_37.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Teemo_37.jpg"
+      },
+      {
+        "id": "17047",
+        "num": 47,
+        "name": "Space Groove Teemo",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Teemo_47.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Teemo_47.jpg"
+      }
+    ]
+  },
+  "Zed": {
+    "name": "Zed",
+    "title": "the Master of Shadows",
+    "skins": [
+      {
+        "id": "238000",
+        "num": 0,
+        "name": "default",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Zed_0.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Zed_0.jpg"
+      },
+      {
+        "id": "238001",
+        "num": 1,
+        "name": "Shockblade Zed",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Zed_1.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Zed_1.jpg"
+      },
+      {
+        "id": "238002",
+        "num": 2,
+        "name": "SKT T1 Zed",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Zed_2.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Zed_2.jpg"
+      },
+      {
+        "id": "238003",
+        "num": 3,
+        "name": "PROJECT: Zed",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Zed_3.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Zed_3.jpg"
+      },
+      {
+        "id": "238010",
+        "num": 10,
+        "name": "Championship Zed",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Zed_10.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Zed_10.jpg"
+      },
+      {
+        "id": "238011",
+        "num": 11,
+        "name": "Death Sworn Zed",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Zed_11.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Zed_11.jpg"
+      },
+      {
+        "id": "238013",
+        "num": 13,
+        "name": "Galaxy Slayer Zed",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Zed_13.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Zed_13.jpg"
+      },
+      {
+        "id": "238015",
+        "num": 15,
+        "name": "PsyOps Zed",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Zed_15.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Zed_15.jpg"
+      },
+      {
+        "id": "238030",
+        "num": 30,
+        "name": "Prestige PROJECT: Zed",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Zed_30.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Zed_30.jpg"
+      },
+      {
+        "id": "238031",
+        "num": 31,
+        "name": "Debonair Zed",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Zed_31.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Zed_31.jpg"
+      },
+      {
+        "id": "238038",
+        "num": 38,
+        "name": "Empyrean Zed",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Zed_38.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Zed_38.jpg"
+      }
+    ]
+  },
+  "Nasus": {
+    "name": "Nasus",
+    "title": "the Curator of the Sands",
+    "skins": [
+      {
+        "id": "75000",
+        "num": 0,
+        "name": "default",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Nasus_0.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Nasus_0.jpg"
+      },
+      {
+        "id": "75001",
+        "num": 1,
+        "name": "Galactic Nasus",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Nasus_1.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Nasus_1.jpg"
+      },
+      {
+        "id": "75002",
+        "num": 2,
+        "name": "Pharaoh Nasus",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Nasus_2.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Nasus_2.jpg"
+      },
+      {
+        "id": "75003",
+        "num": 3,
+        "name": "Dreadknight Nasus",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Nasus_3.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Nasus_3.jpg"
+      },
+      {
+        "id": "75004",
+        "num": 4,
+        "name": "Riot K-9 Nasus",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Nasus_4.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Nasus_4.jpg"
+      },
+      {
+        "id": "75005",
+        "num": 5,
+        "name": "Infernal Nasus",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Nasus_5.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Nasus_5.jpg"
+      },
+      {
+        "id": "75006",
+        "num": 6,
+        "name": "Archduke Nasus",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Nasus_6.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Nasus_6.jpg"
+      },
+      {
+        "id": "75010",
+        "num": 10,
+        "name": "Worldbreaker Nasus",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Nasus_10.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Nasus_10.jpg"
+      },
+      {
+        "id": "75011",
+        "num": 11,
+        "name": "Lunar Guardian Nasus",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Nasus_11.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Nasus_11.jpg"
+      },
+      {
+        "id": "75016",
+        "num": 16,
+        "name": "Battlecast Nasus",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Nasus_16.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Nasus_16.jpg"
+      },
+      {
+        "id": "75025",
+        "num": 25,
+        "name": "Space Groove Nasus",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Nasus_25.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Nasus_25.jpg"
+      },
+      {
+        "id": "75035",
+        "num": 35,
+        "name": "Armored Titan Nasus",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Nasus_35.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Nasus_35.jpg"
+      }
+    ]
+  },
+  "Irelia": {
+    "name": "Irelia",
+    "title": "the Blade Dancer",
+    "skins": [
+      {
+        "id": "39000",
+        "num": 0,
+        "name": "default",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Irelia_0.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Irelia_0.jpg"
+      },
+      {
+        "id": "39001",
+        "num": 1,
+        "name": "Nightblade Irelia",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Irelia_1.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Irelia_1.jpg"
+      },
+      {
+        "id": "39002",
+        "num": 2,
+        "name": "Aviator Irelia",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Irelia_2.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Irelia_2.jpg"
+      },
+      {
+        "id": "39003",
+        "num": 3,
+        "name": "Infiltrator Irelia",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Irelia_3.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Irelia_3.jpg"
+      },
+      {
+        "id": "39004",
+        "num": 4,
+        "name": "Frostblade Irelia",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Irelia_4.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Irelia_4.jpg"
+      },
+      {
+        "id": "39005",
+        "num": 5,
+        "name": "Order of the Lotus Irelia",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Irelia_5.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Irelia_5.jpg"
+      },
+      {
+        "id": "39006",
+        "num": 6,
+        "name": "Divine Sword Irelia",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Irelia_6.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Irelia_6.jpg"
+      },
+      {
+        "id": "39015",
+        "num": 15,
+        "name": "iG Irelia",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Irelia_15.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Irelia_15.jpg"
+      },
+      {
+        "id": "39016",
+        "num": 16,
+        "name": "PROJECT: Irelia",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Irelia_16.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Irelia_16.jpg"
+      },
+      {
+        "id": "39017",
+        "num": 17,
+        "name": "Prestige PROJECT: Irelia",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Irelia_17.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Irelia_17.jpg"
+      },
+      {
+        "id": "39018",
+        "num": 18,
+        "name": "High Noon Irelia",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Irelia_18.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Irelia_18.jpg"
+      },
+      {
+        "id": "39026",
+        "num": 26,
+        "name": "Sentinel Irelia",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Irelia_26.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Irelia_26.jpg"
+      },
+      {
+        "id": "39036",
+        "num": 36,
+        "name": "Prestige PROJECT: Irelia (2022)",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Irelia_36.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Irelia_36.jpg"
+      },
+      {
+        "id": "39037",
+        "num": 37,
+        "name": "Mythmaker Irelia",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Irelia_37.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Irelia_37.jpg"
+      }
+    ]
+  },
+  "Thresh": {
+    "name": "Thresh",
+    "title": "the Chain Warden",
+    "skins": [
+      {
+        "id": "412000",
+        "num": 0,
+        "name": "default",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Thresh_0.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Thresh_0.jpg"
+      },
+      {
+        "id": "412001",
+        "num": 1,
+        "name": "Deep Terror Thresh",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Thresh_1.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Thresh_1.jpg"
+      },
+      {
+        "id": "412002",
+        "num": 2,
+        "name": "Championship Thresh",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Thresh_2.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Thresh_2.jpg"
+      },
+      {
+        "id": "412003",
+        "num": 3,
+        "name": "Blood Moon Thresh",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Thresh_3.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Thresh_3.jpg"
+      },
+      {
+        "id": "412004",
+        "num": 4,
+        "name": "SSW Thresh",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Thresh_4.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Thresh_4.jpg"
+      },
+      {
+        "id": "412005",
+        "num": 5,
+        "name": "Dark Star Thresh",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Thresh_5.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Thresh_5.jpg"
+      },
+      {
+        "id": "412006",
+        "num": 6,
+        "name": "High Noon Thresh",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Thresh_6.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Thresh_6.jpg"
+      },
+      {
+        "id": "412013",
+        "num": 13,
+        "name": "Pulsefire Thresh",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Thresh_13.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Thresh_13.jpg"
+      },
+      {
+        "id": "412014",
+        "num": 14,
+        "name": "Prestige Pulsefire Thresh",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Thresh_14.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Thresh_14.jpg"
+      },
+      {
+        "id": "412015",
+        "num": 15,
+        "name": "FPX Thresh",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Thresh_15.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Thresh_15.jpg"
+      },
+      {
+        "id": "412017",
+        "num": 17,
+        "name": "Spirit Blossom Thresh",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Thresh_17.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Thresh_17.jpg"
+      },
+      {
+        "id": "412027",
+        "num": 27,
+        "name": "Unbound Thresh",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Thresh_27.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Thresh_27.jpg"
+      },
+      {
+        "id": "412028",
+        "num": 28,
+        "name": "Steel Dragon Thresh",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Thresh_28.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Thresh_28.jpg"
+      },
+      {
+        "id": "412038",
+        "num": 38,
+        "name": "Prestige Pulsefire Thresh (2022)",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Thresh_38.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Thresh_38.jpg"
+      },
+      {
+        "id": "412039",
+        "num": 39,
+        "name": "Lunar Emperor Thresh",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Thresh_39.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Thresh_39.jpg"
+      }
+    ]
+  },
+  "Katarina": {
+    "name": "Katarina",
+    "title": "the Sinister Blade",
+    "skins": [
+      {
+        "id": "55000",
+        "num": 0,
+        "name": "default",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Katarina_0.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Katarina_0.jpg"
+      },
+      {
+        "id": "55001",
+        "num": 1,
+        "name": "Mercenary Katarina",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Katarina_1.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Katarina_1.jpg"
+      },
+      {
+        "id": "55002",
+        "num": 2,
+        "name": "Red Card Katarina",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Katarina_2.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Katarina_2.jpg"
+      },
+      {
+        "id": "55003",
+        "num": 3,
+        "name": "Bilgewater Katarina",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Katarina_3.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Katarina_3.jpg"
+      },
+      {
+        "id": "55004",
+        "num": 4,
+        "name": "Kitty Cat Katarina",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Katarina_4.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Katarina_4.jpg"
+      },
+      {
+        "id": "55005",
+        "num": 5,
+        "name": "High Command Katarina",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Katarina_5.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Katarina_5.jpg"
+      },
+      {
+        "id": "55006",
+        "num": 6,
+        "name": "Sandstorm Katarina",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Katarina_6.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Katarina_6.jpg"
+      },
+      {
+        "id": "55007",
+        "num": 7,
+        "name": "Slay Belle Katarina",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Katarina_7.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Katarina_7.jpg"
+      },
+      {
+        "id": "55008",
+        "num": 8,
+        "name": "Warring Kingdoms Katarina",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Katarina_8.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Katarina_8.jpg"
+      },
+      {
+        "id": "55009",
+        "num": 9,
+        "name": "PROJECT: Katarina",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Katarina_9.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Katarina_9.jpg"
+      },
+      {
+        "id": "55010",
+        "num": 10,
+        "name": "Death Sworn Katarina",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Katarina_10.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Katarina_10.jpg"
+      },
+      {
+        "id": "55012",
+        "num": 12,
+        "name": "Battle Academia Katarina",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Katarina_12.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Katarina_12.jpg"
+      },
+      {
+        "id": "55021",
+        "num": 21,
+        "name": "Blood Moon Katarina",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Katarina_21.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Katarina_21.jpg"
+      },
+      {
+        "id": "55029",
+        "num": 29,
+        "name": "Battle Queen Katarina",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Katarina_29.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Katarina_29.jpg"
+      },
+      {
+        "id": "55037",
+        "num": 37,
+        "name": "High Noon Katarina",
+        "splashUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Katarina_37.jpg",
+        "loadingUrl": "https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Katarina_37.jpg"
+      }
+    ]
+  }
+}

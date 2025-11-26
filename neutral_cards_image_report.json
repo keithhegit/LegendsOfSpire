@@ -1,0 +1,905 @@
+{
+  "total": 112,
+  "working": 67,
+  "broken": 45,
+  "broken_cards": [
+    {
+      "id": "Neutral_004",
+      "name": "破甲一击",
+      "description": "造成12点伤并减少目标护甲6点。",
+      "image": "SummonerIgnite.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerIgnite.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_008",
+      "name": "强制斩击",
+      "description": "对单体造成14伤；若目标虚弱则费用变为0。",
+      "image": "SummonerIgnite.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerIgnite.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_010",
+      "name": "法力容器",
+      "description": "获得1点临时法力（本回合）。",
+      "image": "SummonerClarity.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerClarity.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_012",
+      "name": "战争学识",
+      "description": "抽1；若本回合已打出≥2张攻击则改为抽2。",
+      "image": "SummonerGhost.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerGhost.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_013",
+      "name": "战术速记",
+      "description": "下回合先手抽牌+1。",
+      "image": "SummonerGhost.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerGhost.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_014",
+      "name": "暗影笔记",
+      "description": "查看目标下一个行动（在 AI 环境中为查看其策略）。",
+      "image": "SummonerClairvoyance.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerClairvoyance.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_016",
+      "name": "法力石碎片",
+      "description": "若你手牌≤3，则获得1法力并抽1。",
+      "image": "SummonerClarity.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerClarity.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_025",
+      "name": "随风信笺",
+      "description": "随机选择一张手牌使其本回合费用-1；结束回合后该卡被移除(消耗版)。",
+      "image": "SummonerGhost.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerGhost.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_035",
+      "name": "能量回复",
+      "description": "恢复2法力：本回合与下回合各+1（节奏），合计2回。",
+      "image": "SummonerClarity.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerClarity.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_048",
+      "name": "破甲斩8",
+      "description": "对单体造成11点伤害。",
+      "image": "SummonerIgnite.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerIgnite.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_049",
+      "name": "回旋镖9",
+      "description": "抽3张牌。",
+      "image": "SummonerGhost.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerGhost.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_051",
+      "name": "烈焰斩1",
+      "description": "对单体造成10点伤害。",
+      "image": "SummonerIgnite.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerIgnite.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_054",
+      "name": "致命一击4",
+      "description": "对单体造成9点伤害。",
+      "image": "SummonerIgnite.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerIgnite.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_057",
+      "name": "雷霆一击7",
+      "description": "对单体造成8点伤害。",
+      "image": "SummonerIgnite.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerIgnite.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_058",
+      "name": "法力回复8",
+      "description": "回复4法力。",
+      "image": "SummonerClarity.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerClarity.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_060",
+      "name": "冰霜打击0",
+      "description": "对单体造成7点伤害。",
+      "image": "SummonerIgnite.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerIgnite.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_061",
+      "name": "强化1",
+      "description": "抽3张牌。",
+      "image": "SummonerGhost.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerGhost.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_063",
+      "name": "连环打击3",
+      "description": "对单体造成6点伤害。",
+      "image": "SummonerIgnite.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerIgnite.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_066",
+      "name": "疾风斩6",
+      "description": "对单体造成12点伤害。",
+      "image": "SummonerIgnite.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerIgnite.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_069",
+      "name": "暗影突袭9",
+      "description": "对单体造成11点伤害。",
+      "image": "SummonerIgnite.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerIgnite.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_070",
+      "name": "净化0",
+      "description": "回复4法力。",
+      "image": "SummonerClarity.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerClarity.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_072",
+      "name": "破甲斩2",
+      "description": "对单体造成10点伤害。",
+      "image": "SummonerIgnite.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerIgnite.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_073",
+      "name": "回旋镖3",
+      "description": "抽3张牌。",
+      "image": "SummonerGhost.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerGhost.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_078",
+      "name": "致命一击8",
+      "description": "对单体造成8点伤害。",
+      "image": "SummonerIgnite.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerIgnite.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_081",
+      "name": "雷霆一击1",
+      "description": "对单体造成7点伤害。",
+      "image": "SummonerIgnite.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerIgnite.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_082",
+      "name": "法力回复2",
+      "description": "回复4法力。",
+      "image": "SummonerClarity.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerClarity.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_084",
+      "name": "冰霜打击4",
+      "description": "对单体造成6点伤害。",
+      "image": "SummonerIgnite.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerIgnite.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_085",
+      "name": "强化5",
+      "description": "抽3张牌。",
+      "image": "SummonerGhost.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerGhost.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_087",
+      "name": "连环打击7",
+      "description": "对单体造成12点伤害。",
+      "image": "SummonerIgnite.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerIgnite.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_090",
+      "name": "疾风斩0",
+      "description": "对单体造成11点伤害。",
+      "image": "SummonerIgnite.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerIgnite.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_093",
+      "name": "暗影突袭3",
+      "description": "对单体造成10点伤害。",
+      "image": "SummonerIgnite.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerIgnite.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_094",
+      "name": "净化4",
+      "description": "回复4法力。",
+      "image": "SummonerClarity.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerClarity.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_096",
+      "name": "破甲斩6",
+      "description": "对单体造成9点伤害。",
+      "image": "SummonerIgnite.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerIgnite.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_097",
+      "name": "回旋镖7",
+      "description": "抽3张牌。",
+      "image": "SummonerGhost.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerGhost.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_099",
+      "name": "烈焰斩9",
+      "description": "对单体造成8点伤害。",
+      "image": "SummonerIgnite.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerIgnite.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_102",
+      "name": "致命一击2",
+      "description": "对单体造成7点伤害。",
+      "image": "SummonerIgnite.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerIgnite.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_105",
+      "name": "雷霆一击5",
+      "description": "对单体造成6点伤害。",
+      "image": "SummonerIgnite.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerIgnite.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_106",
+      "name": "法力回复6",
+      "description": "回复4法力。",
+      "image": "SummonerClarity.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerClarity.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_108",
+      "name": "冰霜打击8",
+      "description": "对单体造成12点伤害。",
+      "image": "SummonerIgnite.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerIgnite.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_109",
+      "name": "强化9",
+      "description": "抽3张牌。",
+      "image": "SummonerGhost.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerGhost.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_111",
+      "name": "连环打击1",
+      "description": "对单体造成11点伤害。",
+      "image": "SummonerIgnite.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerIgnite.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_114",
+      "name": "疾风斩4",
+      "description": "对单体造成10点伤害。",
+      "image": "SummonerIgnite.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerIgnite.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_117",
+      "name": "暗影突袭7",
+      "description": "对单体造成9点伤害。",
+      "image": "SummonerIgnite.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerIgnite.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_118",
+      "name": "净化8",
+      "description": "回复4法力。",
+      "image": "SummonerClarity.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerClarity.png",
+      "status": "❌"
+    },
+    {
+      "id": "Neutral_120",
+      "name": "破甲斩0",
+      "description": "对单体造成8点伤害。",
+      "image": "SummonerIgnite.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerIgnite.png",
+      "status": "❌"
+    }
+  ],
+  "working_cards": [
+    {
+      "id": "Neutral_001",
+      "name": "破绽刺击",
+      "description": "对目标造成6点伤；若目标有标记则再造成4点伤。",
+      "image": "SummonerExhaust.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerExhaust.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_002",
+      "name": "致盲烟幕",
+      "description": "造成4点伤并使目标虚弱2。",
+      "image": "SummonerSmite.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerSmite.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_003",
+      "name": "缚魂钩",
+      "description": "对目标造成5伤并在其上放置“牵绊”标记：若你下回合对其攻击则额外触发8伤。",
+      "image": "SummonerExhaust.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerExhaust.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_005",
+      "name": "扰心之刃",
+      "description": "造成6点伤并使目标下一张卡效果降低1（若实现对 AI 非真实卡改为降低下一行动威力）。",
+      "image": "SummonerExhaust.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerExhaust.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_006",
+      "name": "缠绕陷阱",
+      "description": "在目标上放置陷阱标记：若目标下回合尝试攻击或打牌，则触发对该目标造成10伤。",
+      "image": "SummonerExhaust.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerExhaust.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_007",
+      "name": "逆流牵制",
+      "description": "若目标本回合有增益，则对其造成10伤并移除一个增益。",
+      "image": "SummonerSmite.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerSmite.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_009",
+      "name": "净化之页",
+      "description": "抽2张牌。",
+      "image": "SummonerFlash.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerFlash.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_011",
+      "name": "贪婪商券",
+      "description": "获得10金币；若弃置此牌则额外获得10金币（弃置风险换奖励）。",
+      "image": "SummonerTeleport.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerTeleport.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_015",
+      "name": "金币押注",
+      "description": "50%获得+30G，50%失去10HP（高风险高回报）。",
+      "image": "SummonerTeleport.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerTeleport.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_017",
+      "name": "求知铭文",
+      "description": "每次击杀单位（非 boss）永久+1抽牌（慎用）。",
+      "image": "SummonerSnowball.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerSnowball.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_018",
+      "name": "匠魂之锤",
+      "description": "选择一张卡永久+1数值（或-1费用）。",
+      "image": "SummonerSnowball.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerSnowball.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_019",
+      "name": "荣誉奖章",
+      "description": "战斗胜利时获得额外+10金币（可叠）。",
+      "image": "SummonerTeleport.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerTeleport.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_020",
+      "name": "猎手徽章",
+      "description": "若本局击杀≥5，立即获得本局力量+2（战斗内成长）。",
+      "image": "SummonerHaste.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerHaste.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_021",
+      "name": "野心契约",
+      "description": "牺牲5最大生命 → 永久+1力量（高代价长期收益）。",
+      "image": "SummonerHaste.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerHaste.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_022",
+      "name": "古老碑铭",
+      "description": "战斗开始时若持有本卡则每回合开始额外抽1张（持续战斗期）。",
+      "image": "SummonerSnowball.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerSnowball.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_023",
+      "name": "逆向引擎",
+      "description": "从弃牌堆将一张卡返回手牌。",
+      "image": "SummonerFlash.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerFlash.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_024",
+      "name": "献祭之环",
+      "description": "牺牲6生命获得12护甲。",
+      "image": "SummonerHeal.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerHeal.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_026",
+      "name": "暗金卷轴",
+      "description": "立即升级一张非BASIC卡（+3数值或-1费用）。",
+      "image": "SummonerSnowball.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerSnowball.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_027",
+      "name": "诱饵之箱",
+      "description": "放置诱饵标记；若目标尝试触发则对其造成8伤。",
+      "image": "SummonerExhaust.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerExhaust.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_028",
+      "name": "回旋弹",
+      "description": "造成9伤并使敌人下一张卡费用+1（资源压制）。",
+      "image": "SummonerSmite.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerSmite.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_029",
+      "name": "虚弱契约",
+      "description": "使目标-1力量，持续2回合。",
+      "image": "SummonerExhaust.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerExhaust.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_030",
+      "name": "重塑石",
+      "description": "随机将手上一张卡替换为同稀有度另一张卡（高变数）。",
+      "image": "SummonerFlash.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerFlash.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_031",
+      "name": "守护之盾",
+      "description": "获得10护甲。",
+      "image": "SummonerBarrier.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerBarrier.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_032",
+      "name": "回复秘药",
+      "description": "回复10生命。",
+      "image": "SummonerHeal.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerHeal.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_033",
+      "name": "格挡之歌",
+      "description": "获得6护甲并使下一次受到的伤害额外减少4。",
+      "image": "SummonerBarrier.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerBarrier.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_034",
+      "name": "逆伤反震",
+      "description": "若在本回合被攻击，则反弹8伤给攻击者。",
+      "image": "SummonerBarrier.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerBarrier.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_036",
+      "name": "稳固姿态",
+      "description": "若本回合没有出牌，则下回合获得6护甲（鼓励保留）。",
+      "image": "SummonerBarrier.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerBarrier.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_037",
+      "name": "暗影岛之歌",
+      "description": "对单体造成8伤；胜利时解锁一次暗影岛事件（剧情/奖励）。",
+      "image": "SummonerDot.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerDot.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_038",
+      "name": "诺克萨斯断章",
+      "description": "目标获取治疗效果降低50%，持续2回合。",
+      "image": "SummonerExhaust.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerExhaust.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_039",
+      "name": "德玛之徽",
+      "description": "目标对你造成的伤害减少30%（1回合）。",
+      "image": "SummonerBarrier.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerBarrier.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_040",
+      "name": "虚空砂",
+      "description": "标记目标：其在3回合内每回合损失5生命；若击杀目标则返还20G。",
+      "image": "SummonerDot.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerDot.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_041",
+      "name": "无畏壁垒",
+      "description": "每回合开始获得5护甲（本战斗）。",
+      "image": "SummonerBarrier.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerBarrier.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_050",
+      "name": "持久态势0",
+      "description": "每回合开始获得4护甲（本战斗）。",
+      "image": "SummonerBarrier.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerBarrier.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_052",
+      "name": "能量脉冲2",
+      "description": "获得10护甲。",
+      "image": "SummonerBarrier.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerBarrier.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_053",
+      "name": "坚韧不拔3",
+      "description": "每回合开始获得3护甲（本战斗）。",
+      "image": "SummonerBarrier.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerBarrier.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_055",
+      "name": "治疗波5",
+      "description": "获得6护甲并抽1牌。",
+      "image": "SummonerHeal.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerHeal.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_056",
+      "name": "持久态势6",
+      "description": "每回合开始获得2护甲（本战斗）。",
+      "image": "SummonerBarrier.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerBarrier.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_059",
+      "name": "坚韧不拔9",
+      "description": "每回合开始获得5护甲（本战斗）。",
+      "image": "SummonerBarrier.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerBarrier.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_062",
+      "name": "持久态势2",
+      "description": "每回合开始获得4护甲（本战斗）。",
+      "image": "SummonerBarrier.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerBarrier.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_064",
+      "name": "护盾术4",
+      "description": "获得14护甲。",
+      "image": "SummonerBarrier.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerBarrier.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_065",
+      "name": "坚韧不拔5",
+      "description": "每回合开始获得3护甲（本战斗）。",
+      "image": "SummonerBarrier.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerBarrier.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_067",
+      "name": "战术撤退7",
+      "description": "获得10护甲并抽1牌。",
+      "image": "SummonerHeal.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerHeal.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_068",
+      "name": "持久态势8",
+      "description": "每回合开始获得2护甲（本战斗）。",
+      "image": "SummonerBarrier.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerBarrier.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_071",
+      "name": "坚韧不拔1",
+      "description": "每回合开始获得5护甲（本战斗）。",
+      "image": "SummonerBarrier.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerBarrier.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_074",
+      "name": "持久态势4",
+      "description": "每回合开始获得4护甲（本战斗）。",
+      "image": "SummonerBarrier.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerBarrier.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_075",
+      "name": "烈焰斩5",
+      "description": "每回合开始获得3护甲（本战斗）。",
+      "image": "SummonerBarrier.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerBarrier.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_079",
+      "name": "治疗波9",
+      "description": "获得14护甲并抽1牌。",
+      "image": "SummonerHeal.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerHeal.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_080",
+      "name": "持久态势0",
+      "description": "每回合开始获得2护甲（本战斗）。",
+      "image": "SummonerBarrier.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerBarrier.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_083",
+      "name": "坚韧不拔3",
+      "description": "每回合开始获得5护甲（本战斗）。",
+      "image": "SummonerBarrier.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerBarrier.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_086",
+      "name": "持久态势6",
+      "description": "每回合开始获得4护甲（本战斗）。",
+      "image": "SummonerBarrier.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerBarrier.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_088",
+      "name": "护盾术8",
+      "description": "获得12护甲。",
+      "image": "SummonerBarrier.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerBarrier.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_089",
+      "name": "坚韧不拔9",
+      "description": "每回合开始获得3护甲（本战斗）。",
+      "image": "SummonerBarrier.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerBarrier.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_091",
+      "name": "战术撤退1",
+      "description": "获得8护甲并抽1牌。",
+      "image": "SummonerHeal.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerHeal.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_092",
+      "name": "持久态势2",
+      "description": "每回合开始获得2护甲（本战斗）。",
+      "image": "SummonerBarrier.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerBarrier.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_095",
+      "name": "坚韧不拔5",
+      "description": "每回合开始获得5护甲（本战斗）。",
+      "image": "SummonerBarrier.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerBarrier.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_098",
+      "name": "持久态势8",
+      "description": "每回合开始获得4护甲（本战斗）。",
+      "image": "SummonerBarrier.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerBarrier.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_100",
+      "name": "能量脉冲0",
+      "description": "获得6护甲。",
+      "image": "SummonerBarrier.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerBarrier.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_101",
+      "name": "坚韧不拔1",
+      "description": "每回合开始获得3护甲（本战斗）。",
+      "image": "SummonerBarrier.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerBarrier.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_103",
+      "name": "治疗波3",
+      "description": "获得12护甲并抽1牌。",
+      "image": "SummonerHeal.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerHeal.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_104",
+      "name": "持久态势4",
+      "description": "每回合开始获得2护甲（本战斗）。",
+      "image": "SummonerBarrier.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerBarrier.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_107",
+      "name": "坚韧不拔7",
+      "description": "每回合开始获得5护甲（本战斗）。",
+      "image": "SummonerBarrier.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerBarrier.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_110",
+      "name": "持久态势0",
+      "description": "每回合开始获得4护甲（本战斗）。",
+      "image": "SummonerBarrier.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerBarrier.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_112",
+      "name": "护盾术2",
+      "description": "获得10护甲。",
+      "image": "SummonerBarrier.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerBarrier.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_113",
+      "name": "坚韧不拔3",
+      "description": "每回合开始获得3护甲（本战斗）。",
+      "image": "SummonerBarrier.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerBarrier.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_115",
+      "name": "战术撤退5",
+      "description": "获得6护甲并抽1牌。",
+      "image": "SummonerHeal.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerHeal.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_116",
+      "name": "持久态势6",
+      "description": "每回合开始获得2护甲（本战斗）。",
+      "image": "SummonerBarrier.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerBarrier.png",
+      "status": "✅"
+    },
+    {
+      "id": "Neutral_119",
+      "name": "坚韧不拔9",
+      "description": "每回合开始获得5护甲（本战斗）。",
+      "image": "SummonerBarrier.png",
+      "url": "https://ddragon.leagueoflegends.com/cdn/13.1.1/img/spell/SummonerBarrier.png",
+      "status": "✅"
+    }
+  ]
+}
