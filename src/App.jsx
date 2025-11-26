@@ -1094,20 +1094,20 @@ export default function LegendsOfTheSpire() {
                 </div>
             )}
             {view !== 'GAMEOVER' && view !== 'VICTORY_ALL' && view !== 'MENU' && view !== 'CHAMPION_SELECT' && champion && (
-            {view === 'MAP' && currentUser && (
-                <div className="absolute top-24 right-5 z-[115] flex flex-col items-end gap-1 text-right">
-                    <button
-                        onClick={handleResetProgress}
-                        className="px-3 py-1 rounded-full border border-red-500 text-red-200 bg-black/60 hover:bg-red-500/20 transition text-xs uppercase tracking-[0.4em]"
-                    >
-                        RESET PROGRESS
-                    </button>
-                    <p className="text-[10px] uppercase tracking-[0.3em] text-red-400">
-                        This clears your current map and forces a new champion pick.
-                    </p>
-                </div>
-            )}
-            {view !== 'GAMEOVER' && view !== 'VICTORY_ALL' && view !== 'MENU' && view !== 'CHAMPION_SELECT' && champion && (
+            <>
+                {view === 'MAP' && currentUser && (
+                    <div className="absolute top-24 right-5 z-[115] flex flex-col items-end gap-1 text-right">
+                        <button
+                            onClick={handleResetProgress}
+                            className="px-3 py-1 rounded-full border border-red-500 text-red-200 bg-black/60 hover:bg-red-500/20 transition text-xs uppercase tracking-[0.4em]"
+                        >
+                            RESET PROGRESS
+                        </button>
+                        <p className="text-[10px] uppercase tracking-[0.3em] text-red-400">
+                            This clears your current map and forces a new champion pick.
+                        </p>
+                    </div>
+                )}
                 <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-black to-transparent z-50 flex items-center justify-between px-8 pointer-events-none">
                     <div className="flex items-center gap-6 pointer-events-auto">
                         <div className="relative group">
@@ -1142,6 +1142,7 @@ export default function LegendsOfTheSpire() {
                         </div>
                     </div>
                 </div>
+            </>
             )}
             {renderView()}
             {showCodex && <CodexView onClose={() => setShowCodex(false)} />}
