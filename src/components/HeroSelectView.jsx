@@ -1,11 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight, Lock } from 'lucide-react';
 import { HERO_LIST } from '../data/heroSkins';
 
-const HeroSelectView = ({ onChampionSelect, unlockedIds = [] }) => {
+const HeroSelectView = ({ onChampionSelect, unlockedIds = [], currentUser }) => {
     const [selectedHero, setSelectedHero] = useState(HERO_LIST.find(h => h.id === 'Jhin') || HERO_LIST[0]);
     const [currentSkinIndex, setCurrentSkinIndex] = useState(0);
+    const [favoriteHero, setFavoriteHero] = useState(null);
+
+    useEffect(() => {
+        if (!currentUser) {
+            setFavoriteHero(null);
+            return;
+        }
+        const stored = localStorage.getItem(`favoriteHero_${currentUser.email}`);
+        if (stored) setFavoriteHero(stored);
+    }, [currentUser]);
 
     const handleHeroSelect = (hero) => {
         setSelectedHero(hero);
@@ -58,6 +68,12 @@ const HeroSelectView = ({ onChampionSelect, unlockedIds = [] }) => {
                 console.error("Failed to load champion data:", error);
             }
         }
+    };
+
+    const handleSetFavorite = () => {
+        if (!currentUser) return;
+        localStorage.setItem(`favoriteHero_${currentUser.email}`, selectedHero.id);
+        setFavoriteHero(selectedHero.id);
     };
 
     return (
@@ -117,13 +133,29 @@ const HeroSelectView = ({ onChampionSelect, unlockedIds = [] }) => {
             <div className="w-[35%] flex flex-col bg-slate-900/50 backdrop-blur-sm border-r border-slate-700/50">
                 {/* Header */}
                 <div className="p-6 border-b border-slate-700/50">
-                    <h3 className="text-2xl font-bold text-amber-400 tracking-widest">SELECT CHAMPION</h3>
-                    <p className="text-slate-400 text-sm mt-1">Choose your legend</p>
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h3 className="text-2xl font-bold text-amber-400 tracking-widest">SELECT CHAMPION</h3>
+                            <p className="text-slate-400 text-sm mt-1">Choose your legend</p>
+                        </div>
+                        {currentUser && (
+                            <div className="flex flex-col items-end text-right">
+                                <p className="text-xs uppercase tracking-[0.4em] text-cyan-300">
+                                    {`Logged in as ${currentUser.username || currentUser.email}`}
+                                </p>
+                                {favoriteHero && (
+                                    <p className="text-[9px] uppercase tracking-[0.5em] text-amber-300">
+                                        {`Favorite: ${favoriteHero}`}
+                                    </p>
+                                )}
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 {/* Grid Container */}
                 <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
-                    <div className="grid grid-cols-5 gap-3">
+                        <div className="grid grid-cols-5 gap-3">
                         {HERO_LIST.map((hero) => (
                             <motion.button
                                 key={hero.id}
@@ -133,7 +165,7 @@ const HeroSelectView = ({ onChampionSelect, unlockedIds = [] }) => {
                                 className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${selectedHero.id === hero.id
                                     ? 'border-amber-400 shadow-[0_0_25px_rgba(251,191,36,0.6)] opacity-100'
                                     : 'border-slate-600 hover:border-amber-300/50 opacity-60 hover:opacity-100'
-                                    }`}
+                                    } ${favoriteHero === hero.id ? 'ring-2 ring-cyan-400 ring-offset-2 ring-offset-slate-900' : ''}`}
                             >
                                 {/* Avatar Image */}
                                 <img
@@ -167,10 +199,22 @@ const HeroSelectView = ({ onChampionSelect, unlockedIds = [] }) => {
             <div className="w-[40%] flex flex-col bg-slate-900/30 backdrop-blur-sm">
                 {/* Header */}
                 <div className="p-6 border-b border-slate-700/50">
-                    <h3 className="text-2xl font-bold text-cyan-400 tracking-widest">SKIN SELECTION</h3>
-                    <p className="text-slate-400 text-sm mt-1">
-                        {selectedHero.skins.length} skins available
-                    </p>
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <h3 className="text-2xl font-bold text-cyan-400 tracking-widest">SKIN SELECTION</h3>
+                            <p className="text-slate-400 text-sm mt-1">
+                                {selectedHero.skins.length} skins available
+                            </p>
+                        </div>
+                        {currentUser && (
+                            <button
+                                onClick={handleSetFavorite}
+                                className="px-3 py-1 text-xs uppercase tracking-[0.3em] border border-cyan-400 text-cyan-200 rounded-full hover:bg-cyan-400 hover:text-black transition"
+                            >
+                                {favoriteHero === selectedHero.id ? 'Favored' : 'Set Favorite'}
+                            </button>
+                        )}
+                    </div>
                 </div>
 
                 {/* Skin Preview */}

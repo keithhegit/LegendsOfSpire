@@ -1,0 +1,17 @@
+name = "legends-of-spire"
+compatibility_date = "2024-01-01"
+account_id = "3ec0d834e151bc1533184acf1c1f2a27"
+workers_dev = false
+vars = { "NODE_ENV" = "production" }
+
+[[d1_databases]]
+binding = "DB"
+database_name = "legends-db"
+database_id = "b2f45e9b-7bc1-417b-ab9a-7a2ad9b503eb"
+
+[build]
+command = "npm run build"
+
+[site]
+bucket = "./dist"
+

@@ -1017,6 +1017,37 @@ export const ENEMY_POOL = {
 - 🎨 **皮肤系统**：英雄皮肤、卡背
 - 🤝 **社交功能**：分享战绩、排行榜
 
+##### 🔐 Cloudflare D1 注册登陆接入计划
+
+> 参考《注册登陆流程开发计划：后端注入 (The Backend Injection).md》，结合当前 Pages + React + Vite 架构整理的落地方案。
+
+1. **准备阶段（环境与模型）**
+   - 在仓库根目录新增 `wrangler.toml`，绑定 Pages Functions 所需的 `DB` 数据库，并设置 `pages_build_output_dir=dist` 以兼容 Vite 构建。
+   - 通过 `npx wrangler d1 create legends-db` 创建 D1，并将生成的 `database_id` 写入配置。
+   - 在根目录添加 `schema.sql`，定义 `users` 表（ID、Email、Username、Password Hash、Salt、created_at）；运行 `npx wrangler d1 execute legends-db --local --file=./schema.sql` 初始化。
+
+2. **Edge 端加密层**
+   - 在 `functions/utils/crypto.js` 中实现 Web Crypto 版本的 `generateSalt / hashPassword / verifyPassword`（PBKDF2 + SHA-256 + 100000 iterations），确保兼容 Cloudflare Edge Runtime。
+
+3. **API 层实现**
+   - 新建 `functions/api/auth/register.js`：接收 `email/username/password` → 校验重复 → 生成 UUID + Salt + Hash → 写入 D1 → 返回 `201 + userInfo`。
+   - 新建 `functions/api/auth/login.js`：接收 `email/password` → 查询用户 → 使用 `verifyPassword` 校验 → 返回 `200 + userInfo`，错误时统一返回模糊提示以避免枚举。
+
+4. **前端服务与状态接入**
+   - 在 `src/services/authService.js` 中封装 `login/register/logout/getCurrentUser`，以 `/api/auth/*` 为前缀请求 Pages Functions。
+   - 成功登录或注册后，将 `user` 数据存入 `localStorage` 以便刷新恢复；`logout` 清理缓存。
+   - 后续在 `LoginView` / `HeroSelectView` 中替换 Mock 逻辑，调用 `authService` 并在成功后进入原有流程。
+
+5. **本地联调与测试**
+   - 使用 `npx wrangler pages dev . --d1 DB=legends-db` 启动全栈环境，确保前后端同时可访问。
+   - 运行注册、登录、重复注册、错误密码等用例；通过 `npx wrangler d1 execute` 查询 `users` 表确认数据写入。
+   - 登录态刷新验证：刷新页面后读取 `authService.getCurrentUser()`，确保 UI 根据缓存状态展示。
+
+6. **后续扩展建议**
+   - 为 API 增加速率限制与审计日志（Pages Functions 中记录）。
+   - 规划 Session/Cookie 方案，为将来的多人功能或排行榜打基础。
+   - 将加密参数（iterations、salt length）与数据库绑定名称写入 `.env.local` 或 CI Secret，便于不同环境复用。
+
 ---
 
 ### 外部文档索引

@@ -1,8 +1,16 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { Sword, Shield, Zap, Skull, Heart, RefreshCw, AlertTriangle, Flame, XCircle, Activity, Map as MapIcon, Gift, Anchor, Coins, ShoppingBag, ChevronRight, Star, Play, Pause, Volume2, VolumeX, Landmark, Lock, RotateCcw, Save, ArrowRight, BookOpen, Layers } from 'lucide-react';
+import { Sword, Shield, Zap, Skull, Heart, RefreshCw, AlertTriangle, Flame, XCircle, Activity, Map as MapIcon, Gift, Anchor, Coins, ShoppingBag, ChevronRight, Star, Play, Pause, Volume2, VolumeX, Landmark, Lock, RotateCcw, Save, ArrowRight, BookOpen, Layers, UserSquare, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { generateGridMap } from './data/gridMapLayout_v4'; // v4生成器（带死胡同检测）
+import { CARD_DATABASE } from './data/cards'; // 卡牌数据
 import GridMapView_v3 from './components/GridMapView_v3'; // 新版六边形地图视图（三选一机制）
+import ChampionSelect from './components/ChampionSelect';
+import BattleScene from './components/BattleScene';
+import LoginView from './components/LoginView'; // 登录界面
+import ToastContainer from './components/shared/Toast'; // 导入 ToastContainer
+import { unlockAudio } from './utils/audioContext'; // 音频解锁工具
+import { getHexNeighbors } from './utils/hexagonGrid'; // 六边形邻居帮助函数
+import { authService } from './services/authService';
 const CDN_VERSION = "13.1.1";
 const CDN_URL = `https://ddragon.leagueoflegends.com/cdn/${CDN_VERSION}`;
 const LOADING_URL = "https://ddragon.leagueoflegends.com/cdn/img/champion/loading";
@@ -567,9 +575,18 @@ export default function LegendsOfTheSpire() {
         const lastVersion = localStorage.getItem('last_version');
         return lastVersion !== 'v0.8.0';
     });
+    const [loginComplete, setLoginComplete] = useState(false);
+    const [currentUser, setCurrentUser] = useState(null);
     const [bgmStarted, setBgmStarted] = useState(false);
 
     useEffect(() => { const savedData = localStorage.getItem(SAVE_KEY); if (savedData) setHasSave(true); }, []);
+    useEffect(() => {
+        const storedUser = authService.getCurrentUser();
+        if (storedUser) {
+            setCurrentUser(storedUser);
+            setLoginComplete(true);
+        }
+    }, []);
 
     useEffect(() => {
         if (view !== 'MENU' && view !== 'CHAMPION_SELECT' && view !== 'GAMEOVER' && view !== 'VICTORY_ALL') {
@@ -609,6 +626,22 @@ export default function LegendsOfTheSpire() {
         setHasSave(false);
         setBgmStarted(true); // 立即启动BGM
         setView('CHAMPION_SELECT');
+    };
+
+    const handleLoginSuccess = async (user) => {
+        await handleNewGame();
+        setCurrentUser(user);
+        setLoginComplete(true);
+    };
+
+    const handleLogout = () => {
+        authService.logout();
+        setCurrentUser(null);
+        setLoginComplete(false);
+        setView('MENU');
+        setHasSave(false);
+        setMapData({ grid: [], nodes: [], nodeMap: new Map() });
+        setChampion(null);
     };
 
     const handleChampionSelect = (selectedChamp) => {
@@ -940,7 +973,7 @@ export default function LegendsOfTheSpire() {
                     )}
                 </div>
             );
-            case 'CHAMPION_SELECT': return <ChampionSelect onChampionSelect={handleChampionSelect} unlockedIds={unlockedChamps} />;
+            case 'CHAMPION_SELECT': return <ChampionSelect onChampionSelect={handleChampionSelect} unlockedIds={unlockedChamps} currentUser={currentUser} />;
             case 'MAP': return <GridMapView_v3 mapData={mapData} onNodeSelect={handleNodeSelect} currentFloor={currentFloor} act={currentAct} activeNode={activeNode} lockedChoices={lockedChoices} />;
             case 'SHOP': return <ShopView gold={gold} deck={masterDeck} relics={relics} onLeave={() => completeNode()} onBuyCard={handleBuyCard} onBuyRelic={handleBuyRelic} onUpgradeCard={handleUpgradeCard} onBuyMana={handleBuyMana} championName={champion.name} />;
             case 'EVENT': return <EventView onLeave={() => completeNode()} onReward={handleEventReward} />;
@@ -954,9 +987,33 @@ export default function LegendsOfTheSpire() {
         }
     };
 
+    if (!loginComplete) {
+        return <LoginView onLogin={handleLoginSuccess} />;
+    }
+
+    const renderUserPanel = () => {
+        if (!currentUser) return null;
+        return (
+            <div className="absolute top-4 right-4 z-[120] flex items-center gap-3 bg-gradient-to-r from-black/70 to-slate-900/70 px-4 py-2 rounded-full border border-white/20 shadow-[0_0_30px_rgba(0,0,0,0.7)] text-sm text-white">
+                <div className="flex items-center gap-2">
+                    <UserSquare className="w-5 h-5 text-amber-400" />
+                    <div className="flex flex-col text-xs uppercase tracking-[0.3em] text-right">
+                        <span className="font-semibold">{currentUser.username || currentUser.email}</span>
+                        <span className="text-white/60">Authenticated</span>
+                    </div>
+                </div>
+                <button onClick={handleLogout} className="flex items-center gap-1 px-3 py-1 border border-transparent rounded-full bg-white/10 hover:bg-white/30 transition text-xs uppercase tracking-[0.3em]">
+                    <LogOut className="w-3 h-3" />
+                    Logout
+                </button>
+            </div>
+        )
+    };
+
     return (
         <div className="relative h-screen w-full bg-[#091428] font-sans select-none overflow-hidden">
             <AudioPlayer src={bgmStarted || view !== 'MENU' ? getCurrentBgm() : null} />
+            {renderUserPanel()}
             {view !== 'GAMEOVER' && view !== 'VICTORY_ALL' && view !== 'MENU' && view !== 'CHAMPION_SELECT' && champion && (
                 <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-black to-transparent z-50 flex items-center justify-between px-8 pointer-events-none">
                     <div className="flex items-center gap-6 pointer-events-auto">
