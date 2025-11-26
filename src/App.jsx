@@ -51,8 +51,6 @@ const STARTING_DECK_BASIC = ["Strike", "Strike", "Strike", "Strike", "Defend", "
 const SAVE_KEY = 'lots_save_v75';
 const UNLOCK_KEY = 'lots_unlocks_v75';
 
-const hasAvailableNode = (nodes) => nodes.some(n => n.status === 'AVAILABLE');
-
 // ==========================================
 // 2. 游戏数据库
 // ==========================================
@@ -582,15 +580,6 @@ export default function LegendsOfTheSpire() {
     const [showDeadEndPrompt, setShowDeadEndPrompt] = useState(false);
     const [bgmStarted, setBgmStarted] = useState(false);
 
-    useEffect(() => { const savedData = localStorage.getItem(SAVE_KEY); if (savedData) setHasSave(true); }, []);
-    useEffect(() => {
-        const storedUser = authService.getCurrentUser();
-        if (storedUser) {
-            setCurrentUser(storedUser);
-            setLoginComplete(true);
-        }
-    }, []);
-
     const getSaveKey = (user) => user ? `${SAVE_KEY}_${user.email}` : SAVE_KEY;
 
     const serializeMapData = () => {
@@ -602,13 +591,6 @@ export default function LegendsOfTheSpire() {
         };
         return serializable;
     };
-
-    useEffect(() => {
-        if ([ 'MENU', 'CHAMPION_SELECT', 'GAMEOVER', 'VICTORY_ALL' ].includes(view)) return;
-        const serializableMapData = serializeMapData();
-        const key = getSaveKey(currentUser);
-        localStorage.setItem(key, JSON.stringify({ view, mapData: serializableMapData, currentFloor, currentAct, masterDeck, champion, currentHp, maxHp, gold, relics, baseStr, activeNode, usedEnemies }));
-    }, [view, currentHp, gold, currentFloor, currentAct, champion, masterDeck, relics, baseStr, activeNode, usedEnemies, currentUser]);
 
     const applySaveData = (data) => {
         if (!data) return;
@@ -634,6 +616,55 @@ export default function LegendsOfTheSpire() {
         setView(data.view);
     };
 
+    const restoreUserSave = (user) => {
+        if (!user) return false;
+        const key = getSaveKey(user);
+        const stored = localStorage.getItem(key);
+        if (stored) {
+            applySaveData(JSON.parse(stored));
+            setHasSave(true);
+            return true;
+        }
+        return false;
+    };
+
+    const hasAvailableNeighbors = (nodesSnapshot = mapData.nodes, gridSnapshot = mapData.grid, totalFloors = mapData.totalFloors || 10) => {
+        if (!activeNode) return true; // 起点默认可选
+        const neighbors = getHexNeighbors(activeNode.row, activeNode.col, totalFloors, gridSnapshot?.[0]?.length || 11);
+        const availableNeighbors = neighbors
+            .map(([r, c]) => gridSnapshot?.[r]?.[c])
+            .filter(n => {
+                if (!n || n.explored) return false;
+                const nKey = `${n.row}-${n.col}`;
+                if (lockedChoices.has(nKey)) return false;
+                return true;
+            });
+        return availableNeighbors.length > 0;
+    };
+
+    useEffect(() => {
+        const storedUser = authService.getCurrentUser();
+        if (!storedUser) return;
+        setCurrentUser(storedUser);
+        const restored = restoreUserSave(storedUser);
+        setLoginComplete(true);
+        if (!restored) {
+            setView('CHAMPION_SELECT');
+        }
+    }, []);
+
+    useEffect(() => {
+        const key = getSaveKey(currentUser);
+        setHasSave(Boolean(localStorage.getItem(key)));
+    }, [currentUser]);
+
+    useEffect(() => {
+        if ([ 'MENU', 'CHAMPION_SELECT', 'GAMEOVER', 'VICTORY_ALL' ].includes(view)) return;
+        const serializableMapData = serializeMapData();
+        const key = getSaveKey(currentUser);
+        localStorage.setItem(key, JSON.stringify({ view, mapData: serializableMapData, currentFloor, currentAct, masterDeck, champion, currentHp, maxHp, gold, relics, baseStr, activeNode, usedEnemies }));
+    }, [view, currentHp, gold, currentFloor, currentAct, champion, masterDeck, relics, baseStr, activeNode, usedEnemies, currentUser]);
+
     const handleContinue = async () => {
         await unlockAudio();
         const s = localStorage.getItem(getSaveKey(currentUser));
@@ -652,17 +683,6 @@ export default function LegendsOfTheSpire() {
         setHasSave(false);
         setBgmStarted(true); // 立即启动BGM
         setView('CHAMPION_SELECT');
-    };
-
-    const restoreUserSave = (user) => {
-        const key = getSaveKey(user);
-        const stored = localStorage.getItem(key);
-        if (stored) {
-            applySaveData(JSON.parse(stored));
-            setHasSave(true);
-            return true;
-        }
-        return false;
     };
 
     const handleLoginSuccess = async (user) => {
@@ -692,7 +712,7 @@ export default function LegendsOfTheSpire() {
             setActiveNode(resetMap.startNode);
         }
         setLockedChoices(new Set());
-        setShowDeadEndPrompt(false);
+        setShowDeadEndPrompt(!hasAvailableNeighbors(resetMap.nodes, resetMap.grid, resetMap.totalFloors));
         setView('MAP');
     };
 
@@ -710,6 +730,7 @@ export default function LegendsOfTheSpire() {
         // 使用v4地图生成器（带死胡同检测和三选一机制）
         const newMapData = generateGridMap(1, []); // act=1, usedEnemies=[]
         setMapData(newMapData);
+        setShowDeadEndPrompt(!hasAvailableNeighbors(newMapData.nodes, newMapData.grid, newMapData.totalFloors));
 
         // 设置初始activeNode为startNode
         if (newMapData.startNode) {
@@ -744,7 +765,7 @@ export default function LegendsOfTheSpire() {
         });
 
         setMapData({ ...mapData, grid: newGrid, nodes: newNodes });
-        setShowDeadEndPrompt(!hasAvailableNode(newNodes));
+        setShowDeadEndPrompt(!hasAvailableNeighbors(newNodes, newGrid, mapData.totalFloors || 10));
 
         // 注意：不清空锁定选项，锁定的选项应该永久锁定
         // 只有在移动到新节点时，才会重新计算可用选项（但已锁定的选项仍然锁定）
@@ -758,7 +779,7 @@ export default function LegendsOfTheSpire() {
                 setCurrentFloor(0);
                 const nextMapData = generateGridMap(nextAct, []); // v4生成器
         setMapData(nextMapData);
-        setShowDeadEndPrompt(!hasAvailableNode(nextMapData.nodes));
+        setShowDeadEndPrompt(!hasAvailableNeighbors(nextMapData.nodes, nextMapData.grid, nextMapData.totalFloors));
                 if (nextMapData.startNode) {
                     setActiveNode(nextMapData.startNode);
                 }

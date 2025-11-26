@@ -3,8 +3,8 @@
 > **游戏名称**: Legends of the Spire (尖塔传说)  
 > **类型**: Roguelike 卡牌游戏  
 > **平台**: Web (桌面 + 移动端)  
-> **当前版本**: v0.9.0 (Beta)
-> **最后更新**: 2025-11-25
+> **当前版本**: v0.9.1 (Beta)
+> **最后更新**: 2025-11-26
 
 ---
 
@@ -77,7 +77,7 @@
 [BOSS战] → [章节通关] → [下一章节/游戏胜利]
 ```
 
-#### 🗺️ 大地图系统（v0.9.0 已实装）
+#### 🗺️ 大地图系统（v0.9.1 已实装）
 
 **设计理念**：从"线性爬塔"升级为"开放地图探索"
 
@@ -380,7 +380,7 @@ scaledDamage = baseDamage × (1 + floor × 0.15)
 └─────────────────────────────────┘
 ```
 
-##### 大地图界面（v0.9.0重构）
+##### 大地图界面（v0.9.1 重构）
 ```
 ┌─────────────────────────────────────┐
 │ ❤️ 85/85  ⚔️ +2  💰 250  [📖][🃏]  │  ← Header
@@ -430,6 +430,17 @@ scaledDamage = baseDamage × (1 + floor × 0.15)
 - **平板端** (768-1199px): 单列布局，图标缩小
 - **移动端** (320-767px): 纵向布局，卡牌区域优化
 
+#### 🧩 本轮 UI 与流程强化
+
+**主题**：登录、英雄选择、地图探索和存档恢复的「暗夜电竞」体验，强化已有的玻璃拟态系统。
+
+**核心更新**：
+- 🌌 **登录/注册交互**：全新 Account + Password 登录表单，集成 `authService`，通过 Pages Functions 与 Cloudflare D1 执行注册/登录（见 `functions/api/auth/*.js` 与 `functions/utils/crypto.js`），成功后缓存用户并立即解锁英雄/地图；
+- 🧑‍✈️ **英雄选择联动**：登录后 `HeroSelectView` 开屏即展示用户昵称/排名、喜爱英雄标记，同时在顶部导航加上当前用户面板与登出按钮，确保刷新后依旧读取 `authService.getCurrentUser()`；
+- 🗺️ **地图进度守护**：地图页新增 Reset Progress 控件（提示会清除当前地图并重新选人）、死胡同提示对话框与 act 重启流程，老用户登录后直接恢复英雄与地图数据，避免从头再选；
+
+**备忘**：方案细节总结在 `new/backend_plan/注册登陆流程开发计划：后端注入 (The Backend Injection).md`，该文档也列出 `wrangler.toml` / `schema.sql` / Pages Functions 的配置与测试流程。
+
 ---
 
 ### 版本演进历史
@@ -437,7 +448,7 @@ scaledDamage = baseDamage × (1 + floor × 0.15)
 #### 📅 版本时间线
 
 ```
-v0.1.0 (Alpha) → v0.5.0 (Beta) → v0.7.5 → v0.8.0 → v0.9.0 (开发中)
+v0.1.0 (Alpha) → v0.5.0 (Beta) → v0.7.5 → v0.8.0 → v0.9.1 (开发中)
    │                │               │        │        │
    │                │               │        │        └─ 六边形地图系统
    │                │               │        └─ 20英雄实装 + 被动系统
@@ -460,7 +471,7 @@ v0.1.0 (Alpha) → v0.5.0 (Beta) → v0.7.5 → v0.8.0 → v0.9.0 (开发中)
 
 **详细日志**：参见 [readme_version.md](./readme_version.md)
 
-#### v0.9.0 (In Development) - 2025-11-21+
+#### v0.9.1 - Hex Map Rollout (2025-11-21+)
 
 **主题**：六边形地图系统 + 开放探索
 
@@ -496,6 +507,20 @@ v0.1.0 (Alpha) → v0.5.0 (Beta) → v0.7.5 → v0.8.0 → v0.9.0 (开发中)
 
 **测试工具**：参见 [HOW_TO_TEST.md](./HOW_TO_TEST.md)
 
+#### v0.9.1 (2025-11-26)
+
+**主题**：登录/注册体验 + 用户存档恢复
+
+**核心更新**：
+- ✨ **Cloudflare D1 认证**：为登录/注册引入 `functions/api/auth/{login,register}.js`、`functions/utils/crypto.js`、`src/services/authService.js`，通过 Pages Functions 操作 D1、执行 PBKDF2+SHA-256 加密、把 `user` 写入/读出 `localStorage`。
+- 💻 **前端账号联动**：`LoginView` 和 `HeroSelectView` 共享用户上下文，登录后自动恢复英雄、地图、卡组状态；地图页面增加用户面板、登出、重置进度入口。
+- 🛰️ **地图保护**：地图视图判断死胡同后弹出重启提示，Reset Progress 会清除当前地图并重新选人，防止旧进度卡死且保留老用户登录后继续 ACT 的流程。
+- 🗂️ **账号存档隔离**：`SAVE_KEY_${account}` 格式的多存档机制，登录即尝试读取该账号的存档，无存档则进入选人页；新增 `RESET PROGRESS` 按钮与“死胡同”弹层，均会明确提示重置后需重新选人。
+- 🧭 **死胡同体验**：`hasAvailableNeighbors` 会同步锁定状态、弹出“重新生成地图 or 稍后”浮层，点击“重新生成”会调用新版 `generateGridMap` 并清空 `lockedChoices`，确保 Act 3 也能就地再刷一次地图。
+- 👤 **浮动用户面板**：徽章整体左移，避免挡到右上角功能；地图页右上角在登录状态下显示风险提示面板，告诉玩家重置后会清空当前进度。
+
+**详细日志**：与这套流程关联的文档有 `new/backend_plan/注册登陆流程开发计划：后端注入 (The Backend Injection).md` 和 `new/Fixing Map Dead-End Issue.md`。
+
 ---
 
 ## 💻 技术开发篇
@@ -505,25 +530,31 @@ v0.1.0 (Alpha) → v0.5.0 (Beta) → v0.7.5 → v0.8.0 → v0.9.0 (开发中)
 #### 🛠️ 技术栈
 
 **前端框架**：
-- **React 18.3+** (函数式组件 + Hooks)
-- **Vite 7.2+** (构建工具)
-- **Framer Motion** (动画库)
+- **React 18.3+**（函数式组件 + Hooks + Context）
+- **Vite 7.2+**（构建、别名、SSR 适配）
+- **Framer Motion**（战斗/界面动画）
 
-**UI框架**：
-- **Tailwind CSS** (样式)
-- **Lucide React** (图标)
+**UI 框架**：
+- **Tailwind CSS**（渐变 + 玻璃拟态 + Glow）
+- **Lucide React**（HUD 图标）
 
-**数据管理**：
-- **LocalStorage** (游戏存档)
-- **LZ-String** (存档压缩)
+**数据 & 状态管理**：
+- **LocalStorage（per-user）**：以 `user:{id}:save` 命名空间保存地图/卡组/资源
+- **Cloudflare D1**：持久化用户账号、盐值、密码哈希
+- **LZ-String**：对地图/卡组存档做压缩
+
+**后端 / 边缘服务**：
+- **Cloudflare Pages Functions**：`functions/api/auth/{login,register}.js` 运行于 Edge Runtime
+- **Web Crypto API (PBKDF2 + SHA-256)**：位于 `functions/utils/crypto.js`，用于密码哈希与验证
+- **Wrangler 3 CLI**：本地调试 (`wrangler pages dev`) 与 D1 schema 注入
 
 **资源加载**：
-- **Riot Games API** (英雄头像、技能图标、语音)
-- **Cloudflare R2** (自定义资源 CDN)
+- **Riot Data Dragon API**：英雄 Splash/头像、皮肤图
+- **Cloudflare R2**：自托管音频、遗物图
 
-**部署平台**：
-- **Cloudflare Pages** (静态网站托管)
-- **GitHub** (代码仓库)
+**部署 & CI**：
+- **Cloudflare Pages**：同时托管静态前端与 Functions
+- **GitHub Actions + Pages 集成**：`main` 推送即触发构建发布
 
 #### 📁 项目结构
 
@@ -531,61 +562,116 @@ v0.1.0 (Alpha) → v0.5.0 (Beta) → v0.7.5 → v0.8.0 → v0.9.0 (开发中)
 legends-spire/
 ├── public/                    # 静态资源
 ├── src/
-│   ├── data/                  # 游戏数据
-│   │   ├── champions.js       # 英雄数据
-│   │   ├── cards.js           # 卡牌数据库
-│   │   ├── enemies.js         # 敌人数据
-│   │   ├── relics.js          # 遗物数据
-│   │   ├── constants.js       # 全局常量
-│   │   ├── gridMapLayout.js   # 地图生成器(v0.8.0)
-│   │   └── gridMapLayout_v2.js # 地图生成器(v0.9.0)
-│   ├── components/            # UI组件
-│   │   ├── shared/            # 通用组件
-│   │   │   ├── Card.jsx       # 卡牌组件
-│   │   │   └── Toast.jsx      # 通知组件
-│   │   ├── BattleScene.jsx    # 战斗场景
-│   │   ├── ChampionSelect.jsx # 英雄选择
-│   │   ├── GridMapView.jsx    # 地图视图
-│   │   ├── ShopView.jsx       # 商店界面
-│   │   ├── RewardView.jsx     # 奖励界面
-│   │   ├── EventView.jsx      # 事件界面
-│   │   ├── RestView.jsx       # 休息界面
-│   │   ├── CodexView.jsx      # 图鉴界面
-│   │   └── DeckView.jsx       # 卡组查看
-│   ├── utils/                 # 工具函数
-│   │   ├── gameLogic.js       # 游戏逻辑
-│   │   ├── audioManager.js    # 音频管理
-│   │   ├── audioContext.js    # 音频解锁
-│   │   └── hexagonGrid.js     # 六边形工具(v0.9.0)
-│   ├── App.jsx                # 主应用入口
-│   └── main.jsx               # React入口
-├── test_map_generation.html   # 地图生成测试页面
-├── game_data.md               # 游戏数据手册
-├── readme_version.md          # 版本历史
-├── new_grid.md                # v0.9.0开发规划
-├── HOW_TO_TEST.md             # 测试指南
-└── PROJECT_DOCUMENTATION.md   # 本文档
+│   ├── data/                    # 游戏数据
+│   │   ├── champions.js         # 英雄数据
+│   │   ├── cards.js             # 卡牌数据库
+│   │   ├── enemies.js           # 敌人数据
+│   │   ├── relics.js            # 遗物数据
+│   │   ├── constants.js         # 全局常量
+│   │   └── gridMapLayout_v3.js  # 六边形地图生成器 (v0.9.1)
+│   ├── components/              # UI组件
+│   │   ├── shared/              # 通用组件
+│   │   │   ├── Card.jsx         # 卡牌组件
+│   │   │   └── Toast.jsx        # 通知组件
+│   │   ├── LoginView.jsx        # 登录 / 注册入口
+│   │   ├── HeroSelectView.jsx   # 新版英雄选择 + 皮肤轮播
+│   │   ├── BattleScene.jsx      # 战斗场景
+│   │   ├── GridMapView_v3.jsx   # 地图视图 (暗夜主题)
+│   │   ├── ShopView.jsx         # 商店界面
+│   │   ├── RewardView.jsx       # 奖励界面
+│   │   ├── EventView.jsx        # 事件界面
+│   │   ├── RestView.jsx         # 休息界面
+│   │   ├── CodexView.jsx        # 图鉴界面
+│   │   └── DeckView.jsx         # 卡组查看
+│   ├── services/
+│   │   └── authService.js       # Cloudflare Pages Auth API 客户端
+│   ├── utils/                   # 工具函数
+│   │   ├── gameLogic.js         # 游戏逻辑
+│   │   ├── audioManager.js      # 音频管理
+│   │   ├── audioContext.js      # 音频解锁
+│   │   ├── hexagonGrid.js       # 六边形工具 (v0.9.1)
+│   │   └── storage.js           # 存档序列化/反序列化与 key 生成
+│   ├── App.jsx                  # 主应用入口
+│   └── main.jsx                 # React入口
+├── functions/
+│   ├── api/
+│   │   └── auth/
+│   │       ├── login.js         # D1 登录接口
+│   │       └── register.js      # D1 注册接口
+│   └── utils/
+│       └── crypto.js            # PBKDF2 + SHA-256 工具
+├── tools/
+│   ├── scripts/                 # 数据修复 / 批量导出脚本
+│   │   ├── fix_cards.py         # 修复卡牌 JSON 结构
+│   │   ├── clean_cards.py       # 清理失效字段
+│   │   ├── generate_neutral_cards.py # 生成 120 张中立卡
+│   │   ├── update_hero_skins.py # 从 Data Dragon 拉取皮肤
+│   │   └── …(其余 Python/Node 工具脚本)
+│   └── simulator/
+│       └── simulator.js
+├── wrangler.toml                # Pages + D1 绑定配置
+├── schema.sql                   # D1 users 表结构
+├── test_map_generation.html     # 地图生成测试页面
+├── game_data.md                 # 游戏数据手册
+├── readme_version.md            # 版本历史
+├── new_grid.md                  # v0.9.1 开发规划
+├── HOW_TO_TEST.md               # 测试指南
+└── PROJECT_DOCUMENTATION.md     # 本文档
 ```
+
+#### 🧰 工具脚本（`tools/scripts`）
+
+| 脚本 | 作用 | 备注 |
+|------|------|------|
+| `fix_cards.py` | 批量修正卡牌 JSON 结构、缺失字段、费用区间 | 依赖 `cards.js`，跑完需手动确认 diff |
+| `clean_cards.py` | 清理遗留字段 / 无效键值，保持数据压缩 | 常与 `fix_cards.py` 搭配使用 |
+| `generate_neutral_cards.py` | 生成 120 张中立卡模板，输出 `cards.js` 片段 | 读取 `neutral_cards_047_120.txt` |
+| `restore_and_balance_cards.py` / `apply_balance.py` | 套用最新平衡表、生成调参报告 | 输出 `cards_ev_balance.md` |
+| `audit_all_spells.py` / `audit_hero_cards.py` / `audit_neutral_and_passives.py` | 批量校验英雄技能 / 中立技能是否存在、图标可用 | 结果写入 `broken_images_report.txt` 等 |
+| `fetch_hero_skins.py` / `update_hero_skins.py` | 调用 Riot Data Dragon，更新 `heroSkins.js` 和皮肤 JSON | 需网络访问 |
+| `check_neutral_images.py` / `fix_neutral_images.py` | 检查&修复中立卡的图标 URL | 与 `neutral_cards_image_report.json` 配合 |
+| `fix_map_deadend.py` | 本地复现死胡同并对比 `gridMapLayout_v4` | 支持 CLI seed 输入 |
+| `check_cards.js` | Node 版卡牌校验（费用、类型、重复 ID） | 通过 `node tools/scripts/check_cards.js` 运行 |
+
+> 所有脚本均非构建必需，仅在需要批量修复或数据审计时运行。
+
+#### 🧹 Dead Code / 历史残留清单
+
+- **地图组件旧版**：`src/components/MapView.jsx`, `GridMapView.jsx`, `GridMapView_v2.jsx`, `GridMapView_v3.jsx.backup` 当前未被引用，计划统一归档/删除，仅保留 `GridMapView_v3.jsx`。
+- **旧选人组件**：`src/components/ChampionSelect.backup.jsx` 已被 `HeroSelectView.jsx` 取代，待确认后移除。
+- **Vite Demo 文件**：`src/main.ts`, `src/main-demo.jsx`, `src/counter.ts`, `src/NewSkillsDemo.jsx`, `src/typescript.svg`, `src/style.css` 仅用于模板，可清理。
+- **地图生成旧版本**：`src/data/gridMapLayout.js`, `gridMapLayout_v2.js`, `gridMapLayout_v3.js`, `gridMapLayout_v4.js.backup` 与 v4 重复，建议仅保留稳定版+文档。
+- **卡牌备份**：`src/data/cards_backup.js`, `cards_temp.js`, `neutral_cards_047_120.txt` 仅供人工对照，后续迁移到 `tools/reference/` 并加说明。
+- **外部参考源码**：`code/Mysterious_Minaret-main/` 体积大但非必须，计划改为 README 链接后删除目录。
+- **调试 HTML**：`test_hex_*.html`, `test_map_generation.html` 可迁移到 `tools/tests/`，附使用指南；否则考虑移除。
+
+> 上述列表尚未实际删除，清理前请根据回滚/备份需求决定是否保留，建议统一移至 `archive/` 并在 README 标注来源与用途。
 
 #### 🔄 数据流
 
 ```
-[LocalStorage 存档]
-         ↓
-    [App.jsx 状态管理]
-         ↓
-  ┌──────┴──────┐
-  ↓             ↓
-[Map View]  [Battle View]
-  ↓             ↓
-[节点选择]   [卡牌战斗]
-  ↓             ↓
-[完成节点]   [战斗结果]
-  ↓             ↓
-  └──────┬──────┘
-         ↓
-   [更新存档]
+[用户输入(Account/Password)]
+        ↓
+[LoginView → authService]
+        ↓ fetch
+[/api/auth/{login,register}]
+        ↓ (PBKDF2验证)
+[Cloudflare D1 → users 表]
+        ↓ success
+[authService 缓存 user → LocalStorage(user)]
+        ↓
+[App.jsx 读取 user & saveKey]
+        ↓
+┌──────────────┬──────────────┐
+↓              ↓
+[HeroSelectView]      [Map/Battle Views]
+↓                      ↓
+[选英雄/重置地图]    [节点探索 / 战斗循环]
+        ↓                      ↓
+     [saveGame(userScoped LocalStorage)]
 ```
+
+> 说明：用户相关数据（账号、盐值、哈希）只在 D1；游戏进度存于 `userScoped` LocalStorage，并在 `App.jsx` 初始化及地图重置时读取/覆写。
 
 ---
 
@@ -957,7 +1043,7 @@ export const ENEMY_POOL = {
 
 ### 开发路线图
 
-#### 🚀 近期计划 (v0.9.0)
+#### 🚀 近期计划 (v0.9.1)
 
 ##### Phase 2: UI组件重构（进行中）
 
@@ -1006,6 +1092,14 @@ export const ENEMY_POOL = {
 - [ ] 六边形边缘抗锯齿
 - [ ] 迷雾过渡动画
 - [ ] 节点高亮效果
+
+##### Phase 5: 卡牌数值平衡 & 技能审计（v0.9.2 准备）
+
+- **任务5.1 数据盘点**：用 `tools/scripts/check_cards.js` + `audit_all_spells.py` 生成 200 张卡牌与技能的启用清单，标记“未生效”、“缺描述”、“需要动画”的项。
+- **任务5.2 数值基线**：依据 `cards_ev_balance.md` 和真实游玩数据，重新划分 BASIC / COMMON / UNCOMMON / RARE 的费用-收益区间，输出新的平衡表。
+- **任务5.3 批处理回写**：通过 `apply_balance.py` / `restore_and_balance_cards.py` 批量写回调整，并人工抽检 10 张核心卡。
+- **任务5.4 QA 验证**：在 `Login → HeroSelect → Map → Battle` 完整流程中测试每位英雄至少 1 张技能卡的触发，记录日志供自动化脚本（待定）比对。
+- **交付输出**：`CARD_BALANCE_PLAN.md`（新）、`game_data.md` 数值章节更新、以及 Pages 部署前后的 Diff。
 
 #### 🔮 远期计划 (v1.0+)
 
@@ -1056,7 +1150,7 @@ export const ENEMY_POOL = {
 
 | 文档名称 | 说明 | 路径 |
 |---------|------|------|
-| **game_data.md** | 游戏数据手册（82张卡牌、20位英雄、8个敌人、30个遗物） | [./game_data.md](./game_data.md) |
+| **game_data.md** | 游戏数据手册（200张卡牌、20位英雄、8个敌人、30个遗物） | [./game_data.md](./game_data.md) |
 | **BALANCE_FIXES_SUMMARY.md** | 英雄技能平衡性修复汇总 | [./BALANCE_FIXES_SUMMARY.md](./BALANCE_FIXES_SUMMARY.md) |
 | **PASSIVE_TEST_GUIDE.md** | 被动技能测试指南 | [./PASSIVE_TEST_GUIDE.md](./PASSIVE_TEST_GUIDE.md) |
 | **SKILL_DESCRIPTION_AUDIT.md** | 技能描述一致性审计报告 | [./SKILL_DESCRIPTION_AUDIT.md](./SKILL_DESCRIPTION_AUDIT.md) |
@@ -1065,12 +1159,14 @@ export const ENEMY_POOL = {
 
 | 文档名称 | 说明 | 路径 |
 |---------|------|------|
-| **new_grid.md** | v0.9.0 六边形地图系统开发规划 | [./new_grid.md](./new_grid.md) |
+| **new_grid.md** | v0.9.1 六边形地图系统开发规划 | [./new_grid.md](./new_grid.md) |
 | **INTEGRATION_GUIDE.md** | 网格地图系统集成指南（Phase 3） | [./INTEGRATION_GUIDE.md](./INTEGRATION_GUIDE.md) |
 | **HOW_TO_TEST.md** | 地图生成算法测试指南 | [./HOW_TO_TEST.md](./HOW_TO_TEST.md) |
 | **NEW_HERO_SKILL_IMPLEMENTATION_SUMMARY.md** | 8个被动技能实装总结 | [./NEW_HERO_SKILL_IMPLEMENTATION_SUMMARY.md](./NEW_HERO_SKILL_IMPLEMENTATION_SUMMARY.md) |
 | **P0_P1_P2_FIXES_SUMMARY.md** | P0-P2优先级修复详细报告 | [./P0_P1_P2_FIXES_SUMMARY.md](./P0_P1_P2_FIXES_SUMMARY.md) |
 | **PERMANENT_GROWTH_FIX_PLAN.md** | 永久成长机制修复计划 | [./PERMANENT_GROWTH_FIX_PLAN.md](./PERMANENT_GROWTH_FIX_PLAN.md) |
+| **Cloudflare D1 注册登陆接入计划** | Cloudflare Pages + D1 身份验证执行方案 | [./new/backend_plan/注册登陆流程开发计划：后端注入 (The Backend Injection).md](./new/backend_plan/注册登陆流程开发计划：后端注入 (The Backend Injection).md) |
+| **Fixing Map Dead-End Issue** | 死胡同检测、重启地图与 Act 延续流程的调研记录 | [./new/Fixing Map Dead-End Issue.md](./new/Fixing Map Dead-End Issue.md) |
 
 #### 📝 版本历史相关
 
@@ -1101,11 +1197,9 @@ export const ENEMY_POOL = {
 ### 游戏内容统计
 
 - **英雄数量**: 20 位
-- **卡牌总数**: 82 张
-  - BASIC: 2 张
-  - COMMON: 20 张
-  - UNCOMMON: 40 张
-  - RARE: 20 张
+- **卡牌总数**: 200 张
+  - 中立卡：120 张（12 BASIC / 40 COMMON / 48 UNCOMMON / 20 RARE）
+  - 英雄专属技能：80 张（20 位英雄 × Q/W/E/R）
 - **敌人数量**: 8 个
 - **遗物数量**: 30 个
 - **章节数**: 3 章 (ACT1/2/3)
@@ -1116,7 +1210,7 @@ export const ENEMY_POOL = {
 - **Alpha版本**: 2024-Q4
 - **Beta版本**: 2025-Q1
 - **v0.8.0发布**: 2025-11-21
-- **v0.9.0计划**: 2025-11-22 - 2025-12-05
+- **v0.9.1计划**: 2025-11-22 - 2025-12-05
 
 ---
 
@@ -1160,8 +1254,8 @@ export const ENEMY_POOL = {
 
 ---
 
-**文档版本**: v1.0.0  
-**最后更新**: 2025-11-21  
+**文档版本**: v1.1.0  
+**最后更新**: 2025-11-26  
 **文档状态**: ✅ 完整
 
 ---
