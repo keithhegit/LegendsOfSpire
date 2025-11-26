@@ -51,6 +51,8 @@ const STARTING_DECK_BASIC = ["Strike", "Strike", "Strike", "Strike", "Defend", "
 const SAVE_KEY = 'lots_save_v75';
 const UNLOCK_KEY = 'lots_unlocks_v75';
 
+const hasAvailableNode = (nodes) => nodes.some(n => n.status === 'AVAILABLE');
+
 // ==========================================
 // 2. 游戏数据库
 // ==========================================
@@ -577,6 +579,7 @@ export default function LegendsOfTheSpire() {
     });
     const [loginComplete, setLoginComplete] = useState(false);
     const [currentUser, setCurrentUser] = useState(null);
+    const [showDeadEndPrompt, setShowDeadEndPrompt] = useState(false);
     const [currentUser, setCurrentUser] = useState(null);
     const [bgmStarted, setBgmStarted] = useState(false);
 
@@ -689,6 +692,18 @@ export default function LegendsOfTheSpire() {
         setChampion(null);
     };
 
+    const handleRestartMap = () => {
+        if (!window.confirm('检测到死胡同，重新生成地图会清除当前进度。是否继续？')) return;
+        const resetMap = generateGridMap(currentAct, []);
+        setMapData(resetMap);
+        if (resetMap.startNode) {
+            setActiveNode(resetMap.startNode);
+        }
+        setLockedChoices(new Set());
+        setShowDeadEndPrompt(false);
+        setView('MAP');
+    };
+
     const handleChampionSelect = (selectedChamp) => {
         // 播放英雄语音
         playChampionVoice(selectedChamp.id);
@@ -737,6 +752,7 @@ export default function LegendsOfTheSpire() {
         });
 
         setMapData({ ...mapData, grid: newGrid, nodes: newNodes });
+        setShowDeadEndPrompt(!hasAvailableNode(newNodes));
 
         // 注意：不清空锁定选项，锁定的选项应该永久锁定
         // 只有在移动到新节点时，才会重新计算可用选项（但已锁定的选项仍然锁定）
@@ -749,7 +765,8 @@ export default function LegendsOfTheSpire() {
                 setCurrentAct(nextAct);
                 setCurrentFloor(0);
                 const nextMapData = generateGridMap(nextAct, []); // v4生成器
-                setMapData(nextMapData);
+        setMapData(nextMapData);
+        setShowDeadEndPrompt(!hasAvailableNode(nextMapData.nodes));
                 if (nextMapData.startNode) {
                     setActiveNode(nextMapData.startNode);
                 }
@@ -1070,6 +1087,20 @@ export default function LegendsOfTheSpire() {
         <div className="relative h-screen w-full bg-[#091428] font-sans select-none overflow-hidden">
             <AudioPlayer src={bgmStarted || view !== 'MENU' ? getCurrentBgm() : null} />
             {renderUserPanel()}
+            {view === 'MAP' && showDeadEndPrompt && (
+                <div className="absolute inset-0 z-[110] flex flex-col items-center justify-center bg-black/70 text-white px-6 text-center">
+                    <div className="bg-slate-900/80 border border-red-500/60 p-6 rounded-lg shadow-[0_0_30px_rgba(0,0,0,0.8)] max-w-xl">
+                        <p className="text-lg font-semibold text-red-300 mb-3">死胡同警告</p>
+                        <p className="text-sm text-slate-200 mb-4">
+                            当前地图没有可用节点可选，建议重新生成地图并重新选英雄，否则会在 Act 3 被卡住。
+                        </p>
+                        <div className="flex flex-wrap items-center justify-center gap-3">
+                            <button onClick={handleRestartMap} className="px-5 py-2 rounded-full bg-red-500 hover:bg-red-400 text-xs uppercase tracking-[0.4em]">重新生成</button>
+                            <button onClick={() => setShowDeadEndPrompt(false)} className="px-5 py-2 rounded-full border border-white/30 hover:border-white text-xs uppercase tracking-[0.4em]">稍后</button>
+                        </div>
+                    </div>
+                </div>
+            )}
             {view !== 'GAMEOVER' && view !== 'VICTORY_ALL' && view !== 'MENU' && view !== 'CHAMPION_SELECT' && champion && (
             {view === 'MAP' && currentUser && (
                 <div className="absolute top-24 right-5 z-[115] flex flex-col items-end gap-1 text-right">
