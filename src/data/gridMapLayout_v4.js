@@ -113,35 +113,47 @@ const applyHoles = (grid, gridRows, gridCols, mainPath, act) => {
   const holeCountRange = HOLE_COUNT_RANGE[act] || HOLE_COUNT_RANGE[1];
   const holeCount = holeCountRange.min + Math.floor(Math.random() * (holeCountRange.max - holeCountRange.min + 1));
   console.log(`[挖空] 生成 ${holeCount} 个随机尺寸空洞`);
-  
+
   // 创建主路径节点集合（保护主路径不被挖空）
   const mainPathSet = new Set(mainPath.map(n => `${n.row}-${n.col}`));
-  
+
+  // ✅ 新增 - 保护主路径的一度邻居
+  const mainPathNeighbors = new Set();
+  for (const node of mainPath) {
+    const neighbors = getHexNeighbors(node.row, node.col, gridRows, gridCols);
+    for (const [r, c] of neighbors) {
+      if (grid[r] && grid[r][c] && !mainPathSet.has(`${r}-${c}`)) {
+        mainPathNeighbors.add(`${r}-${c}`);
+      }
+    }
+  }
+  console.log(`[挖空保护] 主路径节点: ${mainPathSet.size}, 邻居节点: ${mainPathNeighbors.size}`);
+
   // 计算安全区域（避开起点和终点附近）
   const safeStartRow = Math.floor(gridRows * 0.15);
   const safeEndRow = Math.floor(gridRows * 0.85);
   const safeStartCol = Math.floor(gridCols * 0.2);
   const safeEndCol = Math.floor(gridCols * 0.8);
-  
+
   let totalRemoved = 0;
-  
+
   // 生成多个随机空洞
   for (let h = 0; h < holeCount; h++) {
     const hole = generateRandomHole();
     console.log(`[挖空 ${h + 1}/${holeCount}] 尺寸: ${hole.name}`);
-    
+
     // 随机选择空洞位置（确保不越界）
     const maxRow = Math.max(safeStartRow, safeEndRow - hole.height);
     const maxCol = Math.max(safeStartCol, safeEndCol - hole.width);
-    
+
     if (maxRow < safeStartRow || maxCol < safeStartCol) {
       console.warn(`[挖空 ${h + 1}] 跳过：尺寸过大无法放置`);
       continue;
     }
-    
+
     const centerRow = safeStartRow + Math.floor(Math.random() * (maxRow - safeStartRow + 1));
     const centerCol = safeStartCol + Math.floor(Math.random() * (maxCol - safeStartCol + 1));
-    
+
     // 挖空：移除该区域内的所有节点（但保留主路径上的节点）
     const removed = [];
     for (let r = centerRow; r < centerRow + hole.height && r < gridRows; r++) {
@@ -156,11 +168,11 @@ const applyHoles = (grid, gridRows, gridCols, mainPath, act) => {
         }
       }
     }
-    
+
     totalRemoved += removed.length;
     console.log(`[挖空 ${h + 1}] 移除了 ${removed.length} 个节点`);
   }
-  
+
   console.log(`[挖空] 总共移除了 ${totalRemoved} 个节点`);
 };
 
@@ -219,18 +231,18 @@ const NODE_WEIGHTS = {
 // ===========================
 export const generateGridMap = (act, usedEnemies = [], attempt = 0) => {
   console.log(`\n========== 生成 ACT${act} 六边形自由探索地图 ==========`);
-  
+
   const config = ACT_CONFIG[act];
   // 随机选择行数范围
   const gridRows = config.minRows + Math.floor(Math.random() * (config.maxRows - config.minRows + 1));
   const targetSteps = config.minSteps + Math.floor(Math.random() * (config.maxSteps - config.minSteps + 1));
   const pattern = pickShapePattern(act);
   console.log(`[图形] ACT${act} 使用: ${pattern.name}, 行数: ${gridRows}, 目标步数 ${targetSteps}`);
-  
+
   // 初始化网格
   const grid = Array(gridRows).fill(null).map(() => Array(GRID_COLS).fill(null));
   const allNodes = [];
-  
+
   // ===========================
   // Step 1: 生成起点
   // ===========================
@@ -239,9 +251,9 @@ export const generateGridMap = (act, usedEnemies = [], attempt = 0) => {
   startNode.status = 'AVAILABLE';
   grid[0][startCol] = startNode;
   allNodes.push(startNode);
-  
+
   console.log(`[起点] row=0, col=${startCol}`);
-  
+
   // ===========================
   // Step 2: 生成BOSS（顶层中央）
   // ===========================
@@ -250,9 +262,9 @@ export const generateGridMap = (act, usedEnemies = [], attempt = 0) => {
   const bossNode = createNode(bossRow, bossCol, 'BOSS', getBossId(act), act, usedEnemies);
   grid[bossRow][bossCol] = bossNode;
   allNodes.push(bossNode);
-  
+
   console.log(`[BOSS] row=${bossRow}, col=${bossCol}`);
-  
+
   // ===========================
   // Step 3: 生成主路径（确保BOSS可达）
   // ===========================
@@ -262,12 +274,12 @@ export const generateGridMap = (act, usedEnemies = [], attempt = 0) => {
   // Step 4: 生成可选支线
   // ===========================
   addOptionalBranches(grid, mainPath, config.optionalBranches, act, usedEnemies, allNodes);
-  
+
   // ===========================
   // Step 5: 应用挖空（形成立字型/O型/S型）
   // ===========================
   applyHoles(grid, gridRows, GRID_COLS, mainPath, act);
-  
+
   // 更新allNodes：移除被挖空的节点
   const nodeMap = new Map(allNodes.map(n => [`${n.row}-${n.col}`, n]));
   for (let r = 0; r < gridRows; r++) {
@@ -278,12 +290,12 @@ export const generateGridMap = (act, usedEnemies = [], attempt = 0) => {
       }
     }
   }
-  
+
   // ===========================
   // Step 6: 移除孤立节点（飞地）- 在挖空之后，确保所有节点都可达
   // ===========================
   removeIsolatedNodes(grid, gridRows, startNode, bossNode, allNodes);
-  
+
   // ===========================
   // Step 6.5: 检测死胡同节点（已禁用）
   // ===========================
@@ -303,24 +315,18 @@ export const generateGridMap = (act, usedEnemies = [], attempt = 0) => {
     console.warn('⚠️ 多次生成失败，使用fallback生成线性地图');
     return generateFallbackMap(act, usedEnemies);
   }
-  
-    if (attempt < 5) { // 增加重试次数到5次
-      console.log(`⚠️ 重新生成地图 (尝试 ${attempt + 2}/6)...`);
-      return generateGridMap(act, usedEnemies, attempt + 1);
-    }
-    console.warn('⚠️ 多次生成失败，使用fallback生成线性地图');
-    return generateFallbackMap(act, usedEnemies);
-  }
-  
+
+
+
   // ===========================
   // Step 7: BFS验证BOSS可达性
   // ===========================
   const reachable = isBossReachable(grid, startNode, bossNode);
-  
+
   console.log(`\n========== 生成完成 ==========`);
   console.log(`总节点数: ${allNodes.length}`);
   console.log(`BOSS可达: ${reachable ? '✅' : '❌'}`);
-  
+
   if (!reachable) {
     console.warn(`⚠️ BOSS不可达！第 ${attempt + 1} 次尝试失败`);
     if (attempt < 5) { // 增加重试次数到5次
@@ -330,7 +336,7 @@ export const generateGridMap = (act, usedEnemies = [], attempt = 0) => {
     console.warn('⚠️ 多次生成失败，使用fallback生成线性地图');
     return generateFallbackMap(act, usedEnemies);
   }
-  
+
   return {
     grid,
     nodes: allNodes,
@@ -501,14 +507,14 @@ const isBossReachable = (grid, startNode, bossNode) => {
   const visited = new Set();
   const queue = [startNode];
   visited.add(`${startNode.row}-${startNode.col}`);
-  
+
   while (queue.length > 0) {
     const current = queue.shift();
-    
+
     if (current.row === bossNode.row && current.col === bossNode.col) {
       return true;
     }
-    
+
     const neighbors = getHexNeighbors(current.row, current.col, grid.length, GRID_COLS);
     for (const [r, c] of neighbors) {
       const neighbor = grid[r][c];
@@ -518,7 +524,7 @@ const isBossReachable = (grid, startNode, bossNode) => {
       }
     }
   }
-  
+
   return false;
 };
 
@@ -530,15 +536,15 @@ const removeIsolatedNodes = (grid, gridRows, startNode, bossNode, allNodes) => {
   const reachableSet = new Set();
   const queue = [startNode];
   reachableSet.add(`${startNode.row}-${startNode.col}`);
-  
+
   while (queue.length > 0) {
     const current = queue.shift();
     const neighbors = getHexNeighbors(current.row, current.col, gridRows, GRID_COLS);
-    
+
     for (const [r, c] of neighbors) {
       const neighbor = grid[r] && grid[r][c];
       if (!neighbor) continue;
-      
+
       const key = `${r}-${c}`;
       if (!reachableSet.has(key)) {
         reachableSet.add(key);
@@ -546,19 +552,19 @@ const removeIsolatedNodes = (grid, gridRows, startNode, bossNode, allNodes) => {
       }
     }
   }
-  
+
   // 移除所有不可达的节点（飞地），但保护起点和BOSS
   const isolated = [];
   for (let i = allNodes.length - 1; i >= 0; i--) {
     const node = allNodes[i];
     const key = `${node.row}-${node.col}`;
-    
+
     // 保护起点和BOSS节点（即使它们不可达，也不移除）
     if ((node.row === startNode.row && node.col === startNode.col) ||
-        (node.row === bossNode.row && node.col === bossNode.col)) {
+      (node.row === bossNode.row && node.col === bossNode.col)) {
       continue;
     }
-    
+
     // 如果节点不在可达集合中，说明它是飞地
     if (!reachableSet.has(key)) {
       isolated.push(node);
@@ -570,7 +576,7 @@ const removeIsolatedNodes = (grid, gridRows, startNode, bossNode, allNodes) => {
       allNodes.splice(i, 1);
     }
   }
-  
+
   if (isolated.length > 0) {
     console.log(`[清理飞地] 移除了 ${isolated.length} 个孤立节点`);
   }
@@ -585,38 +591,38 @@ const removeIsolatedNodes = (grid, gridRows, startNode, bossNode, allNodes) => {
 // 3. 如果所有可能的选项都无法到达BOSS，则该节点是死胡同
 const detectDeadEnds = (grid, gridRows, startNode, bossNode, allNodes) => {
   const deadEnds = [];
-  
+
   // 预先计算从起点到所有节点的最短路径（用于模拟"已探索"节点）
   const pathToNode = computePathsFromStart(grid, gridRows, startNode, allNodes);
-  
+
   // 对每个节点进行模拟探索（排除起点和BOSS）
   for (const node of allNodes) {
     // 跳过起点和BOSS
     if ((node.row === startNode.row && node.col === startNode.col) ||
-        (node.row === bossNode.row && node.col === bossNode.col)) {
+      (node.row === bossNode.row && node.col === bossNode.col)) {
       continue;
     }
-    
+
     // 获取从起点到该节点的路径（模拟已探索的节点）
     const exploredPath = pathToNode.get(`${node.row}-${node.col}`);
     if (!exploredPath) {
       // 如果无法从起点到达该节点，跳过（这种情况应该被removeIsolatedNodes处理）
       continue;
     }
-    
+
     // 模拟：从该节点出发，考虑"三选一"机制，检查是否能到达BOSS
     const canReachBoss = canReachBossWithThreeChoices(node, grid, gridRows, bossNode, exploredPath);
-    
+
     if (!canReachBoss) {
       deadEnds.push(node);
       console.log(`[死胡同检测] 节点 (${node.row}, ${node.col}) 是死胡同`);
     }
   }
-  
+
   if (deadEnds.length > 0) {
     console.log(`[死胡同检测] 发现 ${deadEnds.length} 个死胡同节点`);
   }
-  
+
   return deadEnds;
 };
 
@@ -627,25 +633,25 @@ const computePathsFromStart = (grid, gridRows, startNode, allNodes) => {
   const queue = [{ node: startNode, path: [startNode] }];
   visited.add(`${startNode.row}-${startNode.col}`);
   paths.set(`${startNode.row}-${startNode.col}`, [startNode]);
-  
+
   while (queue.length > 0) {
     const { node, path } = queue.shift();
-    
+
     const neighbors = getHexNeighbors(node.row, node.col, gridRows, GRID_COLS);
     for (const [r, c] of neighbors) {
       const neighbor = grid[r] && grid[r][c];
       if (!neighbor) continue;
-      
+
       const key = `${r}-${c}`;
       if (visited.has(key)) continue;
-      
+
       visited.add(key);
       const newPath = [...path, neighbor];
       paths.set(key, newPath);
       queue.push({ node: neighbor, path: newPath });
     }
   }
-  
+
   return paths;
 };
 
@@ -654,26 +660,26 @@ const computePathsFromStart = (grid, gridRows, startNode, allNodes) => {
 const canReachBossWithThreeChoices = (startNode, grid, gridRows, bossNode, exploredPath) => {
   // 创建已探索节点集合（从起点到当前节点的路径）
   const exploredSet = new Set(exploredPath.map(n => `${n.row}-${n.col}`));
-  
+
   // 获取当前节点的所有未探索邻居
   const neighbors = getHexNeighbors(startNode.row, startNode.col, gridRows, GRID_COLS);
   const availableNeighbors = [];
-  
+
   for (const [r, c] of neighbors) {
     const neighbor = grid[r] && grid[r][c];
     if (!neighbor) continue;
-    
+
     const key = `${r}-${c}`;
     if (!exploredSet.has(key)) {
       availableNeighbors.push(neighbor);
     }
   }
-  
+
   // 如果没有任何选项，无法到达BOSS
   if (availableNeighbors.length === 0) {
     return false;
   }
-  
+
   // 三选一机制：如果可用邻居≤3个，检查所有选项
   if (availableNeighbors.length <= 3) {
     // 检查每个选项是否能到达BOSS（至少有一个能到达即可）
@@ -684,18 +690,18 @@ const canReachBossWithThreeChoices = (startNode, grid, gridRows, bossNode, explo
     }
     return false; // 所有选项都无法到达BOSS
   }
-  
+
   // 如果可用邻居>3个，需要使用与UI相同的选择逻辑来确定3个选项
   // UI中的逻辑：基于节点位置排序，使用哈希函数选择3个（与activeNode位置相关）
   // 为了准确检测死胡同，我们需要使用相同的逻辑来选择3个选项
-  
+
   // 1. 先按位置排序（与UI逻辑一致）
   const sorted = [...availableNeighbors].sort((a, b) => {
     const seedA = `${a.row}-${a.col}`;
     const seedB = `${b.row}-${b.col}`;
     return seedA.localeCompare(seedB);
   });
-  
+
   // 2. 使用与UI相同的哈希函数选择3个选项
   // UI中的哈希：hash = (activeNode.row * 1000 + activeNode.col) % shuffled.length
   const hash = (startNode.row * 1000 + startNode.col) % sorted.length;
@@ -703,19 +709,19 @@ const canReachBossWithThreeChoices = (startNode, grid, gridRows, bossNode, explo
   for (let i = 0; i < 3; i++) {
     choices.push(sorted[(hash + i) % sorted.length]);
   }
-  
+
   // 3. 检查这3个选项是否能到达BOSS（至少有一个能到达即可）
   for (const choice of choices) {
     if (canReachBossFromNode(choice, grid, gridRows, bossNode, exploredSet)) {
       return true; // 至少有一个选项能到达BOSS
     }
   }
-  
+
   // 4. 如果这3个选项都无法到达BOSS，检查是否有任何其他选项能到达BOSS
   // 如果有，说明UI可能会显示不同的3个选项（因为哈希值可能不同），所以不是死胡同
   // 但实际上，由于哈希是基于节点位置的，对于同一个节点，哈希值是固定的
   // 所以如果这3个选项都无法到达BOSS，就是死胡同
-  
+
   // 但为了更安全，我们仍然检查是否有其他选项能到达BOSS
   // 如果有，且可用选项总数>3，可能UI会显示不同的组合（虽然不太可能）
   let hasOtherReachableOption = false;
@@ -725,12 +731,12 @@ const canReachBossWithThreeChoices = (startNode, grid, gridRows, bossNode, explo
       break;
     }
   }
-  
+
   // 如果只有这3个选项，且都无法到达BOSS，肯定是死胡同
   if (sorted.length === 3) {
     return false;
   }
-  
+
   // 如果有其他选项能到达BOSS，且可用选项总数>3，可能不是死胡同
   // 但为了严格，我们仍然认为这是死胡同（因为UI会显示这3个选项）
   // 实际上，我们应该确保UI显示的3个选项中至少有一个能到达BOSS
@@ -743,35 +749,35 @@ const canReachBossFromNode = (startNode, grid, gridRows, bossNode, exploredSet) 
   const visited = new Set();
   const queue = [startNode];
   visited.add(`${startNode.row}-${startNode.col}`);
-  
+
   while (queue.length > 0) {
     const current = queue.shift();
-    
+
     // 如果到达BOSS，返回true
     if (current.row === bossNode.row && current.col === bossNode.col) {
       return true;
     }
-    
+
     // 获取当前节点的邻居
     const neighbors = getHexNeighbors(current.row, current.col, gridRows, GRID_COLS);
-    
+
     for (const [r, c] of neighbors) {
       const neighbor = grid[r] && grid[r][c];
       if (!neighbor) continue;
-      
+
       const key = `${r}-${c}`;
-      
+
       // 跳过已访问的节点
       if (visited.has(key)) continue;
-      
+
       // 跳过已探索的节点（模拟"不可回溯"规则）
       if (exploredSet.has(key)) continue;
-      
+
       visited.add(key);
       queue.push(neighbor);
     }
   }
-  
+
   // 无法到达BOSS
   return false;
 };
@@ -796,7 +802,7 @@ const getRandomNodeType = (row, totalRows) => {
   // 中间60%：混合
   // 后20%：更多商店/休息
   const progress = row / totalRows;
-  
+
   let weights = { ...NODE_WEIGHTS };
   if (progress < 0.2) {
     weights.BATTLE = 0.70;
@@ -811,7 +817,7 @@ const getRandomNodeType = (row, totalRows) => {
     weights.REST = 0.20;
     weights.CHEST = 0.05;
   }
-  
+
   const rand = Math.random();
   let cumulative = 0;
   for (const [type, weight] of Object.entries(weights)) {
@@ -840,14 +846,14 @@ const getRandomEnemy = (act, usedEnemies = []) => {
   const actEnemies = Object.keys(ENEMY_POOL).filter(
     id => ENEMY_POOL[id].act === act && !id.includes('BOSS')
   );
-  
+
   const available = actEnemies.filter(id => !usedEnemies.includes(id));
-  
+
   if (available.length === 0) {
     console.warn(`Act ${act} no unique enemies left, reusing from pool`);
     return actEnemies[Math.floor(Math.random() * actEnemies.length)] || 'Katarina';
   }
-  
+
   return available[Math.floor(Math.random() * available.length)];
 };
 
@@ -860,20 +866,20 @@ const generateFallbackMap = (act, usedEnemies) => {
   const gridRows = config.minRows + Math.floor(Math.random() * (config.maxRows - config.minRows + 1));
   const grid = Array(gridRows).fill(null).map(() => Array(GRID_COLS).fill(null));
   const allNodes = [];
-  
+
   const centerCol = Math.floor(GRID_COLS / 2);
-  
+
   for (let row = 0; row < gridRows; row++) {
     const type = row === gridRows - 1 ? 'BOSS' : getRandomNodeType(row, gridRows);
     const enemyId = type === 'BOSS' ? getBossId(act) : null;
     const node = createNode(row, centerCol, type, enemyId, act, usedEnemies);
-    
+
     if (row === 0) node.status = 'AVAILABLE';
-    
+
     grid[row][centerCol] = node;
     allNodes.push(node);
   }
-  
+
   return {
     grid,
     nodes: allNodes,
@@ -895,7 +901,7 @@ export const generateGridMapWithRetry = (act, usedEnemies = [], maxRetries = 3) 
     }
     console.warn(`尝试 ${i + 1}/${maxRetries} 失败，重新生成...`);
   }
-  
+
   console.error('所有尝试失败，使用fallback');
   return generateFallbackMap(act, usedEnemies);
 };
