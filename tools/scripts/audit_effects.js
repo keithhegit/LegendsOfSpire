@@ -9,6 +9,7 @@ const __dirname = path.dirname(__filename);
 // Paths
 const cardsPath = path.resolve(__dirname, '../../src/data/cards.js');
 const appPath = path.resolve(__dirname, '../../src/App.jsx');
+const effectHandlerPath = path.resolve(__dirname, '../../src/utils/cardEffectHandler.js');
 const battleUtilsPath = path.resolve(__dirname, '../../src/utils/battleUtils.js'); // Assuming this exists or logic is in App.jsx
 
 async function main() {
@@ -43,6 +44,9 @@ async function main() {
         let appContent = '';
         if (fs.existsSync(appPath)) {
             appContent += fs.readFileSync(appPath, 'utf-8');
+        }
+        if (fs.existsSync(effectHandlerPath)) {
+            appContent += fs.readFileSync(effectHandlerPath, 'utf-8');
         }
         // Add other files if logic is split
         // For now, App.jsx is the main one based on previous context.

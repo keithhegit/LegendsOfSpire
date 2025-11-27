@@ -1,9 +1,9 @@
 {
   "summary": {
-    "total_cards": 202,
-    "total_unique_effects": 141,
-    "implemented_effects": 3,
-    "missing_effects": 138,
+    "total_cards": 192,
+    "total_unique_effects": 134,
+    "implemented_effects": 133,
+    "missing_effects": 1,
     "cards_without_explicit_effect": 17
   },
   "implemented": [
@@ -20,8 +20,9 @@
     },
     {
       "effect": "WEAK",
-      "count": 4,
+      "count": 5,
       "examples": [
+        "TeemoQ",
         "ThreshE",
         "Neutral_002",
         "Neutral_062",
@@ -29,19 +30,9 @@
       ]
     },
     {
-      "effect": "STRENGTH",
-      "count": 1,
-      "examples": [
-        "Ignite"
-      ]
-    }
-  ],
-  "missing": [
-    {
       "effect": "DRAW",
-      "count": 6,
+      "count": 5,
       "examples": [
-        "RivenW",
         "TeemoW",
         "Neutral_009",
         "Neutral_050",
@@ -57,16 +48,6 @@
         "SonaW",
         "ThreshW",
         "Neutral_032"
-      ]
-    },
-    {
-      "effect": "MULTI_HIT",
-      "count": 4,
-      "examples": [
-        "JinxQ",
-        "RivenQ",
-        "ZedQ",
-        "KatarinaQ"
       ]
     },
     {
@@ -109,12 +90,12 @@
       ]
     },
     {
-      "effect": "STUN",
+      "effect": "MULTI_HIT",
       "count": 3,
       "examples": [
-        "ViktorW",
-        "CardMasterE",
-        "IreliaE"
+        "JinxQ",
+        "ZedQ",
+        "KatarinaQ"
       ]
     },
     {
@@ -144,11 +125,11 @@
       ]
     },
     {
-      "effect": "ATTACK_BUFF",
+      "effect": "STUN",
       "count": 2,
       "examples": [
-        "RivenE",
-        "LeeW"
+        "ViktorW",
+        "IreliaE"
       ]
     },
     {
@@ -205,6 +186,13 @@
       "examples": [
         "Neutral_118",
         "Neutral_120"
+      ]
+    },
+    {
+      "effect": "STRENGTH",
+      "count": 1,
+      "examples": [
+        "Ignite"
       ]
     },
     {
@@ -394,48 +382,6 @@
       "count": 1,
       "examples": [
         "ViktorR"
-      ]
-    },
-    {
-      "effect": "PER_ATTACK_BONUS",
-      "count": 1,
-      "examples": [
-        "RivenR"
-      ]
-    },
-    {
-      "effect": "VULN_ON_HIT",
-      "count": 1,
-      "examples": [
-        "CardMasterQ"
-      ]
-    },
-    {
-      "effect": "GAIN_MANA",
-      "count": 1,
-      "examples": [
-        "CardMasterW"
-      ]
-    },
-    {
-      "effect": "DRAW_AND_SCOUT",
-      "count": 1,
-      "examples": [
-        "CardMasterR"
-      ]
-    },
-    {
-      "effect": "CHAIN_TRIGGER",
-      "count": 1,
-      "examples": [
-        "LeeQ"
-      ]
-    },
-    {
-      "effect": "WEAK_ON_HIT",
-      "count": 1,
-      "examples": [
-        "LeeE"
       ]
     },
     {
@@ -1032,7 +978,9 @@
       "examples": [
         "Neutral_076"
       ]
-    },
+    }
+  ],
+  "missing": [
     {
       "effect": "GAIN_POWER_PER_TURN",
       "count": 1,
