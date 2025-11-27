@@ -572,9 +572,465 @@ function applyEffect(effectType, value, context, updates) {
             updates.discountCard = value;
             break;
 
-        // ==================== Placeholder for Future Effects ====================
-        // TODO: Implement Batch 4-5 (62 more effects)
-        // Reference: effect_encyclopedia.md for full list
+        // ==================== BATCH 4: Strength Buffs ====================
+
+        case 'TEMP_STR':
+            // 临时力量 - Temporary strength buff
+            updates.playerStatus = {
+                ...(updates.playerStatus || playerStatus),
+                tempStrength: ((updates.playerStatus?.tempStrength || playerStatus.tempStrength) || 0) + value
+            };
+            break;
+
+        case 'TEMP_STR_ON_KILLS':
+            // 击杀临时力量 - Gain str on kills
+            updates.playerStatus = {
+                ...(updates.playerStatus || playerStatus),
+                tempStrOnKill: ((updates.playerStatus?.tempStrOnKill || playerStatus.tempStrOnKill) || 0) + value
+            };
+            break;
+
+        case 'GAIN_STRENGTH_PER_HIT':
+            // 连击力量 - Gain str per attack
+            updates.playerStatus = {
+                ...(updates.playerStatus || playerStatus),
+                strPerHit: ((updates.playerStatus?.strPerHit || playerStatus.strPerHit) || 0) + value
+            };
+            break;
+
+        case 'GAIN_STR_WHEN_LOSE_HP':
+            // 受伤力量 - Gain str when damaged
+            updates.playerStatus = {
+                ...(updates.playerStatus || playerStatus),
+                strWhenHurt: ((updates.playerStatus?.strWhenHurt || playerStatus.strWhenHurt) || 0) + value
+            };
+            break;
+
+        case 'GAIN_STRENGTH_WHEN_HIT':
+            // 被击力量 - Gain str when hit
+            updates.playerStatus = {
+                ...(updates.playerStatus || playerStatus),
+                strWhenHit: ((updates.playerStatus?.strWhenHit || playerStatus.strWhenHit) || 0) + value
+            };
+            break;
+
+        case 'GAIN_STRENGTH_NEXT_TURN':
+            // 下回合力量 - Gain str next turn
+            updates.playerStatus = {
+                ...(updates.playerStatus || playerStatus),
+                nextTurnStrength: ((updates.playerStatus?.nextTurnStrength || playerStatus.nextTurnStrength) || 0) + value
+            };
+            break;
+
+        case 'GAIN_STRENGTH':
+            // 获得力量 - Already implemented as STRENGTH
+            updates.playerStatus = {
+                ...(updates.playerStatus || playerStatus),
+                strength: ((updates.playerStatus?.strength || playerStatus.strength) || 0) + value
+            };
+            break;
+
+        // ==================== BATCH 4: Permanent Buffs ====================
+
+        case 'PERMA_STR_ON_KILL':
+            // 永久击杀力量 - Permanent str on kill (Nasus Q)
+            updates.playerStatus = {
+                ...(updates.playerStatus || playerStatus),
+                permaStrOnKill: true
+            };
+            break;
+
+        case 'PERMA_STR_FOR_HP':
+            // 生命换力量 - Lose max HP for str
+            updates.loseMaxHp = value;
+            updates.playerStatus = {
+                ...(updates.playerStatus || playerStatus),
+                strength: ((updates.playerStatus?.strength || playerStatus.strength) || 0) + value
+            };
+            break;
+
+        case 'PER_ATTACK_BONUS':
+            // 攻击叠加 - Stack bonus per attack
+            updates.playerStatus = {
+                ...(updates.playerStatus || playerStatus),
+                attackStacks: ((updates.playerStatus?.attackStacks || playerStatus.attackStacks) || 0) + 1
+            };
+            break;
+
+        case 'LOSE_HP_GAIN_STRENGTH':
+            // 失血获得力量 - Sacrifice HP for str
+            updates.playerHp = Math.max(1, playerHp - value);
+            updates.playerStatus = {
+                ...(updates.playerStatus || playerStatus),
+                strength: ((updates.playerStatus?.strength || playerStatus.strength) || 0) + Math.floor(value / 2)
+            };
+            break;
+
+        // ==================== BATCH 4: Block & Defense ====================
+
+        case 'GAIN_BLOCK_NEXT_TURN':
+            // 下回合格挡 - Gain block next turn
+            updates.playerStatus = {
+                ...(updates.playerStatus || playerStatus),
+                nextTurnBlock: ((updates.playerStatus?.nextTurnBlock || playerStatus.nextTurnBlock) || 0) + value
+            };
+            break;
+
+        case 'END_TURN_BLOCK':
+            // 回合结束格挡 - Gain block at turn end
+            updates.playerStatus = {
+                ...(updates.playerStatus || playerStatus),
+                endTurnBlock: ((updates.playerStatus?.endTurnBlock || playerStatus.endTurnBlock) || 0) + value
+            };
+            break;
+
+        case 'SELF_HP_FOR_BLOCK':
+            // 生命换格挡 - Lose HP for block
+            updates.playerHp = Math.max(1, playerHp - Math.floor(value / 3));
+            updates.blockGain = value;
+            break;
+
+        case 'GAIN_BLOCK_WHEN_ATTACK':
+            // 攻击获得格挡 - Gain block when attacking
+            updates.playerStatus = {
+                ...(updates.playerStatus || playerStatus),
+                blockOnAttack: ((updates.playerStatus?.blockOnAttack || playerStatus.blockOnAttack) || 0) + value
+            };
+            break;
+
+        case 'PASSIVE_BLOCK_IF_IDLE':
+            // 待机格挡 - Block if didn't attack
+            updates.playerStatus = {
+                ...(updates.playerStatus || playerStatus),
+                idleBlock: ((updates.playerStatus?.idleBlock || playerStatus.idleBlock) || 0) + value
+            };
+            break;
+
+        case 'REDUCE_BLOCK':
+            // 削弱格挡 - Reduce enemy block
+            updates.reduceEnemyBlock = value;
+            break;
+
+        case 'FIRST_ATTACK_PLUS':
+            // 首次攻击加成 - Bonus on first attack
+            updates.playerStatus = {
+                ...(updates.playerStatus || playerStatus),
+                firstAttackBonus: ((updates.playerStatus?.firstAttackBonus || playerStatus.firstAttackBonus) || 0) + value
+            };
+            break;
+
+        // ==================== BATCH 4: Debuff Management ====================
+
+        case 'APPLY_WEAK':
+            // 施加虚弱 - Apply weak debuff
+            updates.enemyStatus = {
+                ...(updates.enemyStatus || enemyStatus),
+                weak: ((updates.enemyStatus?.weak || enemyStatus.weak) || 0) + value
+            };
+            break;
+
+        case 'APPLY_VULNERABLE':
+            // 施加易伤 - Apply vulnerable debuff
+            updates.enemyStatus = {
+                ...(updates.enemyStatus || enemyStatus),
+                vulnerable: ((updates.enemyStatus?.vulnerable || enemyStatus.vulnerable) || 0) + value
+            };
+            break;
+
+        case 'WEAK_VULN':
+            // 双重虚弱易伤 - Apply both debuffs
+            updates.enemyStatus = {
+                ...(updates.enemyStatus || enemyStatus),
+                weak: ((updates.enemyStatus?.weak || enemyStatus.weak) || 0) + value,
+                vulnerable: ((updates.enemyStatus?.vulnerable || enemyStatus.vulnerable) || 0) + value
+            };
+            break;
+
+        case 'WEAK_VULN_AND_PERMAHP':
+            // 虚弱易伤+永久生命 - Debuffs + HP gain
+            updates.enemyStatus = {
+                ...(updates.enemyStatus || enemyStatus),
+                weak: ((updates.enemyStatus?.weak || enemyStatus.weak) || 0) + value,
+                vulnerable: ((updates.enemyStatus?.vulnerable || enemyStatus.vulnerable) || 0) + value
+            };
+            updates.permaHpGain = value;
+            break;
+
+        case 'ARMOR_REDUCE':
+            // 破甲 - Reduce enemy armor
+            updates.enemyStatus = {
+                ...(updates.enemyStatus || enemyStatus),
+                armorReduction: ((updates.enemyStatus?.armorReduction || enemyStatus.armorReduction) || 0) + value
+            };
+            break;
+
+        case 'SELF_WEAK':
+            // 自我虚弱 - Apply weak to self
+            updates.playerStatus = {
+                ...(updates.playerStatus || playerStatus),
+                weak: ((updates.playerStatus?.weak || playerStatus.weak) || 0) + value
+            };
+            break;
+
+        // ==================== BATCH 5: Turn Manipulation ====================
+
+        case 'DELAY_ACTION':
+            // 延迟行动 - Delay enemy action
+            updates.enemyStatus = {
+                ...(updates.enemyStatus || enemyStatus),
+                delayed: ((updates.enemyStatus?.delayed || enemyStatus.delayed) || 0) + value
+            };
+            break;
+
+        case 'NEXT_ENEMY_COST_PLUS':
+            // 敌人费用提升 - Increase enemy card cost
+            updates.enemyStatus = {
+                ...(updates.enemyStatus || enemyStatus),
+                costIncrease: ((updates.enemyStatus?.costIncrease || enemyStatus.costIncrease) || 0) + value
+            };
+            break;
+
+        case 'DAMAGE_UP_PER_TURN':
+            // 逐回合增伤 - Damage increases each turn
+            updates.playerStatus = {
+                ...(updates.playerStatus || playerStatus),
+                damagePerTurn: ((updates.playerStatus?.damagePerTurn || playerStatus.damagePerTurn) || 0) + value
+            };
+            break;
+
+        case 'RETRO_BONUS':
+            // 回溯加成 - Ekko Q projectile return
+            updates.retroBonus = value;
+            break;
+
+        case 'PULL':
+            // 钩取 - Thresh Q pull mechanic
+            updates.pullEffect = true;
+            break;
+
+        // ==================== BATCH 5: Special Mechanics ====================
+
+        case 'COPY_ENEMY_ACTION':
+            // 复制敌方行动 - Sylas R
+            updates.copyEnemySkill = true;
+            break;
+
+        case 'COPY_NEXT_ATTACK':
+            // 复制下次攻击 - Zed W shadow clone
+            updates.cloneAttack = value; // Percentage
+            break;
+
+        case 'DEATHMARK':
+            // 死亡印记 - Zed R delayed burst
+            updates.deathmarkPercent = value;
+            break;
+
+        case 'SCALE_BY_CRIT':
+            // 暴击缩放 - Yasuo R crit scaling
+            updates.scaleByCrit = value;
+            break;
+
+        case 'MARK_STACK':
+            // 印记叠加 - Vayne W 3-hit
+            updates.enemyStatus = {
+                ...(updates.enemyStatus || enemyStatus),
+                markStacks: ((updates.enemyStatus?.markStacks || enemyStatus.markStacks) || 0) + 1
+            };
+            break;
+
+        case 'TRIPLE_CHAIN_BONUS':
+            // 三连加成 - Vayne passive every 3rd
+            updates.tripleChainBonus = value;
+            break;
+
+        case 'CHAIN_TRIGGER':
+            // 连锁触发 - Lee Q follow-up
+            updates.chainTrigger = value;
+            break;
+
+        case 'TETHER_MARK':
+            // 锁链标记 - Tether connection
+            updates.tetherMark = value;
+            break;
+
+        case 'COMBO_BONUS':
+            // 连招加成 - Katarina E combo
+            updates.playerStatus = {
+                ...(updates.playerStatus || playerStatus),
+                comboCounter: ((updates.playerStatus?.comboCounter || playerStatus.comboCounter) || 0) + 1
+            };
+            break;
+
+        case 'MULTI_STRIKE_SEGMENTS':
+            // 多段连斩 - Katarina R channel
+            updates.multiStrikeSegments = value;
+            break;
+
+        // ==================== BATCH 5: Game State Changes ====================
+
+        case 'PER_CARD_BONUS':
+            // 手牌比例加成 - Damage scales with hand size
+            updates.bonusPerCard = value;
+            break;
+
+        case 'ALL_ATTACKS_BONUS':
+            // 全体攻击加成 - Buff all attacks
+            updates.playerStatus = {
+                ...(updates.playerStatus || playerStatus),
+                globalAttackBonus: ((updates.playerStatus?.globalAttackBonus || playerStatus.globalAttackBonus) || 0) + value
+            };
+            break;
+
+        case 'BUFF_NEXT_SKILL':
+            // 强化下张技能 - Viktor Q
+            updates.playerStatus = {
+                ...(updates.playerStatus || playerStatus),
+                buffNextSkill: ((updates.playerStatus?.buffNextSkill || playerStatus.buffNextSkill) || 0) + value
+            };
+            break;
+
+        case 'KILL_REWARD':
+            // 击杀奖励 - Irelia Q reset
+            updates.killReward = value;
+            break;
+
+        case 'GAMBLE':
+            // 赌博 - Random outcome
+            const randomOutcome = Math.random() * value;
+            updates.gambleResult = Math.floor(randomOutcome);
+            break;
+
+        case 'GAIN_GOLD':
+            // 获得金币 - Gold reward
+            updates.goldGain = value;
+            break;
+
+        case 'WIN_GOLD_BONUS':
+            // 胜利金币加成 - Extra gold on victory
+            updates.playerStatus = {
+                ...(updates.playerStatus || playerStatus),
+                winGoldBonus: ((updates.playerStatus?.winGoldBonus || playerStatus.winGoldBonus) || 0) + value
+            };
+            break;
+
+        case 'OPEN_SHADOW_EVENT':
+            // 开启暗影事件 - Trigger special event
+            updates.triggerEvent = 'shadow';
+            break;
+
+        // ==================== BATCH 5: Miscellaneous & Rare ====================
+
+        case 'TRAP_TRIGGER':
+            // 陷阱触发 - Place trap
+            updates.placeTrap = value;
+            break;
+
+        case 'BAIT_TRIGGER':
+            // 诱饵触发 - Bait mechanic
+            updates.placeBait = value;
+            break;
+
+        case 'FREE_IF_WEAK':
+            // 虚弱免费 - Free if enemy weak
+            updates.freeIfWeak = true;
+            break;
+
+        case 'SLOW':
+            // 减速 - Slow enemy
+            updates.enemyStatus = {
+                ...(updates.enemyStatus || enemyStatus),
+                slowed: ((updates.enemyStatus?.slowed || enemyStatus.slowed) || 0) + value
+            };
+            break;
+
+        case 'HEAL_REDUCE':
+            // 治疗削减 - Grievous wounds
+            updates.enemyStatus = {
+                ...(updates.enemyStatus || enemyStatus),
+                healReduce: value
+            };
+            break;
+
+        case 'DAMAGE_REDUCE':
+            // 伤害削减 - Damage reduction
+            updates.playerStatus = {
+                ...(updates.playerStatus || playerStatus),
+                damageReduction: ((updates.playerStatus?.damageReduction || playerStatus.damageReduction) || 0) + value
+            };
+            break;
+
+        case 'VOID_DOT':
+            // 虚空持续伤害 - Void DOT
+            updates.enemyStatus = {
+                ...(updates.enemyStatus || enemyStatus),
+                voidDot: ((updates.enemyStatus?.voidDot || enemyStatus.voidDot) || 0) + value
+            };
+            break;
+
+        case 'HP_DEGEN':
+            // 生命退化 - HP loss over time
+            updates.enemyStatus = {
+                ...(updates.enemyStatus || enemyStatus),
+                hpDegen: ((updates.enemyStatus?.hpDegen || enemyStatus.hpDegen) || 0) + value
+            };
+            break;
+
+        case 'REVIVE_ONCE':
+            // 复活一次 - Guardian Angel
+            updates.playerStatus = {
+                ...(updates.playerStatus || playerStatus),
+                revive: true,
+                reviveHp: value
+            };
+            break;
+
+        case 'GAIN_RANDOM_BUFF':
+            // 随机增益 - Random buff
+            const buffTypes = ['strength', 'dexterity', 'block'];
+            const randomBuff = buffTypes[Math.floor(Math.random() * buffTypes.length)];
+            updates.playerStatus = {
+                ...(updates.playerStatus || playerStatus),
+                [randomBuff]: ((updates.playerStatus?.[randomBuff] || playerStatus[randomBuff]) || 0) + value
+            };
+            break;
+
+        case 'SHIELD':
+            // 护盾 - Temporary shield
+            updates.playerStatus = {
+                ...(updates.playerStatus || playerStatus),
+                shield: ((updates.playerStatus?.shield || playerStatus.shield) || 0) + value
+            };
+            break;
+
+        case 'NEXT_ATTACK_X2':
+            // 下次攻击x2 - Double next attack
+            updates.playerStatus = {
+                ...(updates.playerStatus || playerStatus),
+                nextAttackX2: true
+            };
+            break;
+
+        case 'PASSIVE_BLOCK':
+            // 被动格挡 - Passive block per turn
+            updates.playerStatus = {
+                ...(updates.playerStatus || playerStatus),
+                passiveBlock: ((updates.playerStatus?.passiveBlock || playerStatus.passiveBlock) || 0) + value
+            };
+            break;
+
+        case 'BLOCK_DRAW':
+            // 格挡抽牌 - Block + draw combo
+            updates.blockGain = Math.floor(value / 2);
+            updates.drawCount += 1;
+            break;
+
+        case 'EXHAUST':
+            // 消耗 - Card removed after use
+            updates.exhaustCard = true;
+            break;
+
+        // ==================== All Effects Implemented ====================
+        // Total: 142 effects (12 initial + 130 batch implemented)
 
         default:
             // Log unimplemented effects for tracking
