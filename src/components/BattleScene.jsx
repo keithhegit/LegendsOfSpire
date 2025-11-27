@@ -170,7 +170,8 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
             playerHp, maxHp: heroData.maxHp, playerStatus, enemyStatus
         });
         if (effectUpdates.drawCount > 0) drawCards(effectUpdates.drawCount);
-        if (effectUpdates.playerHp !== null) setPlayerHp(effectUpdates.playerHp);
+        if (effectUpdates.playerHp !== undefined && effectUpdates.playerHp !== null) setPlayerHp(effectUpdates.playerHp);
+        if (effectUpdates.manaChange) setPlayerMana(m => Math.min(initialMana, m + effectUpdates.manaChange));
         if (effectUpdates.playerStatus) setPlayerStatus(effectUpdates.playerStatus);
         if (effectUpdates.enemyStatus) setEnemyStatus(effectUpdates.enemyStatus);
 
@@ -367,8 +368,11 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
     const renderStatus = (status) => (
         <div className="flex gap-1 mt-1 flex-wrap">
             {status.strength > 0 && <div className="flex items-center text-[10px] text-red-400 bg-red-900/40 px-1 rounded border border-red-900 shadow-sm"><Sword size={10} className="mr-1" /> {status.strength}</div>}
+            {status.dexterity > 0 && <div className="flex items-center text-[10px] text-green-400 bg-green-900/40 px-1 rounded border border-green-900 shadow-sm"><Shield size={10} className="mr-1" /> 灵巧 {status.dexterity}</div>}
             {status.weak > 0 && <div className="flex items-center text-[10px] text-yellow-400 bg-yellow-900/40 px-1 rounded border border-yellow-900 shadow-sm"><Activity size={10} className="mr-1" /> 虚弱 {status.weak}</div>}
             {status.vulnerable > 0 && <div className="flex items-center text-[10px] text-purple-400 bg-purple-900/40 px-1 rounded border border-purple-900 shadow-sm"><Zap size={10} className="mr-1" /> 易伤 {status.vulnerable}</div>}
+            {status.poison > 0 && <div className="flex items-center text-[10px] text-green-500 bg-green-900/40 px-1 rounded border border-green-900 shadow-sm"><Skull size={10} className="mr-1" /> 中毒 {status.poison}</div>}
+            {status.stunned > 0 && <div className="flex items-center text-[10px] text-blue-400 bg-blue-900/40 px-1 rounded border border-blue-900 shadow-sm"><AlertTriangle size={10} className="mr-1" /> 眩晕 {status.stunned}</div>}
         </div>
     );
     const displayValue = nextEnemyAction.type === 'ATTACK' ? nextEnemyAction.value : (nextEnemyAction.actionType === 'Attack' ? nextEnemyAction.dmgValue : nextEnemyAction.effectValue);

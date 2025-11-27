@@ -173,8 +173,8 @@ export const HERO_SKINS = {
             { name: 'Championship Riven 2016', splashUrl: 'https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Riven_7.jpg', loadingUrl: 'https://ddragon.leagueoflegends.com/cdn/img/champion/loading/Riven_7.jpg' },
         ]
     },
-    CardMaster: {
-        id: 'CardMaster',
+    TwistedFate: {
+        id: 'TwistedFate',
         name: 'Twisted Fate',
         title: 'the Card Master',
         avatar: 'https://ddragon.leagueoflegends.com/cdn/13.1.1/img/champion/TwistedFate.png',

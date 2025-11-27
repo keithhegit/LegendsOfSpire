@@ -101,6 +101,16 @@ function applyEffect(effectType, value, context, updates) {
             };
             break;
 
+        case 'LOSE_HP_GAIN_MANA':
+            // 失去生命值获得法力 (Teemo E等)
+            updates.playerHp = Math.max(1, playerHp - value); // 不会致死
+            // 注意：法力值通常在 BattleScene 中直接管理，这里我们需要一种方式返回法力更新
+            // 目前 updates 结构不支持直接更新 mana，我们需要扩展它
+            // 但为了保持兼容性，我们可以通过特殊字段返回，或者在 BattleScene 中处理
+            // 让我们扩展 updates 对象
+            updates.manaChange = (updates.manaChange || 0) + 1;
+            break;
+
         // ==================== Placeholder for Future Effects ====================
         // TODO: Implement remaining 134 effects
         // Reference: card_skills.md for full list

@@ -71,22 +71,6 @@ export const CARD_DATABASE = {
   ViktorE: { id: 'ViktorE', name: '光束', type: 'ATTACK', cost: 2, value: 12, rarity: 'UNCOMMON', hero: 'Viktor', target: 'single', effect: 'BONUS_IF_VULN', effectValue: 4, description: '对目标造成12伤；若该目标有易伤再+4。', img: `${SPELL_URL}/ViktorDeathRay.png`, price: 100 },
   ViktorR: { id: 'ViktorR', name: '进化歧路', type: 'SKILL', cost: 3, value: 18, rarity: 'RARE', hero: 'Viktor', target: 'single', effect: 'DRAW_ON_USE', effectValue: 1, description: '对目标造成18伤并抽1张牌（进化打点）。', img: `${SPELL_URL}/ViktorChaosStorm.png`, price: 150 },
 
-  // Riven
-  RivenQ: { id: 'RivenQ', name: '断剑重铸', type: 'ATTACK', cost: 1, value: 12, rarity: 'COMMON', hero: 'Riven', target: 'single', effect: 'MULTI_HIT', effectValue: 4, description: '对单体造成三段打击，总计12伤。', img: `${SPELL_URL}/RivenTriCleave.png`, price: 50 },
-  RivenW: { id: 'RivenW', name: '气合斩', type: 'SKILL', cost: 1, value: 8, rarity: 'UNCOMMON', hero: 'Riven', target: 'self', effect: 'DRAW', effectValue: 1, description: '获得8护甲并抽1张牌。', img: `${SPELL_URL}/RivenMartyr.png`, price: 80 },
-  RivenE: { id: 'RivenE', name: '勇往直前', type: 'SKILL', cost: 1, value: 4, rarity: 'UNCOMMON', hero: 'Riven', target: 'self', effect: 'ATTACK_BUFF', effectValue: 4, description: '本回合你的攻击+4伤害。', img: `${SPELL_URL}/RivenFeint.png`, price: 100 },
-  RivenR: { id: 'RivenR', name: '放逐之刃', type: 'ATTACK', cost: 3, value: 20, rarity: 'RARE', hero: 'Riven', target: 'single', effect: 'PER_ATTACK_BONUS', effectValue: 4, description: '对目标造成20伤；本回合每打出1张攻击牌对该目标额外+4伤害。', img: `${SPELL_URL}/RivenFengShuiEngine.png`, price: 150 },
-
-  // Card-Master (卡牌大师)
-  CardMasterQ: { id: 'CardMasterQ', name: '红牌', type: 'ATTACK', cost: 1, value: 8, rarity: 'COMMON', hero: 'CardMaster', target: 'single', effect: 'VULN_ON_HIT', effectValue: 1, description: '造成6伤并给予1层易伤。', img: `${SPELL_URL}/WildCards.png`, price: 50 },
-  CardMasterW: { id: 'CardMasterW', name: '蓝牌', type: 'SKILL', cost: 1, value: 7, rarity: 'UNCOMMON', hero: 'CardMaster', target: 'self', effect: 'GAIN_MANA', effectValue: 1, description: '造成6伤并获得1点法力。', img: `${SPELL_URL}/PickACard.png`, price: 80 },
-  CardMasterE: { id: 'CardMasterE', name: '黄牌', type: 'SKILL', cost: 1, value: 0, rarity: 'UNCOMMON', hero: 'CardMaster', target: 'single', effect: 'STUN', effectValue: 1, description: '使目标眩晕1回合。', img: `${SPELL_URL}/CardmasterStack.png`, price: 100 },
-  CardMasterR: { id: 'CardMasterR', name: '命运', type: 'SKILL', cost: 3, value: 0, rarity: 'RARE', hero: 'CardMaster', target: 'single', effect: 'DRAW_AND_SCOUT', effectValue: 3, description: '抽3张并查看目标下一行动；若战斗胜利额外获得15金币（触发战斗结算）。', img: `${SPELL_URL}/Destiny.png`, price: 150 },
-
-  // Lee Sin
-  LeeQ: { id: 'LeeQ', name: '音波回音', type: 'ATTACK', cost: 1, value: 7, rarity: 'COMMON', hero: 'LeeSin', target: 'single', effect: 'CHAIN_TRIGGER', effectValue: 7, description: '对目标造成7伤；命中后可免费再触发一次（0费）。', img: `${SPELL_URL}/BlindMonkQOne.png`, price: 50 },
-  LeeW: { id: 'LeeW', name: '金钟罩', type: 'SKILL', cost: 1, value: 8, block: 8, rarity: 'UNCOMMON', hero: 'LeeSin', target: 'self', effect: 'ATTACK_BUFF', effectValue: 2, description: '获得8护甲；下一次攻击+2伤害。', img: `${SPELL_URL}/BlindMonkWOne.png`, price: 80 },
-  LeeE: { id: 'LeeE', name: '天雷破', type: 'ATTACK', cost: 1, value: 6, rarity: 'UNCOMMON', hero: 'LeeSin', target: 'single', effect: 'WEAK_ON_HIT', effectValue: 1, description: '对目标造成6伤并施加1层虚弱。', img: `${SPELL_URL}/LeeE.png`, price: 100 },
   LeeR: { id: 'LeeR', name: '猛龙摆尾', type: 'ATTACK', cost: 3, value: 20, rarity: 'RARE', hero: 'LeeSin', target: 'single', effect: 'REMOVE_BUFF', effectValue: 1, description: '对目标造成20伤并移除目标的一个增益。', img: `${SPELL_URL}/LeeR.png`, price: 150 },
 
   // Vayne
