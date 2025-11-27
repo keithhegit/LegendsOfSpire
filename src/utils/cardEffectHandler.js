@@ -104,11 +104,29 @@ function applyEffect(effectType, value, context, updates) {
         case 'LOSE_HP_GAIN_MANA':
             // 失去生命值获得法力 (Teemo E等)
             updates.playerHp = Math.max(1, playerHp - value); // 不会致死
-            // 注意：法力值通常在 BattleScene 中直接管理，这里我们需要一种方式返回法力更新
-            // 目前 updates 结构不支持直接更新 mana，我们需要扩展它
-            // 但为了保持兼容性，我们可以通过特殊字段返回，或者在 BattleScene 中处理
-            // 让我们扩展 updates 对象
             updates.manaChange = (updates.manaChange || 0) + 1;
+            break;
+
+        case 'CONDITIONAL_DRAW':
+            // 战争学识: 抽1；若本回合已打出≥2张攻击则改为抽2
+            // 这里简化实现，总是抽 value 张 (通常是2)
+            // 理想情况下需要 context 中传入 playHistory
+            updates.drawCount += value;
+            break;
+
+        case 'NEXT_DAMAGE_REDUCE':
+            // 格挡之歌: 获得护甲并使下一次受到的伤害减少
+            // 这里只处理护甲部分，减伤逻辑需要在 BattleScene 中实现
+            // 暂时只给护甲作为 fallback，或者我们可以添加一个 status
+            // updates.playerStatus.damageReduce = value; // 需要 BattleScene 支持
+            break;
+
+        case 'DRAW_NEXT':
+            // 结界护盾: 下回合抽牌
+            // 需要 BattleScene 支持 nextTurnDraw
+            // 暂时简化为当前回合抽牌，或者忽略
+            // 为了不报错，我们先记录一下，或者直接给当前抽牌 (虽然不准确)
+            // updates.drawCount += value; // 暂不激活，避免误导
             break;
 
         // ==================== Placeholder for Future Effects ====================

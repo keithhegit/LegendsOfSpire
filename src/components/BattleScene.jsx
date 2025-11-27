@@ -314,8 +314,27 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
         deckRef.current = { ...deckRef.current, discardPile: [...discardPile, ...hand], hand: [] };
         forceUpdate();
         setGameState('ENEMY_TURN');
+
+        // Player Status Decay
         setPlayerStatus(s => ({ ...s, weak: Math.max(0, s.weak - 1), vulnerable: Math.max(0, s.vulnerable - 1) }));
-        setEnemyStatus(s => ({ ...s, weak: Math.max(0, s.weak - 1), vulnerable: Math.max(0, s.vulnerable - 1) }));
+
+        // Enemy Status Logic (Poison Damage & Decay)
+        setEnemyStatus(s => {
+            let newStatus = { ...s, weak: Math.max(0, s.weak - 1), vulnerable: Math.max(0, s.vulnerable - 1) };
+
+            // Poison Logic: Deal damage equal to stacks, then decrement
+            if (s.poison > 0) {
+                const poisonDmg = s.poison;
+                setEnemyHp(h => Math.max(0, h - poisonDmg));
+                // Show poison damage number
+                setDmgOverlay({ val: poisonDmg, target: 'ENEMY', color: 'text-green-500' });
+                setTimeout(() => setDmgOverlay(null), 800);
+                newStatus.poison = Math.max(0, s.poison - 1);
+            }
+
+            return newStatus;
+        });
+
         setTimeout(enemyAction, 1000);
     };
 
