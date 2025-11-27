@@ -1043,41 +1043,41 @@ export const ENEMY_POOL = {
 
 ### 开发路线图
 
-#### 🚀 近期计划 (v0.9.1)
+#### 🚀 近期计划 (v0.9.2)
 
-##### Phase 2: UI组件重构（进行中）
+##### Phase 2: UI组件重构 ✅ (已完成)
 
 **任务2.1**: 六边形节点组件
-- [ ] 创建 `HexagonNode.jsx`
-- [ ] SVG六边形绘制
-- [ ] 节点状态样式（LOCKED/AVAILABLE/COMPLETED）
-- [ ] 图标显示逻辑（战斗/商店/事件）
+- [x] 创建 `HexagonNode.jsx`
+- [x] SVG六边形绘制
+- [x] 节点状态样式（LOCKED/AVAILABLE/COMPLETED）
+- [x] 图标显示逻辑（战斗/商店/事件）
 
 **任务2.2**: 路径连线组件
-- [ ] 创建 `PathConnector.jsx`
-- [ ] SVG路径绘制（贝塞尔曲线）
-- [ ] 动画效果（已探索路径高亮）
+- [x] 创建 `PathConnector.jsx`
+- [x] SVG路径绘制（贝塞尔曲线）
+- [x] 动画效果（已探索路径高亮）
 
 **任务2.3**: GridMapView重构
-- [ ] 改用六边形布局渲染
-- [ ] 优化"三选一"高亮逻辑
-- [ ] 改进迷雾效果（只显示next节点）
-- [ ] 添加拖拽查看全图功能
+- [x] 改用六边形布局渲染
+- [x] 优化"三选一"高亮逻辑
+- [x] 改进迷雾效果（只显示next节点）
+- [x] 添加拖拽查看全图功能
 
-##### Phase 3: 游戏逻辑集成
+##### Phase 3: 游戏逻辑集成 ✅ (已完成)
 
 **任务3.1**: App.jsx集成
-- [ ] 修改 `handleChampionSelect`（调用新生成器）
-- [ ] 修改 `completeNode`（三选一逻辑）
-- [ ] 修改 `handleNodeSelect`（节点点击）
-- [ ] 更新存档逻辑（序列化新地图结构）
+- [x] 修改 `handleChampionSelect`（调用新生成器）
+- [x] 修改 `completeNode`（三选一逻辑）
+- [x] 修改 `handleNodeSelect`（节点点击）
+- [x] 更新存档逻辑（序列化新地图结构）
 
 **任务3.2**: ACT切换逻辑
-- [ ] ACT1 -> ACT2 地图重新生成（20层）
-- [ ] ACT2 -> ACT3 地图重新生成（30层）
-- [ ] Boss战胜利后的章节过渡动画
+- [x] ACT1 -> ACT2 地图重新生成（20层）
+- [x] ACT2 -> ACT3 地图重新生成（30层）
+- [x] Boss战胜利后的章节过渡动画
 
-##### Phase 4: 测试与优化
+##### Phase 4: 测试与优化 🔄 (进行中)
 
 **任务4.1**: 功能测试
 - [ ] 地图生成100次，检查是否有无解情况
@@ -1095,11 +1095,27 @@ export const ENEMY_POOL = {
 
 ##### Phase 5: 卡牌数值平衡 & 技能审计（v0.9.2 准备）
 
-- **任务5.1 数据盘点**：用 `tools/scripts/check_cards.js` + `audit_all_spells.py` 生成 200 张卡牌与技能的启用清单，标记“未生效”、“缺描述”、“需要动画”的项。
-- **任务5.2 数值基线**：依据 `cards_ev_balance.md` 和真实游玩数据，重新划分 BASIC / COMMON / UNCOMMON / RARE 的费用-收益区间，输出新的平衡表。
-- **任务5.3 批处理回写**：通过 `apply_balance.py` / `restore_and_balance_cards.py` 批量写回调整，并人工抽检 10 张核心卡。
-- **任务5.4 QA 验证**：在 `Login → HeroSelect → Map → Battle` 完整流程中测试每位英雄至少 1 张技能卡的触发，记录日志供自动化脚本（待定）比对。
-- **交付输出**：`CARD_BALANCE_PLAN.md`（新）、`game_data.md` 数值章节更新、以及 Pages 部署前后的 Diff。
+1. **任务5.1 数据盘点**
+   - 运行 `node tools/scripts/check_cards.js --show-inactive --output reports/card_activation.json`，生成 200 张卡牌的激活/失效状态。
+   - 运行 `python tools/scripts/audit_all_spells.py --export reports/spell_audit.csv`，对技能资源（图标、描述、触发函数）做全量巡检。
+   - 汇总两份报告，按稀有度/英雄分类标记 `inactive`、`missing_icon`、`missing_logic`，并将摘要附到 `cards_ev_balance.md`。
+
+2. **任务5.2 数值基线**
+   - 分析 `cards_ev_balance.md` 现有数据 + 最近三次游玩日志，重新定义 BASIC / COMMON / UNCOMMON / RARE 的费用-收益区间（伤害、护甲、功能性指标）。
+   - 在 `PROJECT_DOCUMENTATION.md` 和 `game_data.md` 增加 “Balance Baseline v2” 表格，明确 target DPS / Block / 特殊效果上限。
+   - 输出 `balance_inputs.json`：脚本读取的目标区间、需强制锁定的卡牌列表、以及特殊调整说明。
+
+3. **任务5.3 批处理回写**
+   - `python tools/scripts/apply_balance.py --config balance_inputs.json --dry-run` 确认 diff，再执行 `--write` 更新 `src/data/cards.js`。
+   - 执行 `python tools/scripts/restore_and_balance_cards.py`，同步旧版本卡组所需的平衡修正。
+   - 抽检至少 10 张代表卡（各稀有度覆盖），输出前后差异、设计理由，写入 `CARD_BALANCE_PLAN.md` 与 PR 描述。
+
+4. **任务5.4 QA 验证**
+   - 编写 `tools/scripts/audit_playtest_plan.md`，列出 20 位英雄的抽测场景（登录 → 选人 → 战斗 → 触发特定技能）。
+   - 手动或半自动执行，记录控制台日志、截图，存入 `reports/phase5_playtests/`；若发现未生效技能，回到 Task5.1 报告重新标记并修复。
+   - 产出最终 QA Checklist，并在 Pages 部署前验证 `reports/*.json` 中所有状态为 `ok`。
+
+**交付物**：`CARD_BALANCE_PLAN.md`（新增）、`balance_inputs.json`、`reports/card_activation.json`、`reports/spell_audit.csv`、`reports/phase5_playtests/*`，以及更新后的 `game_data.md` / `cards_ev_balance.md`。
 
 #### 🔮 远期计划 (v1.0+)
 
