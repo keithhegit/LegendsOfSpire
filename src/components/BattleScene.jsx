@@ -172,7 +172,19 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
         if (effectUpdates.drawCount > 0) drawCards(effectUpdates.drawCount);
         if (effectUpdates.playerHp !== undefined && effectUpdates.playerHp !== null) setPlayerHp(effectUpdates.playerHp);
         if (effectUpdates.manaChange) setPlayerMana(m => Math.min(initialMana, m + effectUpdates.manaChange));
-        if (effectUpdates.playerStatus) setPlayerStatus(effectUpdates.playerStatus);
+
+        // FIX: 金币奖励 (Bug #2)
+        if (effectUpdates.goldGain) {
+            setGold(gold => gold + effectUpdates.goldGain);
+        }
+
+        // FIX: 下回合效果 (Bug #5, #9) - merge status updates
+        if (effectUpdates.playerStatus) {
+            setPlayerStatus(prev => ({
+                ...prev,
+                ...effectUpdates.playerStatus
+            }));
+        }
         if (effectUpdates.enemyStatus) setEnemyStatus(effectUpdates.enemyStatus);
 
         // 盲僧被动：技能牌后设置buff
@@ -210,22 +222,34 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
                 // 延迟播放攻击命中音效
                 playSfx('ATTACK_HIT');
             }, 200);
-            let dmg = card.value + playerStatus.strength;
-            if (playerStatus.weak > 0) dmg = Math.floor(dmg * 0.75);
+            // FIX Bug #1: MULTI_HIT伤害计算 - 易伤应该加成基础伤害，然后再乘以次数
+            let baseDmg = card.value + playerStatus.strength;
+            if (playerStatus.weak > 0) baseDmg = Math.floor(baseDmg * 0.75);
+
+            // FIX Bug #8: 首次攻击加倍 (耀光)
+            if (!playerStatus.firstAttackUsed && playerStatus.firstAttackBonus) {
+                baseDmg += playerStatus.firstAttackBonus;
+                setPlayerStatus(prev => ({ ...prev, firstAttackUsed: true }));
+            }
+
+            // 易伤加成应用于基础伤害 (方案A)
+            if (enemyStatus.vulnerable > 0) {
+                baseDmg = Math.floor(baseDmg * 1.5);
+            }
 
             // 卡特琳娜被动：每打出3张攻击牌后，下一张(第4张)攻击牌伤害翻倍
             if (heroData.relicId === "KatarinaPassive" && katarinaAttackCount === 3) {
-                dmg = dmg * 2;
+                baseDmg = baseDmg * 2;
                 setKatarinaAttackCount(0); // 重置计数器
             }
 
-            const hits = card.isMultiHit ? card.hits : 1;
+            // FIX: 支持 MULTI_HIT from effectUpdates
+            const hits = card.isMultiHit ? card.hits : (effectUpdates.multiHitCount || 1);
             let total = 0;
             let isFirstHit = true; // 用于劫被动
 
             for (let i = 0; i < hits; i++) {
-                let finalDmg = dmg;
-                if (enemyStatus.vulnerable > 0) finalDmg = Math.floor(finalDmg * 1.5);
+                let finalDmg = baseDmg; // 每次击打使用已计算易伤的基础伤害
                 if (heroData.relicId === "YasuoPassive" && Math.random() < 0.1) finalDmg = Math.floor(finalDmg * 2);
                 if (heroData.relics.includes("InfinityEdge")) finalDmg = Math.floor(finalDmg * 1.5);
 
@@ -318,7 +342,7 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
         // Player Status Decay
         setPlayerStatus(s => ({ ...s, weak: Math.max(0, s.weak - 1), vulnerable: Math.max(0, s.vulnerable - 1) }));
 
-        // Enemy Status Logic (Poison Damage & Decay)
+        // Enemy Status Logic (Poison, Bleed, Void DOT Damage & Decay)
         setEnemyStatus(s => {
             let newStatus = { ...s, weak: Math.max(0, s.weak - 1), vulnerable: Math.max(0, s.vulnerable - 1) };
 
@@ -326,16 +350,69 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
             if (s.poison > 0) {
                 const poisonDmg = s.poison;
                 setEnemyHp(h => Math.max(0, h - poisonDmg));
-                // Show poison damage number
                 setDmgOverlay({ val: poisonDmg, target: 'ENEMY', color: 'text-green-500' });
                 setTimeout(() => setDmgOverlay(null), 800);
                 newStatus.poison = Math.max(0, s.poison - 1);
             }
 
+            // FIX Bug #10: 流血 (Bleed) - 每层造成2伤害
+            if (s.bleed > 0) {
+                const bleedDmg = s.bleed * 2;
+                setEnemyHp(h => Math.max(0, h - bleedDmg));
+                setDmgOverlay({ val: bleedDmg, target: 'ENEMY', color: 'text-red-600' });
+                setTimeout(() => setDmgOverlay(null), 800);
+                newStatus.bleed = Math.max(0, s.bleed - 1);
+            }
+
+            // FIX Bug #7: 虚空之砂 DOT
+            if (s.voidDot > 0) {
+                const voidDmg = s.voidDot;
+                setEnemyHp(h => Math.max(0, h - voidDmg));
+                setDmgOverlay({ val: voidDmg, target: 'ENEMY', color: 'text-purple-500' });
+                setTimeout(() => setDmgOverlay(null), 800);
+                newStatus.voidDot = Math.max(0, s.voidDot - 1);
+            }
+
             return newStatus;
         });
 
+        // FIX Bug #9: 回合结束时重置首次攻击标记
+        setPlayerStatus(prev => ({ ...prev, firstAttackUsed: false }));
+
         setTimeout(enemyAction, 1000);
+    };
+
+    // FIX: 下回合效果处理函数
+    const applyNextTurnEffects = () => {
+        setPlayerStatus(prev => {
+            const updates = { ...prev };
+
+            // 下回合法力 (蓄能冥想)
+            if (prev.nextTurnMana > 0) {
+                setPlayerMana(m => Math.min(initialMana, m + prev.nextTurnMana));
+                updates.nextTurnMana = 0;
+            }
+
+            // 下回合抽牌 (结界护盾)
+            if (prev.nextDrawBonus > 0) {
+                drawCards(prev.nextDrawBonus);
+                updates.nextDrawBonus = 0;
+            }
+
+            // 下回合格挡
+            if (prev.nextTurnBlock > 0) {
+                setPlayerBlock(b => b + prev.nextTurnBlock);
+                updates.nextTurnBlock = 0;
+            }
+
+            // 下回合力量
+            if (prev.nextTurnStrength > 0) {
+                updates.strength = (prev.strength || 0) + prev.nextTurnStrength;
+                updates.nextTurnStrength = 0;
+            }
+
+            return updates;
+        });
     };
 
     const enemyAction = () => {
@@ -350,6 +427,28 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
                 // 延迟播放攻击命中音效
                 playSfx('ATTACK_HIT');
             }, 200);
+
+            // FIX Bug #6: 中娅沙漏 - 检查免伤
+            if (playerStatus.avoidNextDamage || playerStatus.immuneOnce) {
+                setPlayerStatus(prev => ({
+                    ...prev,
+                    avoidNextDamage: false,
+                    immuneOnce: false
+                }));
+
+                // 显示免疫效果
+                setDmgOverlay({ val: 'IMMUNE', target: 'PLAYER', color: 'text-yellow-400' });
+                setTimeout(() => setDmgOverlay(null), 800);
+
+                setGameState('PLAYER_TURN');
+                setPlayerBlock(0);
+                drawCards(5);
+                setPlayerMana(initialMana);
+                // FIX Bug #5, #9: 下回合开始时应用效果 (免疫时也要触发)
+                applyNextTurnEffects();
+                return; // 免疫本次伤害
+            }
+
             const baseDmg = act.type === 'ATTACK' ? act.value : act.dmgValue;
             let dmg = baseDmg + enemyStatus.strength;
             if (enemyStatus.weak > 0) dmg = Math.floor(dmg * 0.75);
@@ -381,7 +480,11 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
         }
         if (act.type === 'DEBUFF') { if (act.effect === 'WEAK') setPlayerStatus(s => ({ ...s, weak: s.weak + act.effectValue })); if (act.effect === 'VULNERABLE') setPlayerStatus(s => ({ ...s, vulnerable: s.vulnerable + act.effectValue })); }
         setEnemyBlock(0);
-        setTimeout(startTurnLogic, 1000);
+        setTimeout(() => {
+            // FIX Bug #5, #9: 下回合开始时应用效果
+            applyNextTurnEffects();
+            startTurnLogic();
+        }, 1000);
     };
 
     const renderStatus = (status) => (
