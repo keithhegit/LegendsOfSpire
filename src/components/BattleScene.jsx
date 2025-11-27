@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Sword, Shield, Zap, Skull, Activity, AlertTriangle, Droplet, Ghost, Crosshair, Lock, RefreshCw, TrendingDown, Clock, Layers } from 'lucide-react';
+import { Sword, Shield, Zap, Skull, Activity, AlertTriangle, Droplet, Ghost, Crosshair, Lock, RefreshCw, TrendingDown, Clock, Layers, Flame, Heart } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CARD_DATABASE } from '../data/cards';
 import { RELIC_DATABASE } from '../data/relics';
@@ -495,79 +495,61 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
             {status.vulnerable > 0 && <div className="flex items-center text-[10px] text-purple-400 bg-purple-900/40 px-1 rounded border border-purple-900 shadow-sm"><Zap size={10} className="mr-1" /> 易伤 {status.vulnerable}</div>}
             {status.poison > 0 && <div className="flex items-center text-[10px] text-green-500 bg-green-900/40 px-1 rounded border border-green-900 shadow-sm"><Skull size={10} className="mr-1" /> 中毒 {status.poison}</div>}
             {status.bleed > 0 && <div className="flex items-center text-[10px] text-red-600 bg-red-950/40 px-1 rounded border border-red-800 shadow-sm"><Droplet size={10} className="mr-1" /> 流血 {status.bleed}</div>}
-            {status.voidDot > 0 && <div className="flex items-center text-[10px] text-purple-300 bg-purple-950/40 px-1 rounded border border-purple-800 shadow-sm"><Ghost size={10} className="mr-1" /> 虚空 {status.voidDot}</div>}
-            {status.mark > 0 && <div className="flex items-center text-[10px] text-orange-400 bg-orange-900/40 px-1 rounded border border-orange-900 shadow-sm"><Crosshair size={10} className="mr-1" /> 标记 {status.mark}</div>}
-            {(status.immuneOnce || status.avoidNextDamage) && <div className="flex items-center text-[10px] text-yellow-200 bg-yellow-900/40 px-1 rounded border border-yellow-700 shadow-sm"><Lock size={10} className="mr-1" /> 免疫</div>}
-            {status.stunned > 0 && <div className="flex items-center text-[10px] text-blue-400 bg-blue-900/40 px-1 rounded border border-blue-900 shadow-sm"><AlertTriangle size={10} className="mr-1" /> 眩晕 {status.stunned}</div>}
-            {status.reflect > 0 && <div className="flex items-center text-[10px] text-orange-300 bg-orange-950/40 px-1 rounded border border-orange-800 shadow-sm"><RefreshCw size={10} className="mr-1" /> 反伤 {status.reflect}</div>}
-            {status.damageReduce > 0 && <div className="flex items-center text-[10px] text-blue-300 bg-blue-950/40 px-1 rounded border border-blue-800 shadow-sm"><TrendingDown size={10} className="mr-1" /> 减伤 {status.damageReduce}%</div>}
-            {status.healReduce > 0 && <div className="flex items-center text-[10px] text-red-300 bg-red-950/40 px-1 rounded border border-red-900 shadow-sm"><Skull size={10} className="mr-1" /> 重伤 {status.healReduce}%</div>}
+            {status.burn > 0 && <div className="flex items-center text-[10px] text-orange-500 bg-orange-950/40 px-1 rounded border border-orange-800 shadow-sm"><Flame size={10} className="mr-1" /> 灼烧 {status.burn}</div>}
 
-            {/* Next Turn Effects */}
-            {status.nextTurnBlock > 0 && <div className="flex items-center text-[10px] text-blue-200 bg-blue-900/40 px-1 rounded border border-blue-800 shadow-sm"><Shield size={10} className="mr-1" /><Clock size={8} className="mr-1" /> +{status.nextTurnBlock}</div>}
-            {status.nextTurnStrength > 0 && <div className="flex items-center text-[10px] text-red-200 bg-red-900/40 px-1 rounded border border-red-800 shadow-sm"><Sword size={10} className="mr-1" /><Clock size={8} className="mr-1" /> +{status.nextTurnStrength}</div>}
-            {status.nextTurnMana > 0 && <div className="flex items-center text-[10px] text-blue-200 bg-blue-900/40 px-1 rounded border border-blue-800 shadow-sm"><Zap size={10} className="mr-1" /><Clock size={8} className="mr-1" /> +{status.nextTurnMana}</div>}
-            {status.nextDrawBonus > 0 && <div className="flex items-center text-[10px] text-gray-200 bg-gray-800/40 px-1 rounded border border-gray-600 shadow-sm"><Layers size={10} className="mr-1" /><Clock size={8} className="mr-1" /> +{status.nextDrawBonus}</div>}
-        </div>
-    );
-    const displayValue = nextEnemyAction.type === 'ATTACK' ? nextEnemyAction.value : (nextEnemyAction.actionType === 'Attack' ? nextEnemyAction.dmgValue : nextEnemyAction.effectValue);
-    const IntentIcon = () => { const type = nextEnemyAction.type; const isAttack = type === 'ATTACK' || nextEnemyAction.actionType === 'Attack'; if (isAttack) return <Sword size={20} className="text-red-500" />; if (type === 'BUFF') return <Shield size={20} className="text-blue-400" />; if (type === 'DEBUFF') return <Skull size={20} className="text-purple-400" />; return <AlertTriangle size={20} className="text-gray-400" />; };
-
-    const { hand, drawPile: currentDrawPile, discardPile: currentDiscardPile } = deckRef.current;
-
-    if (!heroData || !enemyConfig) {
+            if (!heroData || !enemyConfig) {
         return <div className="w-full h-full flex items-center justify-center text-white">Loading...</div>;
     }
 
-    return (
-        <div className="w-full h-full relative flex flex-col overflow-hidden bg-black">
-            <div className="absolute inset-0 bg-cover bg-center opacity-40" style={{ backgroundImage: `url(${ACT_BACKGROUNDS[act || 1]})` }}></div>
-            <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-                <div className={`absolute left-10 bottom-[42%] w-64 h-[500px] transition-all duration-200 ${heroAnim === 'attack' ? 'translate-x-32' : ''} ${heroAnim === 'hit' ? 'translate-x-[-10px] brightness-50 bg-red-500/30' : ''}`}>
-                    <img src={heroData.img} className="w-full h-full object-cover object-top rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.8)] border-2 border-[#C8AA6E]" />
-                    <div className="absolute -bottom-24 w-full bg-black/80 border border-[#C8AA6E] p-2 rounded flex flex-col gap-1 shadow-lg z-40"><div className="flex justify-between text-xs text-[#C8AA6E] font-bold"><span>HP {playerHp}/{heroData.maxHp}</span>{playerBlock > 0 && <span className="text-blue-400 flex items-center gap-1"><Shield size={12} />{playerBlock}</span>}</div><div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden"><div className="h-full bg-green-600 transition-all duration-300" style={{ width: `${(playerHp / heroData.maxHp) * 100}%` }}></div></div>{renderStatus(playerStatus)}</div>
+            return (
+            <div className="w-full h-full relative flex flex-col overflow-hidden bg-black">
+                <div className="absolute inset-0 bg-cover bg-center opacity-40" style={{ backgroundImage: `url(${ACT_BACKGROUNDS[act || 1]})` }}></div>
+                <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                    <div className={`absolute left-10 bottom-[42%] w-64 h-[500px] transition-all duration-200 ${heroAnim === 'attack' ? 'translate-x-32' : ''} ${heroAnim === 'hit' ? 'translate-x-[-10px] brightness-50 bg-red-500/30' : ''}`}>
+                        <img src={heroData.img} className="w-full h-full object-cover object-top rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.8)] border-2 border-[#C8AA6E]" />
+                        <div className="absolute -bottom-24 w-full bg-black/80 border border-[#C8AA6E] p-2 rounded flex flex-col gap-1 shadow-lg z-40"><div className="flex justify-between text-xs text-[#C8AA6E] font-bold"><span>HP {playerHp}/{heroData.maxHp}</span>{playerBlock > 0 && <span className="text-blue-400 flex items-center gap-1"><Shield size={12} />{playerBlock}</span>}</div><div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden"><div className="h-full bg-green-600 transition-all duration-300" style={{ width: `${(playerHp / heroData.maxHp) * 100}%` }}></div></div>{renderStatus(playerStatus)}</div>
+                    </div>
+                    <div className="text-6xl font-black text-[#C8AA6E]/20 italic">VS</div>
+                    <div className={`absolute right-10 bottom-[42%] w-64 h-[500px] transition-all duration-200 ${enemyAnim === 'attack' ? '-translate-x-32' : ''} ${enemyAnim === 'hit' ? 'translate-x-[10px] brightness-50 bg-red-500/30' : ''}`}>
+                        <img src={enemyConfig.img} className="w-full h-full object-cover object-top rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.8)] border-2 border-red-800" />
+                        <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-black/80 border border-red-600 px-3 py-1 rounded flex items-center gap-2 animate-bounce"><IntentIcon /><span className="text-white font-bold text-lg">{displayValue}{nextEnemyAction.count > 1 ? `x${nextEnemyAction.count}` : ''}</span></div>
+                        <div className="absolute -bottom-24 w-full bg-black/80 border border-red-800 p-2 rounded flex flex-col gap-1 shadow-lg z-40"><div className="flex justify-between text-xs text-red-500 font-bold"><span>{enemyConfig.name}</span><span>{enemyHp}/{enemyConfig.maxHp}</span></div><div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden"><div className="h-full bg-red-600 transition-all duration-300" style={{ width: `${(enemyHp / enemyConfig.maxHp) * 100}%` }}></div></div>{enemyBlock > 0 && <div className="text-blue-400 text-xs font-bold flex items-center gap-1"><Shield size={10} /> 格挡 {enemyBlock}</div>}{renderStatus(enemyStatus)}</div>
+                    </div>
                 </div>
-                <div className="text-6xl font-black text-[#C8AA6E]/20 italic">VS</div>
-                <div className={`absolute right-10 bottom-[42%] w-64 h-[500px] transition-all duration-200 ${enemyAnim === 'attack' ? '-translate-x-32' : ''} ${enemyAnim === 'hit' ? 'translate-x-[10px] brightness-50 bg-red-500/30' : ''}`}>
-                    <img src={enemyConfig.img} className="w-full h-full object-cover object-top rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.8)] border-2 border-red-800" />
-                    <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-black/80 border border-red-600 px-3 py-1 rounded flex items-center gap-2 animate-bounce"><IntentIcon /><span className="text-white font-bold text-lg">{displayValue}{nextEnemyAction.count > 1 ? `x${nextEnemyAction.count}` : ''}</span></div>
-                    <div className="absolute -bottom-24 w-full bg-black/80 border border-red-800 p-2 rounded flex flex-col gap-1 shadow-lg z-40"><div className="flex justify-between text-xs text-red-500 font-bold"><span>{enemyConfig.name}</span><span>{enemyHp}/{enemyConfig.maxHp}</span></div><div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden"><div className="h-full bg-red-600 transition-all duration-300" style={{ width: `${(enemyHp / enemyConfig.maxHp) * 100}%` }}></div></div>{enemyBlock > 0 && <div className="text-blue-400 text-xs font-bold flex items-center gap-1"><Shield size={10} /> 格挡 {enemyBlock}</div>}{renderStatus(enemyStatus)}</div>
+                {dmgOverlay && (<div className={`absolute top-1/2 ${dmgOverlay.target === 'ENEMY' ? 'right-1/4' : 'left-1/4'} -translate-y-1/2 text-8xl font-black text-white drop-shadow-[0_0_10px_red] animate-ping z-50`}>{dmgOverlay.val}</div>)}
+                <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black via-black/80 to-transparent z-20 flex items-end justify-center pb-6 gap-4 pointer-events-none">
+                    <div className="absolute left-8 bottom-8 w-24 h-24 rounded-full bg-[#091428] border-4 border-[#C8AA6E] flex items-center justify-center shadow-[0_0_30px_#0066FF] pointer-events-auto text-center">
+                        <span className="text-4xl font-bold text-white block">{playerMana}</span>
+                        <span className="text-[10px] text-[#C8AA6E] block">MANA</span>
+                        <div className="text-[8px] text-gray-400 mt-1">{currentDrawPile.length}/{currentDiscardPile.length}</div>
+                    </div>
+                    <div className="flex items-end justify-center pointer-events-auto" style={{ width: '600px', height: '240px', position: 'relative' }}>
+                        <AnimatePresence>
+                            {hand.map((cid, i) => {
+                                const card = CARD_DATABASE[cid];
+                                if (!card) {
+                                    console.warn(`Card not found in database: ${cid}`);
+                                    return null;
+                                }
+                                const canPlay = playerMana >= card.cost && gameState === 'PLAYER_TURN';
+                                return (
+                                    <Card
+                                        key={`${cid}-${i}`}
+                                        cardId={cid}
+                                        index={i}
+                                        totalCards={hand.length}
+                                        canPlay={canPlay}
+                                        onPlay={playCard}
+                                    />
+                                )
+                            })}
+                        </AnimatePresence>
+                    </div>
+                    <button onClick={endTurn} disabled={gameState !== 'PLAYER_TURN'} className="absolute right-8 bottom-8 w-24 h-24 rounded-full bg-[#C8AA6E] border-4 border-[#F0E6D2] flex items-center justify-center font-bold text-[#091428] shadow-lg hover:scale-105 hover:bg-white active:scale-95 transition-all pointer-events-auto">结束<br />回合</button>
                 </div>
             </div>
-            {dmgOverlay && (<div className={`absolute top-1/2 ${dmgOverlay.target === 'ENEMY' ? 'right-1/4' : 'left-1/4'} -translate-y-1/2 text-8xl font-black text-white drop-shadow-[0_0_10px_red] animate-ping z-50`}>{dmgOverlay.val}</div>)}
-            <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black via-black/80 to-transparent z-20 flex items-end justify-center pb-6 gap-4 pointer-events-none">
-                <div className="absolute left-8 bottom-8 w-24 h-24 rounded-full bg-[#091428] border-4 border-[#C8AA6E] flex items-center justify-center shadow-[0_0_30px_#0066FF] pointer-events-auto text-center">
-                    <span className="text-4xl font-bold text-white block">{playerMana}</span>
-                    <span className="text-[10px] text-[#C8AA6E] block">MANA</span>
-                    <div className="text-[8px] text-gray-400 mt-1">{currentDrawPile.length}/{currentDiscardPile.length}</div>
-                </div>
-                <div className="flex items-end justify-center pointer-events-auto" style={{ width: '600px', height: '240px', position: 'relative' }}>
-                    <AnimatePresence>
-                        {hand.map((cid, i) => {
-                            const card = CARD_DATABASE[cid];
-                            if (!card) {
-                                console.warn(`Card not found in database: ${cid}`);
-                                return null;
-                            }
-                            const canPlay = playerMana >= card.cost && gameState === 'PLAYER_TURN';
-                            return (
-                                <Card
-                                    key={`${cid}-${i}`}
-                                    cardId={cid}
-                                    index={i}
-                                    totalCards={hand.length}
-                                    canPlay={canPlay}
-                                    onPlay={playCard}
-                                />
-                            )
-                        })}
-                    </AnimatePresence>
-                </div>
-                <button onClick={endTurn} disabled={gameState !== 'PLAYER_TURN'} className="absolute right-8 bottom-8 w-24 h-24 rounded-full bg-[#C8AA6E] border-4 border-[#F0E6D2] flex items-center justify-center font-bold text-[#091428] shadow-lg hover:scale-105 hover:bg-white active:scale-95 transition-all pointer-events-auto">结束<br />回合</button>
-            </div>
-        </div>
-    );
+            );
 };
 
-export default BattleScene;
+            export default BattleScene;
 
