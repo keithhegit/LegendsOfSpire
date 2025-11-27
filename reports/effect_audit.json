@@ -1,0 +1,1063 @@
+{
+  "summary": {
+    "total_cards": 202,
+    "total_unique_effects": 141,
+    "implemented_effects": 3,
+    "missing_effects": 138,
+    "cards_without_explicit_effect": 17
+  },
+  "implemented": [
+    {
+      "effect": "VULNERABLE",
+      "count": 5,
+      "examples": [
+        "GarenQ",
+        "DariusW",
+        "LuxQ",
+        "JinxW",
+        "Neutral_089"
+      ]
+    },
+    {
+      "effect": "WEAK",
+      "count": 4,
+      "examples": [
+        "ThreshE",
+        "Neutral_002",
+        "Neutral_062",
+        "Neutral_112"
+      ]
+    },
+    {
+      "effect": "STRENGTH",
+      "count": 1,
+      "examples": [
+        "Ignite"
+      ]
+    }
+  ],
+  "missing": [
+    {
+      "effect": "DRAW",
+      "count": 6,
+      "examples": [
+        "RivenW",
+        "TeemoW",
+        "Neutral_009",
+        "Neutral_050",
+        "Neutral_058",
+        "Neutral_106"
+      ]
+    },
+    {
+      "effect": "HEAL",
+      "count": 4,
+      "examples": [
+        "Heal",
+        "SonaW",
+        "ThreshW",
+        "Neutral_032"
+      ]
+    },
+    {
+      "effect": "MULTI_HIT",
+      "count": 4,
+      "examples": [
+        "JinxQ",
+        "RivenQ",
+        "ZedQ",
+        "KatarinaQ"
+      ]
+    },
+    {
+      "effect": "POISON",
+      "count": 4,
+      "examples": [
+        "TeemoE",
+        "Neutral_046",
+        "Neutral_087",
+        "Neutral_104"
+      ]
+    },
+    {
+      "effect": "GAIN_AGI",
+      "count": 4,
+      "examples": [
+        "Neutral_043",
+        "Neutral_069",
+        "Neutral_079",
+        "Neutral_103"
+      ]
+    },
+    {
+      "effect": "MARK",
+      "count": 4,
+      "examples": [
+        "Neutral_047",
+        "Neutral_081",
+        "Neutral_092",
+        "Neutral_114"
+      ]
+    },
+    {
+      "effect": "CLEANSE",
+      "count": 3,
+      "examples": [
+        "GarenW",
+        "Neutral_055",
+        "Neutral_101"
+      ]
+    },
+    {
+      "effect": "STUN",
+      "count": 3,
+      "examples": [
+        "ViktorW",
+        "CardMasterE",
+        "IreliaE"
+      ]
+    },
+    {
+      "effect": "REMOVE_BUFF",
+      "count": 3,
+      "examples": [
+        "LeeR",
+        "Neutral_007",
+        "Neutral_072"
+      ]
+    },
+    {
+      "effect": "DOUBLE_HIT",
+      "count": 3,
+      "examples": [
+        "Neutral_057",
+        "Neutral_078",
+        "Neutral_119"
+      ]
+    },
+    {
+      "effect": "SELF_DAMAGE",
+      "count": 2,
+      "examples": [
+        "UrgotE",
+        "Neutral_048"
+      ]
+    },
+    {
+      "effect": "ATTACK_BUFF",
+      "count": 2,
+      "examples": [
+        "RivenE",
+        "LeeW"
+      ]
+    },
+    {
+      "effect": "STR_DEBUFF",
+      "count": 2,
+      "examples": [
+        "NasusE",
+        "Neutral_029"
+      ]
+    },
+    {
+      "effect": "BONUS_IF_MARKED",
+      "count": 2,
+      "examples": [
+        "Neutral_001",
+        "Neutral_115"
+      ]
+    },
+    {
+      "effect": "BURN",
+      "count": 2,
+      "examples": [
+        "Neutral_051",
+        "Neutral_085"
+      ]
+    },
+    {
+      "effect": "LIFESTEAL",
+      "count": 2,
+      "examples": [
+        "Neutral_053",
+        "Neutral_095"
+      ]
+    },
+    {
+      "effect": "TRIPLE_HIT",
+      "count": 2,
+      "examples": [
+        "Neutral_066",
+        "Neutral_093"
+      ]
+    },
+    {
+      "effect": "GAIN_STRENGTH",
+      "count": 2,
+      "examples": [
+        "Neutral_084",
+        "Neutral_099"
+      ]
+    },
+    {
+      "effect": "APPLY_VULNERABLE",
+      "count": 2,
+      "examples": [
+        "Neutral_118",
+        "Neutral_120"
+      ]
+    },
+    {
+      "effect": "EXECUTE_SCALE",
+      "count": 1,
+      "examples": [
+        "GarenR"
+      ]
+    },
+    {
+      "effect": "BLEED",
+      "count": 1,
+      "examples": [
+        "DariusQ"
+      ]
+    },
+    {
+      "effect": "BLEED_VULN",
+      "count": 1,
+      "examples": [
+        "DariusE"
+      ]
+    },
+    {
+      "effect": "BLEED_EXECUTE",
+      "count": 1,
+      "examples": [
+        "DariusR"
+      ]
+    },
+    {
+      "effect": "DRAW_NEXT",
+      "count": 1,
+      "examples": [
+        "LuxW"
+      ]
+    },
+    {
+      "effect": "BONUS_PER_EXTRA_MANA",
+      "count": 1,
+      "examples": [
+        "LuxE"
+      ]
+    },
+    {
+      "effect": "CONDITIONAL_DOUBLE",
+      "count": 1,
+      "examples": [
+        "LuxR"
+      ]
+    },
+    {
+      "effect": "MARK_TRIGGER",
+      "count": 1,
+      "examples": [
+        "JinxE"
+      ]
+    },
+    {
+      "effect": "LOW_HP_BONUS",
+      "count": 1,
+      "examples": [
+        "JinxR"
+      ]
+    },
+    {
+      "effect": "CRIT_CHANCE",
+      "count": 1,
+      "examples": [
+        "YasuoQ"
+      ]
+    },
+    {
+      "effect": "IMMUNE_ONCE",
+      "count": 1,
+      "examples": [
+        "YasuoW"
+      ]
+    },
+    {
+      "effect": "DOUBLE_IF_ATTACKED",
+      "count": 1,
+      "examples": [
+        "YasuoE"
+      ]
+    },
+    {
+      "effect": "SCALE_BY_CRIT",
+      "count": 1,
+      "examples": [
+        "YasuoR"
+      ]
+    },
+    {
+      "effect": "SELF_BLOCK",
+      "count": 1,
+      "examples": [
+        "SonaQ"
+      ]
+    },
+    {
+      "effect": "DRAW_MANA",
+      "count": 1,
+      "examples": [
+        "SonaE"
+      ]
+    },
+    {
+      "effect": "PER_CARD_BONUS",
+      "count": 1,
+      "examples": [
+        "SonaR"
+      ]
+    },
+    {
+      "effect": "RETRO_BONUS",
+      "count": 1,
+      "examples": [
+        "EkkoQ"
+      ]
+    },
+    {
+      "effect": "REFLECT_IF_HIT",
+      "count": 1,
+      "examples": [
+        "EkkoW"
+      ]
+    },
+    {
+      "effect": "NEXT_COST_REDUCE",
+      "count": 1,
+      "examples": [
+        "EkkoE"
+      ]
+    },
+    {
+      "effect": "HEAL_AND_DAMAGE",
+      "count": 1,
+      "examples": [
+        "EkkoR"
+      ]
+    },
+    {
+      "effect": "LIFELINK",
+      "count": 1,
+      "examples": [
+        "SylasW"
+      ]
+    },
+    {
+      "effect": "NEXT_ATTACK_DOUBLE",
+      "count": 1,
+      "examples": [
+        "SylasE"
+      ]
+    },
+    {
+      "effect": "COPY_ENEMY_ACTION",
+      "count": 1,
+      "examples": [
+        "SylasR"
+      ]
+    },
+    {
+      "effect": "LOW_HP_EXECUTE",
+      "count": 1,
+      "examples": [
+        "UrgotR"
+      ]
+    },
+    {
+      "effect": "BUFF_NEXT_SKILL",
+      "count": 1,
+      "examples": [
+        "ViktorQ"
+      ]
+    },
+    {
+      "effect": "BONUS_IF_VULN",
+      "count": 1,
+      "examples": [
+        "ViktorE"
+      ]
+    },
+    {
+      "effect": "DRAW_ON_USE",
+      "count": 1,
+      "examples": [
+        "ViktorR"
+      ]
+    },
+    {
+      "effect": "PER_ATTACK_BONUS",
+      "count": 1,
+      "examples": [
+        "RivenR"
+      ]
+    },
+    {
+      "effect": "VULN_ON_HIT",
+      "count": 1,
+      "examples": [
+        "CardMasterQ"
+      ]
+    },
+    {
+      "effect": "GAIN_MANA",
+      "count": 1,
+      "examples": [
+        "CardMasterW"
+      ]
+    },
+    {
+      "effect": "DRAW_AND_SCOUT",
+      "count": 1,
+      "examples": [
+        "CardMasterR"
+      ]
+    },
+    {
+      "effect": "CHAIN_TRIGGER",
+      "count": 1,
+      "examples": [
+        "LeeQ"
+      ]
+    },
+    {
+      "effect": "WEAK_ON_HIT",
+      "count": 1,
+      "examples": [
+        "LeeE"
+      ]
+    },
+    {
+      "effect": "NEXT_ATTACK_BONUS",
+      "count": 1,
+      "examples": [
+        "VayneQ"
+      ]
+    },
+    {
+      "effect": "STUN_IF_WEAK",
+      "count": 1,
+      "examples": [
+        "VayneE"
+      ]
+    },
+    {
+      "effect": "DEATHMARK",
+      "count": 1,
+      "examples": [
+        "ZedR"
+      ]
+    },
+    {
+      "effect": "COPY_NEXT_ATTACK",
+      "count": 1,
+      "examples": [
+        "ZedW"
+      ]
+    },
+    {
+      "effect": "SLOW",
+      "count": 1,
+      "examples": [
+        "ZedE"
+      ]
+    },
+    {
+      "effect": "MARK_STACK",
+      "count": 1,
+      "examples": [
+        "VayneW"
+      ]
+    },
+    {
+      "effect": "TRIPLE_CHAIN_BONUS",
+      "count": 1,
+      "examples": [
+        "VaynePassive"
+      ]
+    },
+    {
+      "effect": "PULL",
+      "count": 1,
+      "examples": [
+        "ThreshQ"
+      ]
+    },
+    {
+      "effect": "WEAK_VULN_AND_PERMAHP",
+      "count": 1,
+      "examples": [
+        "ThreshR"
+      ]
+    },
+    {
+      "effect": "PERMA_STR_ON_KILL",
+      "count": 1,
+      "examples": [
+        "NasusQ"
+      ]
+    },
+    {
+      "effect": "WEAK_VULN",
+      "count": 1,
+      "examples": [
+        "NasusW"
+      ]
+    },
+    {
+      "effect": "TEMP_STR",
+      "count": 1,
+      "examples": [
+        "NasusR"
+      ]
+    },
+    {
+      "effect": "KILL_REWARD",
+      "count": 1,
+      "examples": [
+        "IreliaQ"
+      ]
+    },
+    {
+      "effect": "REFLECT_BUFF",
+      "count": 1,
+      "examples": [
+        "IreliaW"
+      ]
+    },
+    {
+      "effect": "ALL_ATTACKS_BONUS",
+      "count": 1,
+      "examples": [
+        "IreliaR"
+      ]
+    },
+    {
+      "effect": "DRAW_ON_HIT",
+      "count": 1,
+      "examples": [
+        "KatarinaW"
+      ]
+    },
+    {
+      "effect": "COMBO_BONUS",
+      "count": 1,
+      "examples": [
+        "KatarinaE"
+      ]
+    },
+    {
+      "effect": "MULTI_STRIKE_SEGMENTS",
+      "count": 1,
+      "examples": [
+        "KatarinaR"
+      ]
+    },
+    {
+      "effect": "TETHER_MARK",
+      "count": 1,
+      "examples": [
+        "Neutral_003"
+      ]
+    },
+    {
+      "effect": "ARMOR_REDUCE",
+      "count": 1,
+      "examples": [
+        "Neutral_004"
+      ]
+    },
+    {
+      "effect": "DEBUFF_CARD",
+      "count": 1,
+      "examples": [
+        "Neutral_005"
+      ]
+    },
+    {
+      "effect": "TRAP_TRIGGER",
+      "count": 1,
+      "examples": [
+        "Neutral_006"
+      ]
+    },
+    {
+      "effect": "FREE_IF_WEAK",
+      "count": 1,
+      "examples": [
+        "Neutral_008"
+      ]
+    },
+    {
+      "effect": "TEMP_MANA",
+      "count": 1,
+      "examples": [
+        "Neutral_010"
+      ]
+    },
+    {
+      "effect": "GAIN_GOLD",
+      "count": 1,
+      "examples": [
+        "Neutral_011"
+      ]
+    },
+    {
+      "effect": "CONDITIONAL_DRAW",
+      "count": 1,
+      "examples": [
+        "Neutral_012"
+      ]
+    },
+    {
+      "effect": "NEXT_DRAW_PLUS",
+      "count": 1,
+      "examples": [
+        "Neutral_013"
+      ]
+    },
+    {
+      "effect": "SCOUT",
+      "count": 1,
+      "examples": [
+        "Neutral_014"
+      ]
+    },
+    {
+      "effect": "GAMBLE",
+      "count": 1,
+      "examples": [
+        "Neutral_015"
+      ]
+    },
+    {
+      "effect": "MANA_IF_LOW_HAND",
+      "count": 1,
+      "examples": [
+        "Neutral_016"
+      ]
+    },
+    {
+      "effect": "PERMA_DRAW_ON_KILL",
+      "count": 1,
+      "examples": [
+        "Neutral_017"
+      ]
+    },
+    {
+      "effect": "PERMA_UPGRADE_CARD",
+      "count": 1,
+      "examples": [
+        "Neutral_018"
+      ]
+    },
+    {
+      "effect": "WIN_GOLD_BONUS",
+      "count": 1,
+      "examples": [
+        "Neutral_019"
+      ]
+    },
+    {
+      "effect": "TEMP_STR_ON_KILLS",
+      "count": 1,
+      "examples": [
+        "Neutral_020"
+      ]
+    },
+    {
+      "effect": "PERMA_STR_FOR_HP",
+      "count": 1,
+      "examples": [
+        "Neutral_021"
+      ]
+    },
+    {
+      "effect": "DRAW_AT_START",
+      "count": 1,
+      "examples": [
+        "Neutral_022"
+      ]
+    },
+    {
+      "effect": "RECYCLE",
+      "count": 1,
+      "examples": [
+        "Neutral_023"
+      ]
+    },
+    {
+      "effect": "SELF_HP_FOR_BLOCK",
+      "count": 1,
+      "examples": [
+        "Neutral_024"
+      ]
+    },
+    {
+      "effect": "DISCOUNT_ONE_CARD",
+      "count": 1,
+      "examples": [
+        "Neutral_025"
+      ]
+    },
+    {
+      "effect": "UPGRADE_CARD",
+      "count": 1,
+      "examples": [
+        "Neutral_026"
+      ]
+    },
+    {
+      "effect": "BAIT_TRIGGER",
+      "count": 1,
+      "examples": [
+        "Neutral_027"
+      ]
+    },
+    {
+      "effect": "NEXT_ENEMY_COST_PLUS",
+      "count": 1,
+      "examples": [
+        "Neutral_028"
+      ]
+    },
+    {
+      "effect": "TRANSFORM",
+      "count": 1,
+      "examples": [
+        "Neutral_030"
+      ]
+    },
+    {
+      "effect": "NEXT_DAMAGE_REDUCE",
+      "count": 1,
+      "examples": [
+        "Neutral_033"
+      ]
+    },
+    {
+      "effect": "RETALIATE_ON_HIT",
+      "count": 1,
+      "examples": [
+        "Neutral_034"
+      ]
+    },
+    {
+      "effect": "REGEN_MANA",
+      "count": 1,
+      "examples": [
+        "Neutral_035"
+      ]
+    },
+    {
+      "effect": "PASSIVE_BLOCK_IF_IDLE",
+      "count": 1,
+      "examples": [
+        "Neutral_036"
+      ]
+    },
+    {
+      "effect": "OPEN_SHADOW_EVENT",
+      "count": 1,
+      "examples": [
+        "Neutral_037"
+      ]
+    },
+    {
+      "effect": "HEAL_REDUCE",
+      "count": 1,
+      "examples": [
+        "Neutral_038"
+      ]
+    },
+    {
+      "effect": "DAMAGE_REDUCE",
+      "count": 1,
+      "examples": [
+        "Neutral_039"
+      ]
+    },
+    {
+      "effect": "VOID_DOT",
+      "count": 1,
+      "examples": [
+        "Neutral_040"
+      ]
+    },
+    {
+      "effect": "CRIT_IF_VULN",
+      "count": 1,
+      "examples": [
+        "Neutral_042"
+      ]
+    },
+    {
+      "effect": "NEXT_ATTACK_X2",
+      "count": 1,
+      "examples": [
+        "Neutral_044"
+      ]
+    },
+    {
+      "effect": "GAIN_STRENGTH_PER_HIT",
+      "count": 1,
+      "examples": [
+        "Neutral_045"
+      ]
+    },
+    {
+      "effect": "GAIN_MANA_NEXT_TURN",
+      "count": 1,
+      "examples": [
+        "Neutral_052"
+      ]
+    },
+    {
+      "effect": "DAMAGE_UP_PER_TURN",
+      "count": 1,
+      "examples": [
+        "Neutral_054"
+      ]
+    },
+    {
+      "effect": "FIRST_ATTACK_PLUS",
+      "count": 1,
+      "examples": [
+        "Neutral_056"
+      ]
+    },
+    {
+      "effect": "AVOID_NEXT_DAMAGE",
+      "count": 1,
+      "examples": [
+        "Neutral_060"
+      ]
+    },
+    {
+      "effect": "IGNORE_BLOCK",
+      "count": 1,
+      "examples": [
+        "Neutral_061"
+      ]
+    },
+    {
+      "effect": "SEE_ENEMY_ACTION",
+      "count": 1,
+      "examples": [
+        "Neutral_064"
+      ]
+    },
+    {
+      "effect": "CRIT_25",
+      "count": 1,
+      "examples": [
+        "Neutral_065"
+      ]
+    },
+    {
+      "effect": "GAIN_STR_WHEN_LOSE_HP",
+      "count": 1,
+      "examples": [
+        "Neutral_067"
+      ]
+    },
+    {
+      "effect": "BONUS_IF_LOW_HP",
+      "count": 1,
+      "examples": [
+        "Neutral_070"
+      ]
+    },
+    {
+      "effect": "GAIN_STRENGTH_WHEN_HIT",
+      "count": 1,
+      "examples": [
+        "Neutral_071"
+      ]
+    },
+    {
+      "effect": "REVIVE_ONCE",
+      "count": 1,
+      "examples": [
+        "Neutral_074"
+      ]
+    },
+    {
+      "effect": "EXECUTE_THRESHOLD",
+      "count": 1,
+      "examples": [
+        "Neutral_075"
+      ]
+    },
+    {
+      "effect": "COUNTER",
+      "count": 1,
+      "examples": [
+        "Neutral_080"
+      ]
+    },
+    {
+      "effect": "APPLY_WEAK",
+      "count": 1,
+      "examples": [
+        "Neutral_082"
+      ]
+    },
+    {
+      "effect": "LIFESTEAL_BUFF",
+      "count": 1,
+      "examples": [
+        "Neutral_086"
+      ]
+    },
+    {
+      "effect": "GAIN_BLOCK_NEXT_TURN",
+      "count": 1,
+      "examples": [
+        "Neutral_088"
+      ]
+    },
+    {
+      "effect": "DRAW_START",
+      "count": 1,
+      "examples": [
+        "Neutral_091"
+      ]
+    },
+    {
+      "effect": "LOSE_HP_GAIN_STRENGTH",
+      "count": 1,
+      "examples": [
+        "Neutral_094"
+      ]
+    },
+    {
+      "effect": "REDUCE_BLOCK",
+      "count": 1,
+      "examples": [
+        "Neutral_096"
+      ]
+    },
+    {
+      "effect": "CRIT_UP",
+      "count": 1,
+      "examples": [
+        "Neutral_097"
+      ]
+    },
+    {
+      "effect": "DELAY_ACTION",
+      "count": 1,
+      "examples": [
+        "Neutral_098"
+      ]
+    },
+    {
+      "effect": "DAMAGE_IF_HURT",
+      "count": 1,
+      "examples": [
+        "Neutral_102"
+      ]
+    },
+    {
+      "effect": "SELF_WEAK",
+      "count": 1,
+      "examples": [
+        "Neutral_105"
+      ]
+    },
+    {
+      "effect": "END_TURN_BLOCK",
+      "count": 1,
+      "examples": [
+        "Neutral_108"
+      ]
+    },
+    {
+      "effect": "HP_DEGEN",
+      "count": 1,
+      "examples": [
+        "Neutral_109"
+      ]
+    },
+    {
+      "effect": "DRAW_IF_KILL",
+      "count": 1,
+      "examples": [
+        "Neutral_110"
+      ]
+    },
+    {
+      "effect": "GAIN_BLOCK_WHEN_ATTACK",
+      "count": 1,
+      "examples": [
+        "Neutral_111"
+      ]
+    },
+    {
+      "effect": "GAIN_RANDOM_BUFF",
+      "count": 1,
+      "examples": [
+        "Neutral_113"
+      ]
+    },
+    {
+      "effect": "LOSE_HP_GAIN_MANA",
+      "count": 1,
+      "examples": [
+        "Neutral_116"
+      ]
+    },
+    {
+      "effect": "GAIN_STRENGTH_NEXT_TURN",
+      "count": 1,
+      "examples": [
+        "Neutral_117"
+      ]
+    },
+    {
+      "effect": "SHIELD",
+      "count": 1,
+      "examples": [
+        "Neutral_076"
+      ]
+    },
+    {
+      "effect": "GAIN_POWER_PER_TURN",
+      "count": 1,
+      "examples": [
+        "Neutral_077"
+      ]
+    }
+  ],
+  "uncategorized_cards": [
+    "Strike",
+    "Defend",
+    "GarenE",
+    "SylasQ",
+    "UrgotQ",
+    "UrgotW",
+    "Neutral_031",
+    "Neutral_041",
+    "Neutral_049",
+    "Neutral_059",
+    "Neutral_063",
+    "Neutral_068",
+    "Neutral_073",
+    "Neutral_083",
+    "Neutral_090",
+    "Neutral_100",
+    "Neutral_107"
+  ]
+}

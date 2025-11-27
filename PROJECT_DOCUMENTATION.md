@@ -1088,18 +1088,6 @@ export const ENEMY_POOL = {
 - [ ] 地图渲染性能（大地图30层）
 - [ ] 动画流畅度（60fps目标）
 
-**任务4.3**: UI调优
-- [ ] 六边形边缘抗锯齿
-- [ ] 迷雾过渡动画
-- [ ] 节点高亮效果
-
-##### Phase 5: 卡牌数值平衡 & 技能审计（v0.9.2 准备）
-
-1. **任务5.1 数据盘点**
-   - 运行 `node tools/scripts/check_cards.js --show-inactive --output reports/card_activation.json`，生成 200 张卡牌的激活/失效状态。
-   - 运行 `python tools/scripts/audit_all_spells.py --export reports/spell_audit.csv`，对技能资源（图标、描述、触发函数）做全量巡检。
-   - 汇总两份报告，按稀有度/英雄分类标记 `inactive`、`missing_icon`、`missing_logic`，并将摘要附到 `cards_ev_balance.md`。
-
 2. **任务5.2 数值基线**
    - 分析 `cards_ev_balance.md` 现有数据 + 最近三次游玩日志，重新定义 BASIC / COMMON / UNCOMMON / RARE 的费用-收益区间（伤害、护甲、功能性指标）。
    - 在 `PROJECT_DOCUMENTATION.md` 和 `game_data.md` 增加 “Balance Baseline v2” 表格，明确 target DPS / Block / 特殊效果上限。
