@@ -12,29 +12,29 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { generateHexagonPath } from '../utils/hexagonGrid';
 
-const HexagonNode = ({ 
-  node, 
-  position, 
-  size = 50, 
+const HexagonNode = ({
+  node,
+  position,
+  size = 50,
   isClickable = false,
   isHighlighted = false,
   isFogged = false,
-  onClick 
+  onClick
 }) => {
   if (!node) return null;
 
   const { x, y } = position;
   const hexPath = generateHexagonPath(x, y, size);
-  
+
   // 节点状态样式
   const getNodeStyle = () => {
     const { type, status } = node;
-    
+
     // 基础颜色（根据节点类型）
     let fillColor = '#1E2328'; // 默认深灰
     let strokeColor = '#3C3C3C'; // 默认边框
     let strokeWidth = 2;
-    
+
     switch (type) {
       case 'START':
         fillColor = '#0A7B83';
@@ -68,21 +68,21 @@ const HexagonNode = ({
       default:
         break;
     }
-    
+
     // 状态修饰
     if (status === 'COMPLETED') {
       fillColor = '#0F1419'; // 深色（已完成）
       strokeColor = '#555555';
     }
-    
+
     if (isHighlighted) {
       strokeColor = '#C8AA6E'; // LOL金色高亮
       strokeWidth = 4;
     }
-    
+
     // 迷雾效果
     const opacity = isFogged ? 0.3 : 1;
-    
+
     return {
       fill: fillColor,
       stroke: strokeColor,
@@ -90,17 +90,17 @@ const HexagonNode = ({
       opacity
     };
   };
-  
+
   // 获取节点图标URL
   const getNodeIcon = () => {
     if (isFogged && node.status !== 'COMPLETED') {
       return null; // 迷雾中不显示图标
     }
-    
+
     const CDN_URL = 'https://ddragon.leagueoflegends.com/cdn/13.24.1';
     const ITEM_URL = `${CDN_URL}/img/item`;
     const PROFILEICON_URL = `${CDN_URL}/img/profileicon`;
-    
+
     switch (node.type) {
       case 'BOSS':
         // 根据act显示不同BOSS头像
@@ -126,29 +126,44 @@ const HexagonNode = ({
         return null;
     }
   };
-  
+
   const nodeStyle = getNodeStyle();
   const iconUrl = getNodeIcon();
-  
+
   return (
     <motion.g
       className={isClickable ? 'cursor-pointer' : ''}
       onClick={isClickable ? onClick : undefined}
-      whileHover={isClickable ? { scale: 1.1 } : {}}
+      whileHover={isClickable ? { scale: 1.1, filter: "drop-shadow(0 0 8px rgba(200, 170, 110, 0.6))" } : {}}
       whileTap={isClickable ? { scale: 0.95 } : {}}
       initial={{ opacity: 0, scale: 0.5 }}
       animate={{ opacity: nodeStyle.opacity, scale: 1 }}
-      transition={{ duration: 0.3 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
     >
+      {/* 定义滤镜 */}
+      <defs>
+        <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="2.5" result="coloredBlur" />
+          <feMerge>
+            <feMergeNode in="coloredBlur" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+        <clipPath id={`hexClip-${node.id}`}>
+          <path d={hexPath} />
+        </clipPath>
+      </defs>
+
       {/* 六边形背景 */}
       <path
         d={hexPath}
         fill={nodeStyle.fill}
         stroke={nodeStyle.stroke}
         strokeWidth={nodeStyle.strokeWidth}
+        shapeRendering="geometricPrecision"
         className="transition-all duration-200"
       />
-      
+
       {/* 节点图标 */}
       {iconUrl && (
         <image
@@ -161,14 +176,7 @@ const HexagonNode = ({
           opacity={node.status === 'COMPLETED' ? 0.5 : 0.9}
         />
       )}
-      
-      {/* Clip Path for Icon */}
-      <defs>
-        <clipPath id={`hexClip-${node.id}`}>
-          <path d={hexPath} />
-        </clipPath>
-      </defs>
-      
+
       {/* 已完成标记 */}
       {node.status === 'COMPLETED' && (
         <text
@@ -178,11 +186,12 @@ const HexagonNode = ({
           fill="#C8AA6E"
           fontSize="24"
           fontWeight="bold"
+          style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8)' }}
         >
           ✓
         </text>
       )}
-      
+
       {/* 高亮光效 */}
       {isHighlighted && (
         <motion.path
@@ -190,10 +199,11 @@ const HexagonNode = ({
           fill="none"
           stroke="#C8AA6E"
           strokeWidth="2"
-          opacity="0.5"
+          filter="url(#glow)"
           animate={{
-            strokeWidth: [2, 6, 2],
-            opacity: [0.5, 0.8, 0.5]
+            strokeWidth: [2, 5, 2],
+            strokeOpacity: [0.6, 1, 0.6],
+            filter: ["drop-shadow(0 0 2px #C8AA6E)", "drop-shadow(0 0 8px #C8AA6E)", "drop-shadow(0 0 2px #C8AA6E)"]
           }}
           transition={{
             duration: 2,

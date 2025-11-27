@@ -410,8 +410,13 @@ const GridMapView_v3 = ({ mapData, onNodeSelect, activeNode, currentFloor, act, 
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-full overflow-hidden bg-[#0a0e27]"
-      style={{ width: VIEW_WIDTH, height: VIEW_HEIGHT, margin: '0 auto' }}
+      className="relative w-full h-full overflow-hidden"
+      style={{
+        width: VIEW_WIDTH,
+        height: VIEW_HEIGHT,
+        margin: '0 auto',
+        background: 'radial-gradient(circle at center, #1a1f35 0%, #0a0e27 100%)'
+      }}
     >
       {/* SVG地图 */}
       <svg
@@ -437,8 +442,9 @@ const GridMapView_v3 = ({ mapData, onNodeSelect, activeNode, currentFloor, act, 
       >
         <defs>
           <linearGradient id="fogGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#1a1a2e" stopOpacity="0.9" />
-            <stop offset="100%" stopColor="#0f0f1a" stopOpacity="0.95" />
+            <stop offset="0%" stopColor="#1a1a2e" stopOpacity="0.8" />
+            <stop offset="50%" stopColor="#131325" stopOpacity="0.9" />
+            <stop offset="100%" stopColor="#0a0e27" stopOpacity="0.98" />
           </linearGradient>
           <clipPath id="hexClip">
             <polygon points={Array.from({ length: 6 }, (_, i) => {
