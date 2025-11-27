@@ -167,7 +167,7 @@ export const CHAMPION_POOL = {
   },
 
   CardMaster: {
-    id: 'CardMaster',
+    id: 'TwistedFate',
     name: '卡牌大师',
     title: '赌徒',
     maxHp: 70,
