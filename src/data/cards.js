@@ -103,6 +103,11 @@ export const CARD_DATABASE = {
   VaynePassive: { id: 'VaynePassive', name: '圣银弩箭被动', type: 'POWER', cost: 0, value: 0, rarity: 'COMMON', hero: 'Vayne', target: 'self', effect: 'TRIPLE_CHAIN_BONUS', effectValue: 15, description: '对同一目标连续造成3次伤害时，第3次造成额外12点真实伤害（单体被动）。', img: `${SPELL_URL}/VaynePassive.png`, price: 0 },
   VayneE: { id: 'VayneE', name: '墙角突袭', type: 'ATTACK', cost: 1, value: 8, rarity: 'UNCOMMON', hero: 'Vayne', target: 'single', effect: 'STUN_IF_WEAK', effectValue: 1, description: '对目标造成6伤；若目标虚弱则使其眩晕1回合。', img: `${SPELL_URL}/VayneCondemn.png`, price: 100 },
 
+  // Teemo
+  TeemoQ: { id: 'TeemoQ', name: '致盲吹箭', type: 'ATTACK', cost: 1, value: 6, rarity: 'COMMON', hero: 'Teemo', target: 'single', effect: 'WEAK', effectValue: 2, description: '造成6伤并使目标虚弱2（致盲效果）。', img: `${SPELL_URL}/TeemoQ.png`, price: 50 },
+  TeemoW: { id: 'TeemoW', name: '疾速行军', type: 'SKILL', cost: 1, value: 5, rarity: 'UNCOMMON', hero: 'Teemo', target: 'self', effect: 'DRAW', effectValue: 1, description: '抽1张牌并获得5护甲。', img: `${SPELL_URL}/TeemoW.png`, price: 80 },
+  TeemoE: { id: 'TeemoE', name: '毒性射击', type: 'ATTACK', cost: 1, value: 0, rarity: 'UNCOMMON', hero: 'Teemo', target: 'single', effect: 'POISON', effectValue: 3, description: '对目标施加3层毒（目标单体持续伤害）。', img: `${SPELL_URL}/TeemoE.png`, price: 100 },
+
   // Thresh
   ThreshQ: { id: 'ThreshQ', name: '死亡判决', type: 'ATTACK', cost: 1, value: 8, rarity: 'COMMON', hero: 'Thresh', target: 'single', effect: 'PULL', effectValue: 1, description: '造成8伤并拉近目标（使其下一次攻击伤害+2）。', img: `${SPELL_URL}/ThreshQ.png`, price: 50 },
   ThreshW: { id: 'ThreshW', name: '魂灯灯笼', type: 'SKILL', cost: 1, value: 0, rarity: 'UNCOMMON', hero: 'Thresh', target: 'self', effect: 'HEAL', effectValue: 8, description: '恢复8生命。', img: `${SPELL_URL}/ThreshW.png`, price: 80 },
