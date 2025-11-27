@@ -446,6 +446,13 @@ const GridMapView_v3 = ({ mapData, onNodeSelect, activeNode, currentFloor, act, 
             <stop offset="50%" stopColor="#131325" stopOpacity="0.9" />
             <stop offset="100%" stopColor="#0a0e27" stopOpacity="0.98" />
           </linearGradient>
+          <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="2.5" result="coloredBlur" />
+            <feMerge>
+              <feMergeNode in="coloredBlur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
           <clipPath id="hexClip">
             <polygon points={Array.from({ length: 6 }, (_, i) => {
               const angle = Math.PI / 3 * i;
