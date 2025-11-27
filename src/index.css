@@ -1,11 +1,42 @@
 ﻿@import "tailwindcss";
 
-/* 闅愯棌婊氬姩鏉′絾鍏佽婊氬姩 */
+/* 隐藏滚动条但允许滚动 */
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
 }
 
 .hide-scrollbar {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+/* ===========================
+ * Map Node Animations (Performance Optimized)
+ * Using CSS instead of JS for better FPS
+ * =========================== */
+
+@keyframes pulse-glow {
+
+  0%,
+  100% {
+    stroke-opacity: 0.6;
+    filter: drop-shadow(0 0 4px #C8AA6E);
+  }
+
+  50% {
+    stroke-opacity: 1;
+    filter: drop-shadow(0 0 12px #C8AA6E);
+  }
+}
+
+.highlighted-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+  will-change: filter, stroke-opacity;
+}
+
+/* Smooth transitions for node interactions */
+svg path {
+  transition: fill 0.2s ease, stroke 0.2s ease;
 }
