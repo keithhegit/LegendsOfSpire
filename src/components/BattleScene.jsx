@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Sword, Shield, Zap, Skull, Activity, AlertTriangle } from 'lucide-react';
+import { Sword, Shield, Zap, Skull, Activity, AlertTriangle, Droplet, Ghost, Crosshair, Lock, RefreshCw, TrendingDown, Clock, Layers } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CARD_DATABASE } from '../data/cards';
 import { RELIC_DATABASE } from '../data/relics';
@@ -494,7 +494,20 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
             {status.weak > 0 && <div className="flex items-center text-[10px] text-yellow-400 bg-yellow-900/40 px-1 rounded border border-yellow-900 shadow-sm"><Activity size={10} className="mr-1" /> 虚弱 {status.weak}</div>}
             {status.vulnerable > 0 && <div className="flex items-center text-[10px] text-purple-400 bg-purple-900/40 px-1 rounded border border-purple-900 shadow-sm"><Zap size={10} className="mr-1" /> 易伤 {status.vulnerable}</div>}
             {status.poison > 0 && <div className="flex items-center text-[10px] text-green-500 bg-green-900/40 px-1 rounded border border-green-900 shadow-sm"><Skull size={10} className="mr-1" /> 中毒 {status.poison}</div>}
+            {status.bleed > 0 && <div className="flex items-center text-[10px] text-red-600 bg-red-950/40 px-1 rounded border border-red-800 shadow-sm"><Droplet size={10} className="mr-1" /> 流血 {status.bleed}</div>}
+            {status.voidDot > 0 && <div className="flex items-center text-[10px] text-purple-300 bg-purple-950/40 px-1 rounded border border-purple-800 shadow-sm"><Ghost size={10} className="mr-1" /> 虚空 {status.voidDot}</div>}
+            {status.mark > 0 && <div className="flex items-center text-[10px] text-orange-400 bg-orange-900/40 px-1 rounded border border-orange-900 shadow-sm"><Crosshair size={10} className="mr-1" /> 标记 {status.mark}</div>}
+            {(status.immuneOnce || status.avoidNextDamage) && <div className="flex items-center text-[10px] text-yellow-200 bg-yellow-900/40 px-1 rounded border border-yellow-700 shadow-sm"><Lock size={10} className="mr-1" /> 免疫</div>}
             {status.stunned > 0 && <div className="flex items-center text-[10px] text-blue-400 bg-blue-900/40 px-1 rounded border border-blue-900 shadow-sm"><AlertTriangle size={10} className="mr-1" /> 眩晕 {status.stunned}</div>}
+            {status.reflect > 0 && <div className="flex items-center text-[10px] text-orange-300 bg-orange-950/40 px-1 rounded border border-orange-800 shadow-sm"><RefreshCw size={10} className="mr-1" /> 反伤 {status.reflect}</div>}
+            {status.damageReduce > 0 && <div className="flex items-center text-[10px] text-blue-300 bg-blue-950/40 px-1 rounded border border-blue-800 shadow-sm"><TrendingDown size={10} className="mr-1" /> 减伤 {status.damageReduce}%</div>}
+            {status.healReduce > 0 && <div className="flex items-center text-[10px] text-red-300 bg-red-950/40 px-1 rounded border border-red-900 shadow-sm"><Skull size={10} className="mr-1" /> 重伤 {status.healReduce}%</div>}
+
+            {/* Next Turn Effects */}
+            {status.nextTurnBlock > 0 && <div className="flex items-center text-[10px] text-blue-200 bg-blue-900/40 px-1 rounded border border-blue-800 shadow-sm"><Shield size={10} className="mr-1" /><Clock size={8} className="mr-1" /> +{status.nextTurnBlock}</div>}
+            {status.nextTurnStrength > 0 && <div className="flex items-center text-[10px] text-red-200 bg-red-900/40 px-1 rounded border border-red-800 shadow-sm"><Sword size={10} className="mr-1" /><Clock size={8} className="mr-1" /> +{status.nextTurnStrength}</div>}
+            {status.nextTurnMana > 0 && <div className="flex items-center text-[10px] text-blue-200 bg-blue-900/40 px-1 rounded border border-blue-800 shadow-sm"><Zap size={10} className="mr-1" /><Clock size={8} className="mr-1" /> +{status.nextTurnMana}</div>}
+            {status.nextDrawBonus > 0 && <div className="flex items-center text-[10px] text-gray-200 bg-gray-800/40 px-1 rounded border border-gray-600 shadow-sm"><Layers size={10} className="mr-1" /><Clock size={8} className="mr-1" /> +{status.nextDrawBonus}</div>}
         </div>
     );
     const displayValue = nextEnemyAction.type === 'ATTACK' ? nextEnemyAction.value : (nextEnemyAction.actionType === 'Attack' ? nextEnemyAction.dmgValue : nextEnemyAction.effectValue);
