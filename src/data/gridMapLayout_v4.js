@@ -307,12 +307,13 @@ export const generateGridMap = (act, usedEnemies = [], attempt = 0) => {
   // 改进: 在挖空之后重新检测死胡同，确保三选一机制下所有路径都通向BOSS
   const deadEnds = detectDeadEnds(grid, gridRows, startNode, bossNode, allNodes);
   if (deadEnds.length > 0) {
+    const maxRetries = act === 3 ? 50 : 20; // Act 3: 50次, Act 1/2: 20次
     console.warn(`⚠️ 检测到 ${deadEnds.length} 个死胡同节点，第 ${attempt + 1} 次尝试失败`);
-    if (attempt < 20) { // 增加重试次数到20次
-      console.log(`⚠️ 重新生成地图 (尝试 ${attempt + 2}/20)...`);
+    if (attempt < maxRetries) {
+      console.log(`⚠️ 重新生成地图 (尝试 ${attempt + 2}/${maxRetries})...`);
       return generateGridMap(act, usedEnemies, attempt + 1);
     }
-    console.warn('⚠️ 多次生成失败，使用fallback生成线性地图');
+    console.warn('⚠️ 多次生成失败，使用fallback预制地图');
     return generateFallbackMap(act, usedEnemies);
   }
 
@@ -328,12 +329,13 @@ export const generateGridMap = (act, usedEnemies = [], attempt = 0) => {
   console.log(`BOSS可达: ${reachable ? '✅' : '❌'}`);
 
   if (!reachable) {
+    const maxRetries = act === 3 ? 50 : 20; // Act 3: 50次, Act 1/2: 20次
     console.warn(`⚠️ BOSS不可达！第 ${attempt + 1} 次尝试失败`);
-    if (attempt < 20) { // 增加重试次数到20次
-      console.log(`⚠️ 重新生成地图 (尝试 ${attempt + 2}/20)...`);
+    if (attempt < maxRetries) {
+      console.log(`⚠️ 重新生成地图 (尝试 ${attempt + 2}/${maxRetries})...`);
       return generateGridMap(act, usedEnemies, attempt + 1);
     }
-    console.warn('⚠️ 多次生成失败，使用fallback生成线性地图');
+    console.warn('⚠️ 多次生成失败，使用fallback预制地图');
     return generateFallbackMap(act, usedEnemies);
   }
 
@@ -858,34 +860,59 @@ const getRandomEnemy = (act, usedEnemies = []) => {
 };
 
 // ===========================
-// Fallback：简单线性地图
+// Fallback：预制Y型安全地图（保证无死胡同）
 // ===========================
 const generateFallbackMap = (act, usedEnemies) => {
-  console.log('[Fallback] 生成简单线性地图');
+  console.log('[Fallback] 使用预制Y型安全地图');
   const config = ACT_CONFIG[act];
-  const gridRows = config.minRows + Math.floor(Math.random() * (config.maxRows - config.minRows + 1));
+
+  // 预制的Y型路径结构（9行，保证左右两条分支 + 中央主路径）
+  const gridRows = 9;
   const grid = Array(gridRows).fill(null).map(() => Array(GRID_COLS).fill(null));
   const allNodes = [];
-
   const centerCol = Math.floor(GRID_COLS / 2);
 
+  // Y型结构的预制路径：
+  // Row 0: 中央起点
+  // Row 1-2: 中央 + 左右各1个选择
+  // Row 3-5: 收紧至中央
+  // Row 6-7: 再次分支
+  // Row 8: BOSS
+  const presetLayout = [
+    [centerCol], // Row 0: 起点
+    [centerCol - 1, centerCol, centerCol + 1], // Row 1: 三个选择
+    [centerCol - 2, centerCol - 1, centerCol, centerCol + 1, centerCol + 2], // Row 2: 五个选择
+    [centerCol - 1, centerCol, centerCol + 1], // Row 3: 收紧
+    [centerCol - 1, centerCol, centerCol + 1], // Row 4: 保持
+    [centerCol], // Row 5: 中央节点
+    [centerCol - 1, centerCol, centerCol + 1], // Row 6: 再次分支
+    [centerCol], // Row 7: 收紧
+    [centerCol] // Row 8: BOSS
+  ];
+
+  // 生成节点
   for (let row = 0; row < gridRows; row++) {
-    const type = row === gridRows - 1 ? 'BOSS' : getRandomNodeType(row, gridRows);
-    const enemyId = type === 'BOSS' ? getBossId(act) : null;
-    const node = createNode(row, centerCol, type, enemyId, act, usedEnemies);
+    const cols = presetLayout[row];
+    for (const col of cols) {
+      const type = row === gridRows - 1 ? 'BOSS' : getRandomNodeType(row, gridRows);
+      const enemyId = type === 'BOSS' ? getBossId(act) : null;
+      const node = createNode(row, col, type, enemyId, act, usedEnemies);
 
-    if (row === 0) node.status = 'AVAILABLE';
+      if (row === 0) node.status = 'AVAILABLE';
 
-    grid[row][centerCol] = node;
-    allNodes.push(node);
+      grid[row][col] = node;
+      allNodes.push(node);
+    }
   }
+
+  console.log(`[Fallback] 生成了 ${allNodes.length} 个节点的Y型安全地图`);
 
   return {
     grid,
     nodes: allNodes,
     totalFloors: gridRows,
-    startNode: allNodes[0],
-    bossNode: allNodes[allNodes.length - 1],
+    startNode: grid[0][centerCol],
+    bossNode: grid[gridRows - 1][centerCol],
     act
   };
 };

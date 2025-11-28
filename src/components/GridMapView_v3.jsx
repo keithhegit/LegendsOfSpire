@@ -21,17 +21,29 @@ const GridMapView_v3 = ({ mapData, onNodeSelect, activeNode, currentFloor, act, 
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [exploredNodes, setExploredNodes] = useState(new Set());
-  const [showLoading, setShowLoading] = useState(false);
+  const [showLoading, setShowLoading] = useState(true); // Start with loading
+  const loadingTimerRef = useRef(null);
 
   // Enforce minimum 1s loading screen display
   useEffect(() => {
     if (!mapData || !mapData.grid) {
+      // No map data, show loading
       setShowLoading(true);
+      if (loadingTimerRef.current) {
+        clearTimeout(loadingTimerRef.current);
+        loadingTimerRef.current = null;
+      }
     } else {
-      const timer = setTimeout(() => {
+      // Map data loaded, wait 1s before hiding loading screen
+      loadingTimerRef.current = setTimeout(() => {
         setShowLoading(false);
       }, 1000);
-      return () => clearTimeout(timer);
+
+      return () => {
+        if (loadingTimerRef.current) {
+          clearTimeout(loadingTimerRef.current);
+        }
+      };
     }
   }, [mapData]);
 
