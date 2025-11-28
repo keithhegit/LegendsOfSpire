@@ -308,8 +308,8 @@ export const generateGridMap = (act, usedEnemies = [], attempt = 0) => {
   const deadEnds = detectDeadEnds(grid, gridRows, startNode, bossNode, allNodes);
   if (deadEnds.length > 0) {
     console.warn(`⚠️ 检测到 ${deadEnds.length} 个死胡同节点，第 ${attempt + 1} 次尝试失败`);
-    if (attempt < 5) { // 增加重试次数到5次
-      console.log(`⚠️ 重新生成地图 (尝试 ${attempt + 2}/6)...`);
+    if (attempt < 20) { // 增加重试次数到20次
+      console.log(`⚠️ 重新生成地图 (尝试 ${attempt + 2}/20)...`);
       return generateGridMap(act, usedEnemies, attempt + 1);
     }
     console.warn('⚠️ 多次生成失败，使用fallback生成线性地图');
@@ -329,8 +329,8 @@ export const generateGridMap = (act, usedEnemies = [], attempt = 0) => {
 
   if (!reachable) {
     console.warn(`⚠️ BOSS不可达！第 ${attempt + 1} 次尝试失败`);
-    if (attempt < 5) { // 增加重试次数到5次
-      console.log(`⚠️ 重新生成地图 (尝试 ${attempt + 2}/6)...`);
+    if (attempt < 20) { // 增加重试次数到20次
+      console.log(`⚠️ 重新生成地图 (尝试 ${attempt + 2}/20)...`);
       return generateGridMap(act, usedEnemies, attempt + 1);
     }
     console.warn('⚠️ 多次生成失败，使用fallback生成线性地图');

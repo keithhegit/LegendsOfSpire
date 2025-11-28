@@ -389,7 +389,7 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
 
             // 下回合法力 (蓄能冥想)
             if (prev.nextTurnMana > 0) {
-                setPlayerMana(m => Math.min(initialMana, m + prev.nextTurnMana));
+                setPlayerMana(m => m + prev.nextTurnMana);
                 updates.nextTurnMana = 0;
             }
 

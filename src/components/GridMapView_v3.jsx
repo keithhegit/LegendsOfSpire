@@ -95,8 +95,15 @@ const GridMapView_v3 = ({ mapData, onNodeSelect, activeNode, currentFloor, act, 
 
   if (!mapData || !mapData.grid) {
     return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-[#C8AA6E] text-xl">地图数据加载中...</div>
+      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black">
+        <div className="absolute inset-0 bg-cover bg-center opacity-60" style={{ backgroundImage: `url(https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/LoL/lolloading.jpg)` }}></div>
+        <div className="relative z-10 flex flex-col items-center gap-4">
+          <div className="w-16 h-16 border-4 border-[#C8AA6E] border-t-transparent rounded-full animate-spin"></div>
+          <div className="text-[#C8AA6E] text-2xl font-bold tracking-widest uppercase">Generating Map...</div>
+          <div className="w-64 h-2 bg-gray-800 rounded-full overflow-hidden border border-[#C8AA6E]/30">
+            <div className="h-full bg-[#C8AA6E] animate-[loading_2s_ease-in-out_infinite]" style={{ width: '100%' }}></div>
+          </div>
+        </div>
       </div>
     );
   }
