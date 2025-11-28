@@ -23,21 +23,23 @@ const GridMapView_v3 = ({ mapData, onNodeSelect, activeNode, currentFloor, act, 
   const [exploredNodes, setExploredNodes] = useState(new Set());
   const [showLoading, setShowLoading] = useState(true); // Start with loading
   const loadingTimerRef = useRef(null);
+  const [loadingProgress, setLoadingProgress] = useState(0); // 0, 50, or 100
 
-  // Enforce minimum 1s loading screen display
+  // Enforce minimum 1s loading screen display with progress animation
   useEffect(() => {
     if (!mapData || !mapData.grid) {
-      // No map data, show loading
+      // No map data, show loading at 0%
       setShowLoading(true);
+      setLoadingProgress(0);
       if (loadingTimerRef.current) {
         clearTimeout(loadingTimerRef.current);
         loadingTimerRef.current = null;
       }
     } else {
-      // Map data loaded, wait 1s before hiding loading screen
-      loadingTimerRef.current = setTimeout(() => {
-        setShowLoading(false);
-      }, 1000);
+      // Map data loaded, animate: 0% -> 50% -> 100%
+      setLoadingProgress(50);
+      setTimeout(() => setLoadingProgress(100), 500);
+      loadingTimerRef.current = setTimeout(() => setShowLoading(false), 1000);
 
       return () => {
         if (loadingTimerRef.current) {
@@ -119,16 +121,19 @@ const GridMapView_v3 = ({ mapData, onNodeSelect, activeNode, currentFloor, act, 
   }, [activeNode]);
 
   if (!mapData || !mapData.grid || showLoading) {
+    const loadingImages = {
+      0: 'https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/LoL/loading/lolloading00.webp',
+      50: 'https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/LoL/loading/lolloading50.webp',
+      100: 'https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/LoL/loading/lolloading100.webp'
+    };
+
     return (
-      <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black">
-        <div className="absolute inset-0 bg-cover bg-center opacity-60" style={{ backgroundImage: `url(https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/LoL/lolloading.jpg)` }}></div>
-        <div className="relative z-10 flex flex-col items-center gap-4">
-          <div className="w-16 h-16 border-4 border-[#C8AA6E] border-t-transparent rounded-full animate-spin"></div>
-          <div className="text-[#C8AA6E] text-2xl font-bold tracking-widest uppercase">Generating Map...</div>
-          <div className="w-64 h-2 bg-gray-800 rounded-full overflow-hidden border border-[#C8AA6E]/30">
-            <div className="h-full bg-[#C8AA6E] animate-[loading_2s_ease-in-out_infinite]" style={{ width: '100%' }}></div>
-          </div>
-        </div>
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black">
+        <img
+          src={loadingImages[loadingProgress]}
+          alt="Loading"
+          className="w-full h-full object-cover"
+        />
       </div>
     );
   }
