@@ -21,6 +21,19 @@ const GridMapView_v3 = ({ mapData, onNodeSelect, activeNode, currentFloor, act, 
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [exploredNodes, setExploredNodes] = useState(new Set());
+  const [showLoading, setShowLoading] = useState(false);
+
+  // Enforce minimum 1s loading screen display
+  useEffect(() => {
+    if (!mapData || !mapData.grid) {
+      setShowLoading(true);
+    } else {
+      const timer = setTimeout(() => {
+        setShowLoading(false);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [mapData]);
 
   const HEX_SIZE = 45;
   const ICON_SCALE = 1.15;
@@ -93,7 +106,7 @@ const GridMapView_v3 = ({ mapData, onNodeSelect, activeNode, currentFloor, act, 
     }
   }, [activeNode]);
 
-  if (!mapData || !mapData.grid) {
+  if (!mapData || !mapData.grid || showLoading) {
     return (
       <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black">
         <div className="absolute inset-0 bg-cover bg-center opacity-60" style={{ backgroundImage: `url(https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/LoL/lolloading.jpg)` }}></div>
