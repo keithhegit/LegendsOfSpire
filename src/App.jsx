@@ -1049,7 +1049,44 @@ export default function LegendsOfTheSpire() {
                 </div>
             );
             case 'CHAMPION_SELECT': return <ChampionSelect onChampionSelect={handleChampionSelect} unlockedIds={unlockedChamps} currentUser={currentUser} />;
-            case 'MAP': return <GridMapView_v3 mapData={mapData} onNodeSelect={handleNodeSelect} currentFloor={currentFloor} act={currentAct} activeNode={activeNode} lockedChoices={lockedChoices} />;
+            case 'MAP': return (
+                <div className="relative w-full h-full">
+                    {/* [DEV ONLY] 跳关调试按钮 */}
+                    <div className="absolute top-20 left-1/2 -translate-x-1/2 z-[100] flex gap-2">
+                        <button
+                            onClick={() => handleSkipToAct(1)}
+                            className={`px-4 py-2 rounded-lg font-bold text-xs uppercase transition-all ${
+                                currentAct === 1 
+                                ? 'bg-blue-600 text-white border-2 border-blue-400' 
+                                : 'bg-black/70 text-blue-300 border border-blue-500/50 hover:bg-blue-900/50'
+                            }`}
+                        >
+                            🧪 ACT 1
+                        </button>
+                        <button
+                            onClick={() => handleSkipToAct(2)}
+                            className={`px-4 py-2 rounded-lg font-bold text-xs uppercase transition-all ${
+                                currentAct === 2
+                                ? 'bg-purple-600 text-white border-2 border-purple-400'
+                                : 'bg-black/70 text-purple-300 border border-purple-500/50 hover:bg-purple-900/50'
+                            }`}
+                        >
+                            🧪 ACT 2
+                        </button>
+                        <button
+                            onClick={() => handleSkipToAct(3)}
+                            className={`px-4 py-2 rounded-lg font-bold text-xs uppercase transition-all ${
+                                currentAct === 3
+                                ? 'bg-red-600 text-white border-2 border-red-400'
+                                : 'bg-black/70 text-red-300 border border-red-500/50 hover:bg-red-900/50'
+                            }`}
+                        >
+                            🧪 ACT 3
+                        </button>
+                    </div>
+                    <GridMapView_v3 mapData={mapData} onNodeSelect={handleNodeSelect} currentFloor={currentFloor} act={currentAct} activeNode={activeNode} lockedChoices={lockedChoices} />
+                </div>
+            );
             case 'SHOP': return <ShopView gold={gold} deck={masterDeck} relics={relics} onLeave={() => completeNode()} onBuyCard={handleBuyCard} onBuyRelic={handleBuyRelic} onUpgradeCard={handleUpgradeCard} onBuyMana={handleBuyMana} championName={champion.name} />;
             case 'EVENT': return <EventView onLeave={() => completeNode()} onReward={handleEventReward} />;
             case 'CHEST': return <ChestView onLeave={() => completeNode()} onRelicReward={handleRelicReward} relics={relics} act={currentAct} />;
@@ -1094,6 +1131,23 @@ export default function LegendsOfTheSpire() {
         setActiveNode(null);
         setChampion(null);
         setView('CHAMPION_SELECT');
+    };
+
+    // [DEV ONLY] 跳转到指定ACT（测试用）
+    const handleSkipToAct = (targetAct) => {
+        if (!champion) return;
+        const newMapData = generateGridMap(targetAct, []);
+        setMapData(newMapData);
+        setShowDeadEndPrompt(!hasAvailableNeighbors(newMapData.nodes, newMapData.grid, newMapData.totalFloors));
+        if (newMapData.startNode) {
+            setActiveNode(newMapData.startNode);
+        }
+        setCurrentAct(targetAct);
+        setCurrentFloor(0);
+        setLockedChoices(new Set());
+        // 恢复一些HP以便测试
+        setCurrentHp(Math.min(maxHp, currentHp + Math.floor(maxHp * 0.5)));
+        setView('MAP');
     };
 
     return (

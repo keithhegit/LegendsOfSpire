@@ -166,8 +166,8 @@ export const CHAMPION_POOL = {
     description: '高连段压力，擅长短回合爆发'
   },
 
-  CardMaster: {
-    id: 'CardMaster',
+  TwistedFate: {
+    id: 'TwistedFate',
     name: '卡牌大师',
     title: '赌徒',
     maxHp: 70,

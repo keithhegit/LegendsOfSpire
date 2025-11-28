@@ -21,6 +21,33 @@ const GridMapView_v3 = ({ mapData, onNodeSelect, activeNode, currentFloor, act, 
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [exploredNodes, setExploredNodes] = useState(new Set());
+  const [showLoading, setShowLoading] = useState(true); // Start with loading
+  const loadingTimerRef = useRef(null);
+  const [loadingProgress, setLoadingProgress] = useState(0); // 0, 50, or 100
+
+  // Enforce minimum 1s loading screen display with progress animation
+  useEffect(() => {
+    if (!mapData || !mapData.grid) {
+      // No map data, show loading at 0%
+      setShowLoading(true);
+      setLoadingProgress(0);
+      if (loadingTimerRef.current) {
+        clearTimeout(loadingTimerRef.current);
+        loadingTimerRef.current = null;
+      }
+    } else {
+      // Map data loaded, animate: 0% -> 50% -> 100%
+      setLoadingProgress(50);
+      setTimeout(() => setLoadingProgress(100), 500);
+      loadingTimerRef.current = setTimeout(() => setShowLoading(false), 1000);
+
+      return () => {
+        if (loadingTimerRef.current) {
+          clearTimeout(loadingTimerRef.current);
+        }
+      };
+    }
+  }, [mapData]);
 
   const HEX_SIZE = 45;
   const ICON_SCALE = 1.15;
@@ -93,10 +120,20 @@ const GridMapView_v3 = ({ mapData, onNodeSelect, activeNode, currentFloor, act, 
     }
   }, [activeNode]);
 
-  if (!mapData || !mapData.grid) {
+  if (!mapData || !mapData.grid || showLoading) {
+    const loadingImages = {
+      0: 'https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/LoL/loading/lolloading00.webp',
+      50: 'https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/LoL/loading/lolloading50.webp',
+      100: 'https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/LoL/loading/lolloading100.webp'
+    };
+
     return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-[#C8AA6E] text-xl">地图数据加载中...</div>
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black">
+        <img
+          src={loadingImages[loadingProgress]}
+          alt="Loading"
+          className="w-full h-full object-cover"
+        />
       </div>
     );
   }
@@ -410,8 +447,13 @@ const GridMapView_v3 = ({ mapData, onNodeSelect, activeNode, currentFloor, act, 
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-full overflow-hidden bg-[#0a0e27]"
-      style={{ width: VIEW_WIDTH, height: VIEW_HEIGHT, margin: '0 auto' }}
+      className="relative w-full h-full overflow-hidden"
+      style={{
+        width: VIEW_WIDTH,
+        height: VIEW_HEIGHT,
+        margin: '0 auto',
+        background: 'radial-gradient(circle at center, #1a1f35 0%, #0a0e27 100%)'
+      }}
     >
       {/* SVG地图 */}
       <svg
@@ -437,9 +479,17 @@ const GridMapView_v3 = ({ mapData, onNodeSelect, activeNode, currentFloor, act, 
       >
         <defs>
           <linearGradient id="fogGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#1a1a2e" stopOpacity="0.9" />
-            <stop offset="100%" stopColor="#0f0f1a" stopOpacity="0.95" />
+            <stop offset="0%" stopColor="#1a1a2e" stopOpacity="0.8" />
+            <stop offset="50%" stopColor="#131325" stopOpacity="0.9" />
+            <stop offset="100%" stopColor="#0a0e27" stopOpacity="0.98" />
           </linearGradient>
+          <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="2.5" result="coloredBlur" />
+            <feMerge>
+              <feMergeNode in="coloredBlur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
           <clipPath id="hexClip">
             <polygon points={Array.from({ length: 6 }, (_, i) => {
               const angle = Math.PI / 3 * i;

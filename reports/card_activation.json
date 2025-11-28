@@ -1,0 +1,1421 @@
+{
+  "total": 202,
+  "active": 128,
+  "inactive": 74,
+  "cards": {
+    "Strike": {
+      "id": "Strike",
+      "name": "打击",
+      "type": "ATTACK",
+      "rarity": "BASIC",
+      "status": "active"
+    },
+    "Defend": {
+      "id": "Defend",
+      "name": "防御",
+      "type": "SKILL",
+      "rarity": "BASIC",
+      "status": "active"
+    },
+    "Ignite": {
+      "id": "Ignite",
+      "name": "点燃",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "Heal": {
+      "id": "Heal",
+      "name": "治疗术",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "GarenQ": {
+      "id": "GarenQ",
+      "name": "致命打击",
+      "type": "ATTACK",
+      "rarity": "COMMON",
+      "status": "active"
+    },
+    "GarenW": {
+      "id": "GarenW",
+      "name": "勇气",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "GarenE": {
+      "id": "GarenE",
+      "name": "审判",
+      "type": "ATTACK",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "GarenR": {
+      "id": "GarenR",
+      "name": "德玛西亚正义",
+      "type": "ATTACK",
+      "rarity": "RARE",
+      "status": "active"
+    },
+    "DariusQ": {
+      "id": "DariusQ",
+      "name": "大杀四方",
+      "type": "ATTACK",
+      "rarity": "COMMON",
+      "status": "active"
+    },
+    "DariusW": {
+      "id": "DariusW",
+      "name": "致残打击",
+      "type": "ATTACK",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "DariusE": {
+      "id": "DariusE",
+      "name": "无情铁手",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "DariusR": {
+      "id": "DariusR",
+      "name": "诺克萨斯断头台",
+      "type": "ATTACK",
+      "rarity": "RARE",
+      "status": "active"
+    },
+    "LuxQ": {
+      "id": "LuxQ",
+      "name": "光之束缚",
+      "type": "ATTACK",
+      "rarity": "COMMON",
+      "status": "active"
+    },
+    "LuxW": {
+      "id": "LuxW",
+      "name": "结界护盾",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "LuxE": {
+      "id": "LuxE",
+      "name": "透光奇点",
+      "type": "ATTACK",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "LuxR": {
+      "id": "LuxR",
+      "name": "终极闪光",
+      "type": "ATTACK",
+      "rarity": "RARE",
+      "status": "active"
+    },
+    "JinxQ": {
+      "id": "JinxQ",
+      "name": "机枪扫射",
+      "type": "ATTACK",
+      "rarity": "COMMON",
+      "status": "active"
+    },
+    "JinxW": {
+      "id": "JinxW",
+      "name": "电磁炮",
+      "type": "ATTACK",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "JinxE": {
+      "id": "JinxE",
+      "name": "火箭陷阱",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "JinxR": {
+      "id": "JinxR",
+      "name": "超究极飞弹",
+      "type": "ATTACK",
+      "rarity": "RARE",
+      "status": "active"
+    },
+    "YasuoQ": {
+      "id": "YasuoQ",
+      "name": "斩钢闪",
+      "type": "ATTACK",
+      "rarity": "COMMON",
+      "status": "active"
+    },
+    "YasuoW": {
+      "id": "YasuoW",
+      "name": "风之墙",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "YasuoE": {
+      "id": "YasuoE",
+      "name": "疾风步",
+      "type": "ATTACK",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "YasuoR": {
+      "id": "YasuoR",
+      "name": "狂风绝息斩",
+      "type": "ATTACK",
+      "rarity": "RARE",
+      "status": "active"
+    },
+    "SonaQ": {
+      "id": "SonaQ",
+      "name": "英勇赞美诗",
+      "type": "ATTACK",
+      "rarity": "COMMON",
+      "status": "active"
+    },
+    "SonaW": {
+      "id": "SonaW",
+      "name": "坚毅咏叹调",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "SonaE": {
+      "id": "SonaE",
+      "name": "迅捷奏鸣曲",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "SonaR": {
+      "id": "SonaR",
+      "name": "终乐章",
+      "type": "ATTACK",
+      "rarity": "RARE",
+      "status": "active"
+    },
+    "EkkoQ": {
+      "id": "EkkoQ",
+      "name": "时间折刃",
+      "type": "ATTACK",
+      "rarity": "COMMON",
+      "status": "active"
+    },
+    "EkkoW": {
+      "id": "EkkoW",
+      "name": "时光护盾",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "EkkoE": {
+      "id": "EkkoE",
+      "name": "相位俯冲",
+      "type": "ATTACK",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "EkkoR": {
+      "id": "EkkoR",
+      "name": "时空逆转",
+      "type": "SKILL",
+      "rarity": "RARE",
+      "status": "active"
+    },
+    "SylasQ": {
+      "id": "SylasQ",
+      "name": "锁链鞭笞",
+      "type": "ATTACK",
+      "rarity": "COMMON",
+      "status": "active"
+    },
+    "SylasW": {
+      "id": "SylasW",
+      "name": "吸取之斩",
+      "type": "ATTACK",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "SylasE": {
+      "id": "SylasE",
+      "name": "叛乱突袭",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "SylasR": {
+      "id": "SylasR",
+      "name": "夺魂",
+      "type": "SKILL",
+      "rarity": "RARE",
+      "status": "active"
+    },
+    "UrgotQ": {
+      "id": "UrgotQ",
+      "name": "腐蚀炸弹",
+      "type": "ATTACK",
+      "rarity": "COMMON",
+      "status": "active"
+    },
+    "UrgotW": {
+      "id": "UrgotW",
+      "name": "集火屏障",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "UrgotE": {
+      "id": "UrgotE",
+      "name": "超限驱动",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "UrgotR": {
+      "id": "UrgotR",
+      "name": "处刑索命",
+      "type": "ATTACK",
+      "rarity": "RARE",
+      "status": "active"
+    },
+    "ViktorQ": {
+      "id": "ViktorQ",
+      "name": "能量转导",
+      "type": "SKILL",
+      "rarity": "COMMON",
+      "status": "active"
+    },
+    "ViktorW": {
+      "id": "ViktorW",
+      "name": "引力场",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "ViktorE": {
+      "id": "ViktorE",
+      "name": "光束",
+      "type": "ATTACK",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "ViktorR": {
+      "id": "ViktorR",
+      "name": "进化歧路",
+      "type": "SKILL",
+      "rarity": "RARE",
+      "status": "active"
+    },
+    "RivenQ": {
+      "id": "RivenQ",
+      "name": "断剑重铸",
+      "type": "ATTACK",
+      "rarity": "COMMON",
+      "status": "active"
+    },
+    "RivenW": {
+      "id": "RivenW",
+      "name": "气合斩",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "RivenE": {
+      "id": "RivenE",
+      "name": "勇往直前",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "RivenR": {
+      "id": "RivenR",
+      "name": "放逐之刃",
+      "type": "ATTACK",
+      "rarity": "RARE",
+      "status": "active"
+    },
+    "CardMasterQ": {
+      "id": "CardMasterQ",
+      "name": "红牌",
+      "type": "ATTACK",
+      "rarity": "COMMON",
+      "status": "active"
+    },
+    "CardMasterW": {
+      "id": "CardMasterW",
+      "name": "蓝牌",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "CardMasterE": {
+      "id": "CardMasterE",
+      "name": "黄牌",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "CardMasterR": {
+      "id": "CardMasterR",
+      "name": "命运",
+      "type": "SKILL",
+      "rarity": "RARE",
+      "status": "active"
+    },
+    "LeeQ": {
+      "id": "LeeQ",
+      "name": "音波回音",
+      "type": "ATTACK",
+      "rarity": "COMMON",
+      "status": "active"
+    },
+    "LeeW": {
+      "id": "LeeW",
+      "name": "金钟罩",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "LeeE": {
+      "id": "LeeE",
+      "name": "天雷破",
+      "type": "ATTACK",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "LeeR": {
+      "id": "LeeR",
+      "name": "猛龙摆尾",
+      "type": "ATTACK",
+      "rarity": "RARE",
+      "status": "active"
+    },
+    "VayneQ": {
+      "id": "VayneQ",
+      "name": "闪避突袭",
+      "type": "ATTACK",
+      "rarity": "COMMON",
+      "status": "active"
+    },
+    "VayneE": {
+      "id": "VayneE",
+      "name": "墙角突袭",
+      "type": "ATTACK",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "ZedR": {
+      "id": "ZedR",
+      "name": "死亡印记",
+      "type": "SKILL",
+      "rarity": "RARE",
+      "status": "active"
+    },
+    "ZedQ": {
+      "id": "ZedQ",
+      "name": "手里剑",
+      "type": "ATTACK",
+      "rarity": "COMMON",
+      "status": "active"
+    },
+    "ZedW": {
+      "id": "ZedW",
+      "name": "影分身",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "ZedE": {
+      "id": "ZedE",
+      "name": "影刃",
+      "type": "ATTACK",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "VayneW": {
+      "id": "VayneW",
+      "name": "圣银弩箭",
+      "type": "POWER",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "VaynePassive": {
+      "id": "VaynePassive",
+      "name": "圣银弩箭被动",
+      "type": "POWER",
+      "rarity": "COMMON",
+      "status": "active"
+    },
+    "ThreshQ": {
+      "id": "ThreshQ",
+      "name": "生死判决",
+      "type": "ATTACK",
+      "rarity": "COMMON",
+      "status": "active"
+    },
+    "ThreshW": {
+      "id": "ThreshW",
+      "name": "灵魂灯笼",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "ThreshE": {
+      "id": "ThreshE",
+      "name": "罪恶引",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "ThreshR": {
+      "id": "ThreshR",
+      "name": "幽冥监牢",
+      "type": "SKILL",
+      "rarity": "RARE",
+      "status": "active"
+    },
+    "TeemoW": {
+      "id": "TeemoW",
+      "name": "小跑",
+      "type": "SKILL",
+      "rarity": "COMMON",
+      "status": "active"
+    },
+    "TeemoE": {
+      "id": "TeemoE",
+      "name": "毒性射击",
+      "type": "ATTACK",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "NasusQ": {
+      "id": "NasusQ",
+      "name": "汲魂痛击",
+      "type": "ATTACK",
+      "rarity": "COMMON",
+      "status": "active"
+    },
+    "NasusW": {
+      "id": "NasusW",
+      "name": "腐化咒",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "NasusE": {
+      "id": "NasusE",
+      "name": "灵魂烈焰",
+      "type": "ATTACK",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "NasusR": {
+      "id": "NasusR",
+      "name": "狂沙之怒",
+      "type": "POWER",
+      "rarity": "RARE",
+      "status": "active"
+    },
+    "IreliaQ": {
+      "id": "IreliaQ",
+      "name": "利刃冲击",
+      "type": "ATTACK",
+      "rarity": "COMMON",
+      "status": "active"
+    },
+    "IreliaW": {
+      "id": "IreliaW",
+      "name": "反击之舞",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "IreliaE": {
+      "id": "IreliaE",
+      "name": "束缚之刃",
+      "type": "ATTACK",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "IreliaR": {
+      "id": "IreliaR",
+      "name": "先锋突袭",
+      "type": "ATTACK",
+      "rarity": "RARE",
+      "status": "active"
+    },
+    "KatarinaQ": {
+      "id": "KatarinaQ",
+      "name": "弧刃斩",
+      "type": "ATTACK",
+      "rarity": "COMMON",
+      "status": "active"
+    },
+    "KatarinaW": {
+      "id": "KatarinaW",
+      "name": "迅刃突袭",
+      "type": "ATTACK",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "KatarinaE": {
+      "id": "KatarinaE",
+      "name": "蛇步闪击",
+      "type": "ATTACK",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "KatarinaR": {
+      "id": "KatarinaR",
+      "name": "死亡莲华",
+      "type": "ATTACK",
+      "rarity": "RARE",
+      "status": "active"
+    },
+    "Neutral_001": {
+      "id": "Neutral_001",
+      "name": "破绽刺击",
+      "type": "ATTACK",
+      "rarity": "COMMON",
+      "status": "active"
+    },
+    "Neutral_002": {
+      "id": "Neutral_002",
+      "name": "致盲烟幕",
+      "type": "ATTACK",
+      "rarity": "COMMON",
+      "status": "active"
+    },
+    "Neutral_003": {
+      "id": "Neutral_003",
+      "name": "缚魂钩",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "Neutral_004": {
+      "id": "Neutral_004",
+      "name": "破甲一击",
+      "type": "ATTACK",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "Neutral_005": {
+      "id": "Neutral_005",
+      "name": "扰心之刃",
+      "type": "ATTACK",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "Neutral_006": {
+      "id": "Neutral_006",
+      "name": "缠绕陷阱",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "Neutral_007": {
+      "id": "Neutral_007",
+      "name": "逆流牵制",
+      "type": "ATTACK",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "Neutral_008": {
+      "id": "Neutral_008",
+      "name": "强制斩击",
+      "type": "ATTACK",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "Neutral_009": {
+      "id": "Neutral_009",
+      "name": "净化之页",
+      "type": "SKILL",
+      "rarity": "COMMON",
+      "status": "active"
+    },
+    "Neutral_010": {
+      "id": "Neutral_010",
+      "name": "法力容器",
+      "type": "SKILL",
+      "rarity": "COMMON",
+      "status": "active"
+    },
+    "Neutral_011": {
+      "id": "Neutral_011",
+      "name": "贪婪商券",
+      "type": "SKILL",
+      "rarity": "COMMON",
+      "status": "active"
+    },
+    "Neutral_012": {
+      "id": "Neutral_012",
+      "name": "战争学识",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "Neutral_013": {
+      "id": "Neutral_013",
+      "name": "战术速记",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "Neutral_014": {
+      "id": "Neutral_014",
+      "name": "暗影笔记",
+      "type": "SKILL",
+      "rarity": "RARE",
+      "status": "active"
+    },
+    "Neutral_015": {
+      "id": "Neutral_015",
+      "name": "金币押注",
+      "type": "SKILL",
+      "rarity": "RARE",
+      "status": "active"
+    },
+    "Neutral_016": {
+      "id": "Neutral_016",
+      "name": "法力石碎片",
+      "type": "SKILL",
+      "rarity": "COMMON",
+      "status": "active"
+    },
+    "Neutral_017": {
+      "id": "Neutral_017",
+      "name": "求知铭文",
+      "type": "POWER",
+      "rarity": "RARE",
+      "status": "active"
+    },
+    "Neutral_018": {
+      "id": "Neutral_018",
+      "name": "匠魂之锤",
+      "type": "SKILL",
+      "rarity": "RARE",
+      "status": "active"
+    },
+    "Neutral_019": {
+      "id": "Neutral_019",
+      "name": "荣誉奖章",
+      "type": "SKILL",
+      "rarity": "COMMON",
+      "status": "active"
+    },
+    "Neutral_020": {
+      "id": "Neutral_020",
+      "name": "猎手徽章",
+      "type": "POWER",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "Neutral_021": {
+      "id": "Neutral_021",
+      "name": "野心契约",
+      "type": "SKILL",
+      "rarity": "RARE",
+      "status": "active"
+    },
+    "Neutral_022": {
+      "id": "Neutral_022",
+      "name": "古老碑铭",
+      "type": "POWER",
+      "rarity": "RARE",
+      "status": "active"
+    },
+    "Neutral_023": {
+      "id": "Neutral_023",
+      "name": "逆向引擎",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "Neutral_024": {
+      "id": "Neutral_024",
+      "name": "献祭之环",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "Neutral_025": {
+      "id": "Neutral_025",
+      "name": "随风信笺",
+      "type": "SKILL",
+      "rarity": "COMMON",
+      "status": "active"
+    },
+    "Neutral_026": {
+      "id": "Neutral_026",
+      "name": "暗金卷轴",
+      "type": "SKILL",
+      "rarity": "RARE",
+      "status": "active"
+    },
+    "Neutral_027": {
+      "id": "Neutral_027",
+      "name": "诱饵之箱",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "Neutral_028": {
+      "id": "Neutral_028",
+      "name": "回旋弹",
+      "type": "ATTACK",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "Neutral_029": {
+      "id": "Neutral_029",
+      "name": "虚弱契约",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "Neutral_030": {
+      "id": "Neutral_030",
+      "name": "重塑石",
+      "type": "SKILL",
+      "rarity": "RARE",
+      "status": "active"
+    },
+    "Neutral_031": {
+      "id": "Neutral_031",
+      "name": "守护之盾",
+      "type": "SKILL",
+      "rarity": "COMMON",
+      "status": "active"
+    },
+    "Neutral_032": {
+      "id": "Neutral_032",
+      "name": "回复秘药",
+      "type": "SKILL",
+      "rarity": "COMMON",
+      "status": "active"
+    },
+    "Neutral_033": {
+      "id": "Neutral_033",
+      "name": "格挡之歌",
+      "type": "SKILL",
+      "rarity": "COMMON",
+      "status": "active"
+    },
+    "Neutral_034": {
+      "id": "Neutral_034",
+      "name": "逆伤反震",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "Neutral_035": {
+      "id": "Neutral_035",
+      "name": "能量回复",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "Neutral_036": {
+      "id": "Neutral_036",
+      "name": "稳固姿态",
+      "type": "POWER",
+      "rarity": "COMMON",
+      "status": "active"
+    },
+    "Neutral_037": {
+      "id": "Neutral_037",
+      "name": "暗影岛之歌",
+      "type": "ATTACK",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "Neutral_038": {
+      "id": "Neutral_038",
+      "name": "诺克萨斯断章",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "Neutral_039": {
+      "id": "Neutral_039",
+      "name": "德玛之徽",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "Neutral_040": {
+      "id": "Neutral_040",
+      "name": "虚空砂",
+      "type": "SKILL",
+      "rarity": "RARE",
+      "status": "active"
+    },
+    "Neutral_041": {
+      "id": "Neutral_041",
+      "name": "无畏壁垒",
+      "type": "SKILL",
+      "rarity": "COMMON",
+      "status": "active"
+    },
+    "Neutral_042": {
+      "id": "Neutral_042",
+      "name": "精准打击",
+      "type": "ATTACK",
+      "rarity": "COMMON",
+      "status": "active"
+    },
+    "Neutral_043": {
+      "id": "Neutral_043",
+      "name": "灵巧身法",
+      "type": "SKILL",
+      "rarity": "COMMON",
+      "status": "active"
+    },
+    "Neutral_044": {
+      "id": "Neutral_044",
+      "name": "集火号令",
+      "type": "POWER",
+      "rarity": "RARE",
+      "status": "active"
+    },
+    "Neutral_045": {
+      "id": "Neutral_045",
+      "name": "积蓄怒火",
+      "type": "POWER",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "Neutral_046": {
+      "id": "Neutral_046",
+      "name": "暗影毒刃",
+      "type": "ATTACK",
+      "rarity": "UNCOMMON",
+      "status": "active"
+    },
+    "Neutral_047": {
+      "id": "Neutral_047",
+      "name": "诱敌深入",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_048": {
+      "id": "Neutral_048",
+      "name": "牺牲打",
+      "type": "ATTACK",
+      "rarity": "UNCOMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_049": {
+      "id": "Neutral_049",
+      "name": "闪转腾挪",
+      "type": "SKILL",
+      "rarity": "COMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_050": {
+      "id": "Neutral_050",
+      "name": "战术撤退",
+      "type": "SKILL",
+      "rarity": "COMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_051": {
+      "id": "Neutral_051",
+      "name": "烈火试炼",
+      "type": "ATTACK",
+      "rarity": "RARE",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_052": {
+      "id": "Neutral_052",
+      "name": "蓄能冥想",
+      "type": "POWER",
+      "rarity": "RARE",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_053": {
+      "id": "Neutral_053",
+      "name": "暗影虹吸",
+      "type": "ATTACK",
+      "rarity": "UNCOMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_054": {
+      "id": "Neutral_054",
+      "name": "符文点燃",
+      "type": "POWER",
+      "rarity": "UNCOMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_055": {
+      "id": "Neutral_055",
+      "name": "不屈意志",
+      "type": "SKILL",
+      "rarity": "COMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_056": {
+      "id": "Neutral_056",
+      "name": "蓄势待发",
+      "type": "POWER",
+      "rarity": "COMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_057": {
+      "id": "Neutral_057",
+      "name": "致命连击",
+      "type": "ATTACK",
+      "rarity": "RARE",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_058": {
+      "id": "Neutral_058",
+      "name": "军备补给",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_059": {
+      "id": "Neutral_059",
+      "name": "强攻扫击",
+      "type": "ATTACK",
+      "rarity": "UNCOMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_060": {
+      "id": "Neutral_060",
+      "name": "暗影屏障",
+      "type": "SKILL",
+      "rarity": "RARE",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_061": {
+      "id": "Neutral_061",
+      "name": "符能穿刺",
+      "type": "ATTACK",
+      "rarity": "COMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_062": {
+      "id": "Neutral_062",
+      "name": "战术压制",
+      "type": "SKILL",
+      "rarity": "COMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_063": {
+      "id": "Neutral_063",
+      "name": "符文庇护",
+      "type": "SKILL",
+      "rarity": "COMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_064": {
+      "id": "Neutral_064",
+      "name": "暗影洞察",
+      "type": "POWER",
+      "rarity": "UNCOMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_065": {
+      "id": "Neutral_065",
+      "name": "精准爆头",
+      "type": "ATTACK",
+      "rarity": "UNCOMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_066": {
+      "id": "Neutral_066",
+      "name": "迅击三连",
+      "type": "ATTACK",
+      "rarity": "UNCOMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_067": {
+      "id": "Neutral_067",
+      "name": "痛苦献祭",
+      "type": "POWER",
+      "rarity": "RARE",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_068": {
+      "id": "Neutral_068",
+      "name": "烈焰冲击",
+      "type": "ATTACK",
+      "rarity": "RARE",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_069": {
+      "id": "Neutral_069",
+      "name": "暗影幻步",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_070": {
+      "id": "Neutral_070",
+      "name": "死线一击",
+      "type": "ATTACK",
+      "rarity": "COMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_071": {
+      "id": "Neutral_071",
+      "name": "复仇之焰",
+      "type": "POWER",
+      "rarity": "UNCOMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_072": {
+      "id": "Neutral_072",
+      "name": "灵魂压制",
+      "type": "SKILL",
+      "rarity": "RARE",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_073": {
+      "id": "Neutral_073",
+      "name": "暗影灵刺",
+      "type": "ATTACK",
+      "rarity": "COMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_074": {
+      "id": "Neutral_074",
+      "name": "复生印记",
+      "type": "POWER",
+      "rarity": "RARE",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_075": {
+      "id": "Neutral_075",
+      "name": "精准处刑",
+      "type": "ATTACK",
+      "rarity": "RARE",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_078": {
+      "id": "Neutral_078",
+      "name": "重斩连发",
+      "type": "ATTACK",
+      "rarity": "UNCOMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_079": {
+      "id": "Neutral_079",
+      "name": "灵巧格挡",
+      "type": "SKILL",
+      "rarity": "COMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_080": {
+      "id": "Neutral_080",
+      "name": "反制锁链",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_081": {
+      "id": "Neutral_081",
+      "name": "猎杀预兆",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_082": {
+      "id": "Neutral_082",
+      "name": "痛击",
+      "type": "ATTACK",
+      "rarity": "COMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_083": {
+      "id": "Neutral_083",
+      "name": "魂能冲击",
+      "type": "ATTACK",
+      "rarity": "RARE",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_084": {
+      "id": "Neutral_084",
+      "name": "战技突破",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_085": {
+      "id": "Neutral_085",
+      "name": "符文燃烧",
+      "type": "ATTACK",
+      "rarity": "UNCOMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_086": {
+      "id": "Neutral_086",
+      "name": "灵魂抽取",
+      "type": "POWER",
+      "rarity": "RARE",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_087": {
+      "id": "Neutral_087",
+      "name": "侵蚀毒雾",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_088": {
+      "id": "Neutral_088",
+      "name": "沉稳姿态",
+      "type": "POWER",
+      "rarity": "COMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_089": {
+      "id": "Neutral_089",
+      "name": "失衡猛击",
+      "type": "ATTACK",
+      "rarity": "COMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_090": {
+      "id": "Neutral_090",
+      "name": "符纹甲胄",
+      "type": "SKILL",
+      "rarity": "RARE",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_091": {
+      "id": "Neutral_091",
+      "name": "灵能涌动",
+      "type": "POWER",
+      "rarity": "RARE",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_092": {
+      "id": "Neutral_092",
+      "name": "致命标记",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_093": {
+      "id": "Neutral_093",
+      "name": "凶刃连舞",
+      "type": "ATTACK",
+      "rarity": "RARE",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_094": {
+      "id": "Neutral_094",
+      "name": "仪式献祭",
+      "type": "SKILL",
+      "rarity": "RARE",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_095": {
+      "id": "Neutral_095",
+      "name": "幽魂钩爪",
+      "type": "ATTACK",
+      "rarity": "UNCOMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_096": {
+      "id": "Neutral_096",
+      "name": "软化目标",
+      "type": "SKILL",
+      "rarity": "COMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_097": {
+      "id": "Neutral_097",
+      "name": "冷酷精准",
+      "type": "POWER",
+      "rarity": "UNCOMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_098": {
+      "id": "Neutral_098",
+      "name": "操控心智",
+      "type": "SKILL",
+      "rarity": "RARE",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_099": {
+      "id": "Neutral_099",
+      "name": "血色冲锋",
+      "type": "ATTACK",
+      "rarity": "COMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_100": {
+      "id": "Neutral_100",
+      "name": "符文震爆",
+      "type": "ATTACK",
+      "rarity": "RARE",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_101": {
+      "id": "Neutral_101",
+      "name": "魂火庇佑",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_102": {
+      "id": "Neutral_102",
+      "name": "血债血偿",
+      "type": "ATTACK",
+      "rarity": "UNCOMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_103": {
+      "id": "Neutral_103",
+      "name": "铁壁守势",
+      "type": "SKILL",
+      "rarity": "RARE",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_104": {
+      "id": "Neutral_104",
+      "name": "无声毒息",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_105": {
+      "id": "Neutral_105",
+      "name": "过载打击",
+      "type": "ATTACK",
+      "rarity": "UNCOMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_106": {
+      "id": "Neutral_106",
+      "name": "灵感迸发",
+      "type": "SKILL",
+      "rarity": "COMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_107": {
+      "id": "Neutral_107",
+      "name": "迅捷突袭",
+      "type": "ATTACK",
+      "rarity": "COMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_108": {
+      "id": "Neutral_108",
+      "name": "坚韧信仰",
+      "type": "POWER",
+      "rarity": "UNCOMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_109": {
+      "id": "Neutral_109",
+      "name": "虚空腐蚀",
+      "type": "SKILL",
+      "rarity": "RARE",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_110": {
+      "id": "Neutral_110",
+      "name": "急速斩",
+      "type": "ATTACK",
+      "rarity": "COMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_111": {
+      "id": "Neutral_111",
+      "name": "英勇风范",
+      "type": "POWER",
+      "rarity": "UNCOMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_112": {
+      "id": "Neutral_112",
+      "name": "战术压制",
+      "type": "SKILL",
+      "rarity": "COMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_113": {
+      "id": "Neutral_113",
+      "name": "异能注入",
+      "type": "POWER",
+      "rarity": "RARE",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_114": {
+      "id": "Neutral_114",
+      "name": "终焉标记",
+      "type": "SKILL",
+      "rarity": "RARE",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_115": {
+      "id": "Neutral_115",
+      "name": "暗影深击",
+      "type": "ATTACK",
+      "rarity": "UNCOMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_116": {
+      "id": "Neutral_116",
+      "name": "灵魂献祭",
+      "type": "SKILL",
+      "rarity": "RARE",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_117": {
+      "id": "Neutral_117",
+      "name": "月之鼓动",
+      "type": "POWER",
+      "rarity": "UNCOMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_118": {
+      "id": "Neutral_118",
+      "name": "锋芒暴刺",
+      "type": "ATTACK",
+      "rarity": "COMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_119": {
+      "id": "Neutral_119",
+      "name": "符火连锁",
+      "type": "ATTACK",
+      "rarity": "RARE",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_120": {
+      "id": "Neutral_120",
+      "name": "虚空裂痕",
+      "type": "ATTACK",
+      "rarity": "RARE",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_076": {
+      "id": "Neutral_076",
+      "name": "奥术屏障",
+      "type": "SKILL",
+      "rarity": "UNCOMMON",
+      "status": "inactive_placeholder"
+    },
+    "Neutral_077": {
+      "id": "Neutral_077",
+      "name": "符文激荡",
+      "type": "POWER",
+      "rarity": "RARE",
+      "status": "inactive_placeholder"
+    }
+  }
+}

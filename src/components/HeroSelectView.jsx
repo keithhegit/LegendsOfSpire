@@ -37,8 +37,12 @@ const HeroSelectView = ({ onChampionSelect, unlockedIds = [], currentUser }) => 
     const handleLockIn = async () => {
         if (onChampionSelect) {
             try {
-                const { CHAMPION_POOL } = await import('../data/champions');
+                console.log(`[HeroSelect] Locking in hero: ${selectedHero.id}`);
+                const { default: CHAMPION_POOL } = await import('../data/champions');
+                console.log(`[HeroSelect] Loaded CHAMPION_POOL keys:`, Object.keys(CHAMPION_POOL));
+
                 let championData = CHAMPION_POOL[selectedHero.id];
+                console.log(`[HeroSelect] Found champion data for ${selectedHero.id}:`, championData ? 'Yes' : 'No');
 
                 // Inject selected skin data
                 const selectedSkin = selectedHero.skins[currentSkinIndex];
@@ -155,7 +159,7 @@ const HeroSelectView = ({ onChampionSelect, unlockedIds = [], currentUser }) => 
 
                 {/* Grid Container */}
                 <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
-                        <div className="grid grid-cols-5 gap-3">
+                    <div className="grid grid-cols-5 gap-3">
                         {HERO_LIST.map((hero) => (
                             <motion.button
                                 key={hero.id}
@@ -240,73 +244,50 @@ const HeroSelectView = ({ onChampionSelect, unlockedIds = [], currentUser }) => 
                                 {/* Gradient Overlay */}
                                 <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-transparent to-slate-900/30" />
 
-                                {/* Navigation Arrows */}
-                                <button
-                                    onClick={prevSkin}
-                                    className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-slate-900/80 hover:bg-slate-800 border-2 border-slate-600 hover:border-amber-400 rounded-full flex items-center justify-center text-white transition-all shadow-lg hover:shadow-[0_0_20px_rgba(251,191,36,0.4)]"
-                                >
-                                    <ChevronLeft className="w-6 h-6" />
-                                </button>
-
-                                <button
-                                    onClick={nextSkin}
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-slate-900/80 hover:bg-slate-800 border-2 border-slate-600 hover:border-amber-400 rounded-full flex items-center justify-center text-white transition-all shadow-lg hover:shadow-[0_0_20px_rgba(251,191,36,0.4)]"
-                                >
-                                    <ChevronRight className="w-6 h-6" />
-                                </button>
-
-                                {/* Skin Name Bottom Overlay */}
-                                <div className="absolute bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-slate-900 to-transparent">
-                                    <motion.h4
-                                        key={currentSkinIndex}
-                                        initial={{ y: 10, opacity: 0 }}
-                                        animate={{ y: 0, opacity: 1 }}
-                                        className="text-3xl font-black text-white text-center drop-shadow-[0_0_15px_rgba(0,0,0,0.9)]"
-                                    >
-                                        {selectedHero.skins[currentSkinIndex].name.toUpperCase()}
-                                    </motion.h4>
+                                {/* Skin Name Badge */}
+                                <div className="absolute bottom-6 left-6 right-6">
+                                    <div className="bg-slate-900/80 backdrop-blur-md border border-cyan-400/30 rounded-lg p-4">
+                                        <h4 className="text-2xl font-bold text-cyan-300 mb-1">
+                                            {selectedHero.skins[currentSkinIndex].name}
+                                        </h4>
+                                        <p className="text-slate-400 text-sm">
+                                            Skin {currentSkinIndex + 1} of {selectedHero.skins.length}
+                                        </p>
+                                    </div>
                                 </div>
-                            </div>
 
-                            {/* Skin Counter */}
-                            <div className="mt-4 text-center">
-                                <p className="text-slate-400 text-sm tracking-wider">
-                                    {currentSkinIndex + 1} / {selectedHero.skins.length}
-                                </p>
+                                {/* Navigation Arrows */}
+                                {selectedHero.skins.length > 1 && (
+                                    <>
+                                        <button
+                                            onClick={prevSkin}
+                                            className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-slate-900/60 hover:bg-slate-800 border border-slate-600 flex items-center justify-center transition-all hover:scale-110"
+                                        >
+                                            <ChevronLeft className="text-white" size={24} />
+                                        </button>
+                                        <button
+                                            onClick={nextSkin}
+                                            className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-slate-900/60 hover:bg-slate-800 border border-slate-600 flex items-center justify-center transition-all hover:scale-110"
+                                        >
+                                            <ChevronRight className="text-white" size={24} />
+                                        </button>
+                                    </>
+                                )}
                             </div>
                         </motion.div>
                     </AnimatePresence>
                 </div>
 
-                {/* Skin Thumbnails */}
-                <div className="px-6 pb-6">
-                    <div className="flex gap-2 overflow-x-auto pb-2 custom-scrollbar">
-                        {selectedHero.skins.map((skin, index) => (
-                            <button
-                                key={index}
-                                onClick={() => setCurrentSkinIndex(index)}
-                                className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${currentSkinIndex === index
-                                    ? 'border-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.6)]'
-                                    : 'border-slate-600 hover:border-cyan-300/50 opacity-50 hover:opacity-100'
-                                    }`}
-                            >
-                                <img src={skin.loadingUrl} className="w-full h-full object-cover" />
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Footer - Lock Button (Moved to Right Panel) */}
-                <div className="p-6 border-t border-slate-700/50 bg-slate-900/50">
+                {/* Lock In Button */}
+                <div className="p-6 border-t border-slate-700/50">
                     <motion.button
+                        onClick={handleLockIn}
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
-                        onClick={handleLockIn}
-                        className="w-full py-4 bg-gradient-to-r from-cyan-500 to-cyan-600 hover:from-cyan-400 hover:to-cyan-500 text-slate-900 font-black text-lg tracking-wider rounded-lg shadow-[0_0_30px_rgba(34,211,238,0.4)] hover:shadow-[0_0_40px_rgba(34,211,238,0.6)] transition-all flex items-center justify-center gap-2"
+                        className="w-full py-4 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-900 font-bold text-lg tracking-widest rounded-lg shadow-lg transition-all uppercase flex items-center justify-center gap-3"
                     >
-                        <Lock className="w-5 h-5" />
-                        <span>LOCK IN {selectedHero.name.toUpperCase()}</span>
-                        <ChevronRight className="w-5 h-5" />
+                        <Lock size={20} />
+                        Lock In
                     </motion.button>
                 </div>
             </div>

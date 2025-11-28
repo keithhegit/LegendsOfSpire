@@ -1,0 +1,27 @@
+{
+    "baseline": {
+        "1_cost_damage": 9,
+        "1_cost_block": 8,
+        "rarity_multipliers": {
+            "COMMON": 1.0,
+            "UNCOMMON": 1.2,
+            "RARE": 1.4
+        }
+    },
+    "adjustments": {
+        "NasusQ": {
+            "value": 6
+        },
+        "VaynePassive": {
+            "img": "${SPELL_URL}/Vayne_NightHunter.png"
+        }
+    },
+    "prune_range": {
+        "start": "Neutral_047",
+        "end": "Neutral_120"
+    },
+    "force_lock": [
+        "Strike",
+        "Defend"
+    ]
+}
