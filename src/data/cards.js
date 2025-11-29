@@ -37,7 +37,7 @@ export const CARD_DATABASE = {
 
   // Yasuo
   YasuoQ: { id: 'YasuoQ', name: '斩钢闪', type: 'ATTACK', cost: 1, value: 7, rarity: 'COMMON', hero: 'Yasuo', target: 'single', effect: 'CRIT_CHANCE', effectValue: 10, description: '对单体造成7点伤害；暴击率受力量影响。', img: `${SPELL_URL}/YasuoQ1Wrapper.png`, price: 50 },
-  YasuoW: { id: 'YasuoW', name: '风之墙', type: 'SKILL', cost: 1, value: 12, rarity: 'UNCOMMON', hero: 'Yasuo', target: 'self', effect: 'IMMUNE_ONCE', effectValue: 1, description: '获得12护甲并免疫一次伤害（本回合）。', img: `${SPELL_URL}/YasuoW.png`, price: 80 },
+  YasuoW: { id: 'YasuoW', name: '风之墙', type: 'SKILL', cost: 1, block: 4, rarity: 'UNCOMMON', hero: 'Yasuo', target: 'self', effect: 'IMMUNE_ONCE', effectValue: 1, description: '获得4护甲并免疫一次伤害（本回合）。', img: `${SPELL_URL}/YasuoW.png`, price: 80 },
   YasuoE: { id: 'YasuoE', name: '疾风步', type: 'ATTACK', cost: 0, value: 4, rarity: 'UNCOMMON', hero: 'Yasuo', target: 'single', effect: 'DOUBLE_IF_ATTACKED', effectValue: 0, description: '造成4点伤害；若本回合已打出攻击则伤害翻倍。', img: `${SPELL_URL}/YasuoE.png`, price: 60 },
   YasuoR: { id: 'YasuoR', name: '狂风绝息斩', type: 'ATTACK', cost: 3, value: 6, rarity: 'RARE', hero: 'Yasuo', target: 'single', effect: 'SCALE_BY_CRIT', effectValue: 6, description: '对目标造成 6×（本回合暴击次数） 伤害。', img: `${SPELL_URL}/YasuoR.png`, price: 150 },
 
