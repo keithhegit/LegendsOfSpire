@@ -123,10 +123,19 @@ function applyEffect(effectType, value, context, updates) {
 
         case 'DRAW_NEXT':
             // 结界护盾: 下回合抽牌
-            // 需要 BattleScene 支持 nextTurnDraw
-            // 暂时简化为当前回合抽牌，或者忽略
-            // 为了不报错，我们先记录一下，或者直接给当前抽牌 (虽然不准确)
-            // updates.drawCount += value; // 暂不激活，避免误导
+            updates.playerStatus = {
+                ...(updates.playerStatus || playerStatus),
+                nextDrawBonus: ((updates.playerStatus?.nextDrawBonus || playerStatus.nextDrawBonus) || 0) + value
+            };
+            break;
+
+        case 'PULL':
+            // 死亡判决: 拉近目标 (机械上视为易伤或者特殊状态)
+            // 这里暂时给1层易伤作为反馈
+            updates.enemyStatus = {
+                ...(updates.enemyStatus || enemyStatus),
+                vulnerable: ((updates.enemyStatus?.vulnerable || enemyStatus.vulnerable) || 0) + 1
+            };
             break;
 
         // ==================== BATCH 1: Multi-hit & Combo ====================
@@ -209,7 +218,7 @@ function applyEffect(effectType, value, context, updates) {
             // 标记
             updates.enemyStatus = {
                 ...(updates.enemyStatus || enemyStatus),
-                marked: ((updates.enemyStatus?.marked || enemyStatus.marked) || 0) + value
+                mark: ((updates.enemyStatus?.mark || enemyStatus.mark) || 0) + value
             };
             break;
 

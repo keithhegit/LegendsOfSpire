@@ -46,6 +46,7 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
     const [zedFirstAttack, setZedFirstAttack] = useState(true); // 劫：首次攻击标记
     const [katarinaAttackCount, setKatarinaAttackCount] = useState(0); // 卡特琳娜：攻击计数
     const [lastPlayedCard, setLastPlayedCard] = useState(null); // 追踪最后打出的牌
+    const [cardsPlayedCount, setCardsPlayedCount] = useState(0); // 本回合打出的卡牌数量
 
     useEffect(() => {
         // 战斗开始时播放英雄语音
@@ -91,6 +92,7 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
         // setPlayerBlock(0); // 已移除
         let drawCount = 5; if (heroData.relicId === "JinxPassive") drawCount = 6;
         drawCards(drawCount);
+        setCardsPlayedCount(0); // 重置卡牌计数
         if (heroData.relicId === "ViktorPassive" && Math.random() < 0.5) {
             const basicCard = shuffle(['Strike', 'Defend'])[0];
             let { hand } = deckRef.current;
@@ -164,6 +166,7 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
 
         // 记录最后打出的牌（用于内瑟斯/艾瑞莉娅被动）
         setLastPlayedCard(card);
+        setCardsPlayedCount(prev => prev + 1);
 
         // 处理卡牌效果
         const effectUpdates = applyCardEffects(card, {
@@ -233,9 +236,10 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
             }
 
             // 易伤加成应用于基础伤害 (方案A)
-            if (enemyStatus.vulnerable > 0) {
-                baseDmg = Math.floor(baseDmg * 1.5);
-            }
+            // if (enemyStatus.vulnerable > 0) {
+            //     baseDmg = Math.floor(baseDmg * 1.5);
+            // }
+            // MOVED TO BELOW to use currentEnemyStatus
 
             // 卡特琳娜被动：每打出3张攻击牌后，下一张(第4张)攻击牌伤害翻倍
             if (heroData.relicId === "KatarinaPassive" && katarinaAttackCount === 3) {
@@ -243,10 +247,52 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
                 setKatarinaAttackCount(0); // 重置计数器
             }
 
+            // FIX: 下一次攻击加成 (NEXT_ATTACK_BONUS) - VayneQ
+            if (playerStatus.nextAttackBonus > 0) {
+                baseDmg += playerStatus.nextAttackBonus;
+                setPlayerStatus(prev => ({ ...prev, nextAttackBonus: 0 }));
+            }
+
+            // FIX: 斩杀加成 (EXECUTE_SCALE) - GarenR
+            if (effectUpdates.executeScale) {
+                const missingHp = enemyConfig.maxHp - enemyHp;
+                baseDmg += Math.floor(missingHp * effectUpdates.executeScale);
+            }
+
+            // FIX: 条件双倍 (CONDITIONAL_DOUBLE) - LuxR
+            if (effectUpdates.conditionalDouble && cardsPlayedCount >= 4) {
+                baseDmg *= 2; // 这里的 cardsPlayedCount 包含当前这张牌，所以如果是第4张打出，count已经是4
+            }
+
+            // FIX: 低血加成 (LOW_HP_BONUS) - JinxR
+            if (effectUpdates.lowHpBonus && enemyHp < enemyConfig.maxHp * 0.5) {
+                baseDmg += effectUpdates.lowHpBonus;
+            }
+
             // FIX: 支持 MULTI_HIT from effectUpdates
             const hits = card.isMultiHit ? card.hits : (effectUpdates.multiHitCount || 1);
             let total = 0;
             let isFirstHit = true; // 用于劫被动
+
+            // FIX: 提前合并状态用于计算 (解决 Vulnerable 异步问题)
+            const currentEnemyStatus = { ...enemyStatus, ...effectUpdates.enemyStatus };
+
+            // 易伤加成应用于基础伤害 (方案A) - 使用合并后的状态
+            if (currentEnemyStatus.vulnerable > 0) {
+                baseDmg = Math.floor(baseDmg * 1.5);
+            }
+
+            // FIX: 下一次攻击翻倍 (NEXT_ATTACK_DOUBLE)
+            if (playerStatus.nextAttackDouble) {
+                baseDmg *= 2;
+                setPlayerStatus(prev => ({ ...prev, nextAttackDouble: false }));
+            }
+
+            // 卡特琳娜被动：每打出3张攻击牌后，下一张(第4张)攻击牌伤害翻倍
+            if (heroData.relicId === "KatarinaPassive" && katarinaAttackCount === 3) {
+                baseDmg = baseDmg * 2;
+                setKatarinaAttackCount(0); // 重置计数器
+            }
 
             for (let i = 0; i < hits; i++) {
                 let finalDmg = baseDmg; // 每次击打使用已计算易伤的基础伤害
@@ -285,13 +331,21 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
                 setEnemyHp(h => Math.max(0, h - dmgToHp)); total += dmgToHp;
                 if (heroData.relics.includes("VampiricScepter")) setPlayerHp(h => Math.min(heroData.maxHp, h + 1));
                 if (heroData.relicId === "DariusPassive") setEnemyStatus(s => ({ ...s, weak: s.weak + 1 }));
+
+                // FIX: Multi-hit display - Stagger damage numbers
+                const hitDmg = dmgToHp; // Capture current hit damage
+                setTimeout(() => {
+                    setDmgOverlay({ val: hitDmg, target: 'ENEMY' });
+                    setTimeout(() => setDmgOverlay(null), 250);
+                }, i * 300);
             }
-            setDmgOverlay({ val: total, target: 'ENEMY' }); setTimeout(() => setDmgOverlay(null), 800);
+            // setDmgOverlay({ val: total, target: 'ENEMY' }); setTimeout(() => setDmgOverlay(null), 800);
         }
         if (card.block) {
             // 玩家获得格挡时播放格挡音效
             playSfx('BLOCK_SHIELD');
-            setPlayerBlock(b => b + card.block);
+            // FIX: 灵巧 (Dexterity) 加成
+            setPlayerBlock(b => b + card.block + (playerStatus.dexterity || 0));
         }
     };
 
@@ -338,6 +392,9 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
         deckRef.current = { ...deckRef.current, discardPile: [...discardPile, ...hand], hand: [] };
         forceUpdate();
         setGameState('ENEMY_TURN');
+
+        // FIX: 回合结束清空敌人格挡 (Slay the Spire 规则)
+        setEnemyBlock(0);
 
         // Player Status Decay
         setPlayerStatus(s => ({ ...s, weak: Math.max(0, s.weak - 1), vulnerable: Math.max(0, s.vulnerable - 1) }));
@@ -417,6 +474,22 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
 
     const enemyAction = () => {
         if (enemyHp <= 0) return;
+
+        // FIX: 眩晕逻辑 (STUN)
+        if (enemyStatus.stunned > 0) {
+            setEnemyStatus(s => ({ ...s, stunned: s.stunned - 1 }));
+            setDmgOverlay({ val: 'STUNNED', target: 'ENEMY', color: 'text-blue-400' });
+            setTimeout(() => setDmgOverlay(null), 800);
+
+            // 跳过回合，直接开始玩家回合
+            setTimeout(() => {
+                // FIX Bug #5, #9: 下回合开始时应用效果
+                applyNextTurnEffects();
+                startTurnLogic();
+            }, 1000);
+            return;
+        }
+
         triggerAnim('ENEMY', 'attack');
         const act = nextEnemyAction;
         if (act.type === 'ATTACK' || act.actionType === 'Attack') {
@@ -479,7 +552,7 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
             setEnemyBlock(b => b + act.effectValue);
         }
         if (act.type === 'DEBUFF') { if (act.effect === 'WEAK') setPlayerStatus(s => ({ ...s, weak: s.weak + act.effectValue })); if (act.effect === 'VULNERABLE') setPlayerStatus(s => ({ ...s, vulnerable: s.vulnerable + act.effectValue })); }
-        setEnemyBlock(0);
+        // setEnemyBlock(0); // FIX: 移除此处的清零，防止敌人刚获得格挡就被清除
         setTimeout(() => {
             // FIX Bug #5, #9: 下回合开始时应用效果
             applyNextTurnEffects();
