@@ -1179,7 +1179,7 @@ export default function LegendsOfTheSpire() {
                                 RESET PROGRESS
                             </button>
                             <p className="text-[10px] uppercase tracking-[0.3em] text-red-400">
-                                This clears your current map and forces a new champion pick.
+                                重置并回到选人画面.
                             </p>
                         </div>
                     )}
