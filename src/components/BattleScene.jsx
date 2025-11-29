@@ -47,6 +47,13 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
     const [katarinaAttackCount, setKatarinaAttackCount] = useState(0); // 卡特琳娜：攻击计数
     const [lastPlayedCard, setLastPlayedCard] = useState(null); // 追踪最后打出的牌
     const [cardsPlayedCount, setCardsPlayedCount] = useState(0); // 本回合打出的卡牌数量
+    // Batch 2: 暴击系统
+    const [critCount, setCritCount] = useState(0);
+    // Batch 2: 伤害历史追踪
+    const [dealtDamageThisTurn, setDealtDamageThisTurn] = useState(false);
+    const [dealtDamageLastTurn, setDealtDamageLastTurn] = useState(false);
+    // Batch 2: 死亡印记
+    const [deathMarkDamage, setDeathMarkDamage] = useState(0);
 
     useEffect(() => {
         // 战斗开始时播放英雄语音
@@ -93,6 +100,7 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
         let drawCount = 5; if (heroData.relicId === "JinxPassive") drawCount = 6;
         drawCards(drawCount);
         setCardsPlayedCount(0); // 重置卡牌计数
+        setCritCount(0); // Batch 2: 重置暴击计数
         if (heroData.relicId === "ViktorPassive" && Math.random() < 0.5) {
             const basicCard = shuffle(['Strike', 'Defend'])[0];
             let { hand } = deckRef.current;
@@ -269,6 +277,28 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
                 baseDmg += effectUpdates.lowHpBonus;
             }
 
+            // Batch 2: 暴击系统 (CRIT_CHANCE) - YasuoQ
+            if (card.effect === 'CRIT_CHANCE') {
+                const critChance = (playerStatus.strength || 0) * 0.05; // 每点力量5%暴击率
+                if (Math.random() < critChance) {
+                    baseDmg *= 2; // 暴击伤害翻倍
+                    setCritCount(prev => prev + 1); // 累积暴击次数
+                    setDmgOverlay({ val: 'CRITICAL!', target: 'ENEMY', color: 'text-yellow-500' });
+                }
+            }
+
+            // Batch 2: 暴击次数缩放 (SCALE_BY_CRIT) - YasuoR
+            if (card.effect === 'SCALE_BY_CRIT') {
+                baseDmg = baseDmg * Math.max(1, critCount); // 伤害 = 基础值 × 暴击次数
+            }
+
+            // Batch 2: 回溯加成 (RETRO_BONUS) - EkkoQ
+            if (effectUpdates.retroBonus) {
+                if (dealtDamageLastTurn) {
+                    baseDmg += effectUpdates.retroBonus; // 如果上回合造成过伤害，增加伤害
+                }
+            }
+
             // FIX: 支持 MULTI_HIT from effectUpdates
             const hits = card.isMultiHit ? card.hits : (effectUpdates.multiHitCount || 1);
             let total = 0;
@@ -329,6 +359,15 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
                 }
 
                 setEnemyHp(h => Math.max(0, h - dmgToHp)); total += dmgToHp;
+
+                // Batch 2: 记录造成伤害 (用于 RETRO_BONUS)
+                if (dmgToHp > 0) setDealtDamageThisTurn(true);
+
+                // Batch 2: 累积死亡印记伤害
+                if (enemyStatus.deathMark > 0) {
+                    setDeathMarkDamage(prev => prev + dmgToHp);
+                }
+
                 if (heroData.relics.includes("VampiricScepter")) setPlayerHp(h => Math.min(heroData.maxHp, h + 1));
                 if (heroData.relicId === "DariusPassive") setEnemyStatus(s => ({ ...s, weak: s.weak + 1 }));
 
@@ -393,6 +432,10 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
         forceUpdate();
         setGameState('ENEMY_TURN');
 
+        // Batch 2: 更新伤害历史
+        setDealtDamageLastTurn(dealtDamageThisTurn);
+        setDealtDamageThisTurn(false);
+
         // FIX: 回合结束清空敌人格挡 (Slay the Spire 规则)
         setEnemyBlock(0);
 
@@ -410,6 +453,20 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
                 setDmgOverlay({ val: poisonDmg, target: 'ENEMY', color: 'text-green-500' });
                 setTimeout(() => setDmgOverlay(null), 800);
                 newStatus.poison = Math.max(0, s.poison - 1);
+            }
+
+            // Batch 2: 死亡印记爆发 (DEATHMARK) - ZedR
+            if (s.deathMark > 0) {
+                let newMark = s.deathMark - 1;
+                if (newMark === 0) {
+                    // 印记倒计时结束，爆发伤害
+                    const markDmg = deathMarkDamage;
+                    setEnemyHp(h => Math.max(0, h - markDmg));
+                    setDmgOverlay({ val: `MARK: ${markDmg}`, target: 'ENEMY', color: 'text-red-600' });
+                    setTimeout(() => setDmgOverlay(null), 1200);
+                    setDeathMarkDamage(0); // 重置累积伤害
+                }
+                newStatus.deathMark = newMark;
             }
 
             // FIX Bug #10: 流血 (Bleed) - 每层造成2伤害
