@@ -659,7 +659,7 @@ export default function LegendsOfTheSpire() {
     }, [currentUser]);
 
     useEffect(() => {
-        if ([ 'MENU', 'CHAMPION_SELECT', 'GAMEOVER', 'VICTORY_ALL' ].includes(view)) return;
+        if (['MENU', 'CHAMPION_SELECT', 'GAMEOVER', 'VICTORY_ALL'].includes(view)) return;
         const serializableMapData = serializeMapData();
         const key = getSaveKey(currentUser);
         localStorage.setItem(key, JSON.stringify({ view, mapData: serializableMapData, currentFloor, currentAct, masterDeck, champion, currentHp, maxHp, gold, relics, baseStr, activeNode, usedEnemies }));
@@ -778,8 +778,8 @@ export default function LegendsOfTheSpire() {
                 setCurrentAct(nextAct);
                 setCurrentFloor(0);
                 const nextMapData = generateGridMap(nextAct, []); // v4生成器
-        setMapData(nextMapData);
-        setShowDeadEndPrompt(!hasAvailableNeighbors(nextMapData.nodes, nextMapData.grid, nextMapData.totalFloors));
+                setMapData(nextMapData);
+                setShowDeadEndPrompt(!hasAvailableNeighbors(nextMapData.nodes, nextMapData.grid, nextMapData.totalFloors));
                 if (nextMapData.startNode) {
                     setActiveNode(nextMapData.startNode);
                 }
@@ -1055,31 +1055,28 @@ export default function LegendsOfTheSpire() {
                     <div className="absolute top-20 left-1/2 -translate-x-1/2 z-[100] flex gap-2">
                         <button
                             onClick={() => handleSkipToAct(1)}
-                            className={`px-4 py-2 rounded-lg font-bold text-xs uppercase transition-all ${
-                                currentAct === 1 
-                                ? 'bg-blue-600 text-white border-2 border-blue-400' 
+                            className={`px-4 py-2 rounded-lg font-bold text-xs uppercase transition-all ${currentAct === 1
+                                ? 'bg-blue-600 text-white border-2 border-blue-400'
                                 : 'bg-black/70 text-blue-300 border border-blue-500/50 hover:bg-blue-900/50'
-                            }`}
+                                }`}
                         >
                             🧪 ACT 1
                         </button>
                         <button
                             onClick={() => handleSkipToAct(2)}
-                            className={`px-4 py-2 rounded-lg font-bold text-xs uppercase transition-all ${
-                                currentAct === 2
+                            className={`px-4 py-2 rounded-lg font-bold text-xs uppercase transition-all ${currentAct === 2
                                 ? 'bg-purple-600 text-white border-2 border-purple-400'
                                 : 'bg-black/70 text-purple-300 border border-purple-500/50 hover:bg-purple-900/50'
-                            }`}
+                                }`}
                         >
                             🧪 ACT 2
                         </button>
                         <button
                             onClick={() => handleSkipToAct(3)}
-                            className={`px-4 py-2 rounded-lg font-bold text-xs uppercase transition-all ${
-                                currentAct === 3
+                            className={`px-4 py-2 rounded-lg font-bold text-xs uppercase transition-all ${currentAct === 3
                                 ? 'bg-red-600 text-white border-2 border-red-400'
                                 : 'bg-black/70 text-red-300 border border-red-500/50 hover:bg-red-900/50'
-                            }`}
+                                }`}
                         >
                             🧪 ACT 3
                         </button>
@@ -1106,7 +1103,7 @@ export default function LegendsOfTheSpire() {
     const renderUserPanel = () => {
         if (!currentUser) return null;
         return (
-            <div className="absolute top-4 right-5 z-[120] flex items-center gap-3 bg-gradient-to-r from-black/70 to-slate-900/70 px-4 py-2 rounded-full border border-white/20 shadow-[0_0_30px_rgba(0,0,0,0.7)] text-sm text-white">
+            <div className="absolute top-16 right-5 z-[120] flex items-center gap-3 bg-gradient-to-r from-black/70 to-slate-900/70 px-4 py-2 rounded-full border border-white/20 shadow-[0_0_30px_rgba(0,0,0,0.7)] text-sm text-white">
                 <div className="flex items-center gap-2">
                     <UserSquare className="w-5 h-5 text-amber-400" />
                     <div className="flex flex-col text-xs uppercase tracking-[0.3em] text-right">
@@ -1136,18 +1133,21 @@ export default function LegendsOfTheSpire() {
     // [DEV ONLY] 跳转到指定ACT（测试用）
     const handleSkipToAct = (targetAct) => {
         if (!champion) return;
-        const newMapData = generateGridMap(targetAct, []);
-        setMapData(newMapData);
-        setShowDeadEndPrompt(!hasAvailableNeighbors(newMapData.nodes, newMapData.grid, newMapData.totalFloors));
-        if (newMapData.startNode) {
-            setActiveNode(newMapData.startNode);
-        }
-        setCurrentAct(targetAct);
-        setCurrentFloor(0);
-        setLockedChoices(new Set());
-        // 恢复一些HP以便测试
-        setCurrentHp(Math.min(maxHp, currentHp + Math.floor(maxHp * 0.5)));
-        setView('MAP');
+        setMapData(null); // 触发加载屏幕
+        setTimeout(() => {
+            const newMapData = generateGridMap(targetAct, []);
+            setMapData(newMapData);
+            setShowDeadEndPrompt(!hasAvailableNeighbors(newMapData.nodes, newMapData.grid, newMapData.totalFloors));
+            if (newMapData.startNode) {
+                setActiveNode(newMapData.startNode);
+            }
+            setCurrentAct(targetAct);
+            setCurrentFloor(0);
+            setLockedChoices(new Set());
+            // 恢复一些HP以便测试
+            setCurrentHp(Math.min(maxHp, currentHp + Math.floor(maxHp * 0.5)));
+            setView('MAP');
+        }, 100);
     };
 
     return (
@@ -1169,55 +1169,55 @@ export default function LegendsOfTheSpire() {
                 </div>
             )}
             {view !== 'GAMEOVER' && view !== 'VICTORY_ALL' && view !== 'MENU' && view !== 'CHAMPION_SELECT' && champion && (
-            <>
-                {view === 'MAP' && currentUser && (
-                    <div className="absolute top-24 right-5 z-[115] flex flex-col items-end gap-1 text-right">
-                        <button
-                            onClick={handleResetProgress}
-                            className="px-3 py-1 rounded-full border border-red-500 text-red-200 bg-black/60 hover:bg-red-500/20 transition text-xs uppercase tracking-[0.4em]"
-                        >
-                            RESET PROGRESS
-                        </button>
-                        <p className="text-[10px] uppercase tracking-[0.3em] text-red-400">
-                            This clears your current map and forces a new champion pick.
-                        </p>
-                    </div>
-                )}
-                <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-black to-transparent z-50 flex items-center justify-between px-8 pointer-events-none">
-                    <div className="flex items-center gap-6 pointer-events-auto">
-                        <div className="relative group">
-                            <img src={champion.avatar} className="w-12 h-12 rounded-full border-2 border-[#C8AA6E] shadow-lg" />
-                            <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-[#091428] rounded-full border border-[#C8AA6E] flex items-center justify-center text-xs font-bold text-[#C8AA6E]">{currentFloor + 1}F</div>
+                <>
+                    {view === 'MAP' && currentUser && (
+                        <div className="absolute top-24 right-5 z-[115] flex flex-col items-end gap-1 text-right">
+                            <button
+                                onClick={handleResetProgress}
+                                className="px-3 py-1 rounded-full border border-red-500 text-red-200 bg-black/60 hover:bg-red-500/20 transition text-xs uppercase tracking-[0.4em]"
+                            >
+                                RESET PROGRESS
+                            </button>
+                            <p className="text-[10px] uppercase tracking-[0.3em] text-red-400">
+                                This clears your current map and forces a new champion pick.
+                            </p>
                         </div>
-                        <div className="flex items-center gap-4">
-                            <div className="flex flex-col">
-                                <span className="text-[#F0E6D2] font-bold text-lg shadow-black drop-shadow-md flex items-center gap-2">
-                                    {champion.name}
-                                    <RelicTooltip relic={RELIC_DATABASE[champion.relicId]}>
-                                        <img src={RELIC_DATABASE[champion.relicId].img}
-                                            className="w-6 h-6 rounded border border-yellow-400 bg-black/50 cursor-help hover:scale-110 transition-transform"
-                                        />
-                                    </RelicTooltip>
-                                </span>
-                                <div className="flex items-center gap-4 text-sm font-bold"><span className="text-red-400 flex items-center gap-1"><Heart size={14} fill="currentColor" /> {currentHp}/{maxHp}</span><span className="text-yellow-400 flex items-center gap-1"><Coins size={14} fill="currentColor" /> {gold}</span></div>
+                    )}
+                    <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-black to-transparent z-50 flex items-center justify-between px-8 pointer-events-none">
+                        <div className="flex items-center gap-6 pointer-events-auto">
+                            <div className="relative group">
+                                <img src={champion.avatar} className="w-12 h-12 rounded-full border-2 border-[#C8AA6E] shadow-lg" />
+                                <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-[#091428] rounded-full border border-[#C8AA6E] flex items-center justify-center text-xs font-bold text-[#C8AA6E]">{currentFloor + 1}F</div>
                             </div>
-                            {/* 遗物栏 - 紧邻被动技能右侧 */}
-                            <div className="flex gap-2 flex-wrap max-w-md">
-                                {relics.filter(rid => rid !== champion.relicId).map((rid, i) => {
-                                    const relic = RELIC_DATABASE[rid];
-                                    return (
-                                        <RelicTooltip key={i} relic={relic}>
-                                            <div className="w-9 h-9 rounded border border-[#C8AA6E]/50 bg-black/50 relative group cursor-help hover:scale-110 transition-transform">
-                                                <img src={relic.img} className="w-full h-full object-cover" />
-                                            </div>
+                            <div className="flex items-center gap-4">
+                                <div className="flex flex-col">
+                                    <span className="text-[#F0E6D2] font-bold text-lg shadow-black drop-shadow-md flex items-center gap-2">
+                                        {champion.name}
+                                        <RelicTooltip relic={RELIC_DATABASE[champion.relicId]}>
+                                            <img src={RELIC_DATABASE[champion.relicId].img}
+                                                className="w-6 h-6 rounded border border-yellow-400 bg-black/50 cursor-help hover:scale-110 transition-transform"
+                                            />
                                         </RelicTooltip>
-                                    );
-                                })}
+                                    </span>
+                                    <div className="flex items-center gap-4 text-sm font-bold"><span className="text-red-400 flex items-center gap-1"><Heart size={14} fill="currentColor" /> {currentHp}/{maxHp}</span><span className="text-yellow-400 flex items-center gap-1"><Coins size={14} fill="currentColor" /> {gold}</span></div>
+                                </div>
+                                {/* 遗物栏 - 紧邻被动技能右侧 */}
+                                <div className="flex gap-2 flex-wrap max-w-md">
+                                    {relics.filter(rid => rid !== champion.relicId).map((rid, i) => {
+                                        const relic = RELIC_DATABASE[rid];
+                                        return (
+                                            <RelicTooltip key={i} relic={relic}>
+                                                <div className="w-9 h-9 rounded border border-[#C8AA6E]/50 bg-black/50 relative group cursor-help hover:scale-110 transition-transform">
+                                                    <img src={relic.img} className="w-full h-full object-cover" />
+                                                </div>
+                                            </RelicTooltip>
+                                        );
+                                    })}
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </>
+                </>
             )}
             {renderView()}
             {showCodex && <CodexView onClose={() => setShowCodex(false)} />}
