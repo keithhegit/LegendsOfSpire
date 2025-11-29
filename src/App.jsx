@@ -1103,7 +1103,7 @@ export default function LegendsOfTheSpire() {
     const renderUserPanel = () => {
         if (!currentUser) return null;
         return (
-            <div className="absolute top-16 right-5 z-[120] flex items-center gap-3 bg-gradient-to-r from-black/70 to-slate-900/70 px-4 py-2 rounded-full border border-white/20 shadow-[0_0_30px_rgba(0,0,0,0.7)] text-sm text-white">
+            <div className="absolute top-4 right-28 z-[120] flex items-center gap-3 bg-gradient-to-r from-black/70 to-slate-900/70 px-4 py-2 rounded-full border border-white/20 shadow-[0_0_30px_rgba(0,0,0,0.7)] text-sm text-white">
                 <div className="flex items-center gap-2">
                     <UserSquare className="w-5 h-5 text-amber-400" />
                     <div className="flex flex-col text-xs uppercase tracking-[0.3em] text-right">
