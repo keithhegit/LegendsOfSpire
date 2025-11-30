@@ -1,17 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Sword, Shield, Zap, Skull, Heart, RefreshCw, AlertTriangle, Flame, XCircle, Activity, Map as MapIcon, Gift, Anchor, Coins, ShoppingBag, ChevronRight, Star, Play, Pause, Volume2, VolumeX, Landmark, Lock, RotateCcw, Save, ArrowRight, BookOpen, Layers, UserSquare, LogOut } from 'lucide-react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { generateGridMap } from './data/gridMapLayout_v4'; // v4生成器（带死胡同检测）
-import { CARD_DATABASE } from './data/cards'; // 卡牌数据
-import GridMapView_v3 from './components/GridMapView_v3'; // 新版六边形地图视图（三选一机制）
-import ChampionSelect from './components/ChampionSelect';
-import BattleScene from './components/BattleScene';
-import LoginView from './components/LoginView'; // 登录界面
-import ToastContainer from './components/shared/Toast'; // 导入 ToastContainer
-import { unlockAudio } from './utils/audioContext'; // 音频解锁工具
-import { getHexNeighbors } from './utils/hexagonGrid'; // 六边形邻居帮助函数
-import { authService } from './services/authService';
-const CDN_VERSION = "13.1.1";
 const CDN_URL = `https://ddragon.leagueoflegends.com/cdn/${CDN_VERSION}`;
 const LOADING_URL = "https://ddragon.leagueoflegends.com/cdn/img/champion/loading";
 const SPLASH_URL = "https://ddragon.leagueoflegends.com/cdn/img/champion/splash";
@@ -524,257 +512,450 @@ const RestView = ({ onRest }) => (
             <div className="w-24 h-24 rounded-full border-4 border-[#0AC8B9] overflow-hidden bg-black shadow-[0_0_50px_#0AC8B9]"><img src={`${ITEM_URL}/2003.png`} className="w-full h-full object-cover" /></div>
             <h2 className="text-5xl font-serif text-[#0AC8B9] drop-shadow-[0_0_10px_#0AC8B9]">泉水憩息</h2>
             <button onClick={onRest} className="group w-64 h-80 bg-slate-900/80 border-2 border-[#0AC8B9] rounded-xl flex flex-col items-center justify-center hover:bg-[#0AC8B9]/20 transition-all cursor-pointer">
-                <Heart size={64} className="text-red-500 mb-4 group-hover:scale-110 transition-transform" />
-                <h3 className="text-2xl font-bold text-white mb-2">回复</h3>
-                <p className="text-[#0AC8B9]">回复 30% 生命值</p>
-            </button>
-        </div>
-    </div>
-);
+                ```
+                case 'REST': return "text-blue-400 border-blue-500/50";
+                case 'SHOP': return "text-yellow-400 border-yellow-500/50";
+                case 'EVENT': return "text-purple-400 border-purple-500/50";
+                case 'CHEST': return "text-green-400 border-green-500/50";
+                case 'BATTLE': return "text-slate-200 border-slate-500/50";
+                default: return "text-slate-400";
+        }
+    }
+                return (
+                <div className="flex flex-col items-center h-full w-full relative overflow-hidden bg-[#0c0c12]">
+                    <div className="absolute inset-0 z-0"><div className="absolute inset-0 bg-black/60 z-10" /><div className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-50" style={{ backgroundImage: `url('${ACT_BACKGROUNDS[act] || ACT_BACKGROUNDS[1]}')` }}></div></div>
+                    <div className="relative z-20 w-full h-full flex flex-col-reverse items-center overflow-y-auto py-20 gap-16 hide-scrollbar">
+                        <div className="text-[#C8AA6E] font-serif text-2xl mb-8">第 {act} 章</div>
+                        {mapData.map((floor, floorIndex) => (
+                            <div key={floorIndex} className="flex justify-center gap-24 relative group">
+                                {floor.map((node, nodeIndex) => {
+                                    const isAvailable = node.status === 'AVAILABLE';
+                                    const isCompleted = node.status === 'COMPLETED';
+                                    const isLocked = node.status === 'LOCKED';
+                                    const iconUrl = getMapIcon(node);
+                                    const labelText = node.type === 'BATTLE' ? (ENEMY_POOL[node.enemyId]?.name || 'Unknown') : node.type;
+                                    return (
+                                        <div key={node.id} className="relative flex flex-col items-center">
+                                            {node.next && node.next.length > 0 && (
+                                                <div className="absolute bottom-full left-1/2 w-full h-16 pointer-events-none">
+                                                    <svg width="200" height="64" style={{ overflow: 'visible', position: 'absolute', bottom: 0, left: '-100px' }}>
+                                                        {node.next.map(nextId => {
+                                                            const nextNodeIndex = parseInt(nextId.split('-')[1]);
+                                                            const dx = (nextNodeIndex - nodeIndex) * 50 + 100;
+                                                            return <line key={nextId} x1="100" y1="64" x2={dx} y2="0" stroke={isLocked ? "#334155" : "#C8AA6E"} strokeWidth="2" opacity="0.5" />;
+                                                        })}
+                                                    </svg>
+                                                </div>
+                                            )}
+                                            <button onClick={() => isAvailable && onNodeSelect(node)} disabled={!isAvailable} className={`w-24 h-24 rounded-full border-2 flex items-center justify-center transition-all duration-300 relative overflow-hidden bg-black ${isAvailable ? `border-[#C8AA6E] scale-110 shadow-[0_0_30px_#C8AA6E] cursor-pointer hover:scale-125 ring-2 ring-[#C8AA6E]/50` : 'border-slate-600'} ${isCompleted ? 'opacity-40 grayscale border-slate-500' : ''} ${isLocked ? 'opacity-20 blur-[1px]' : ''}`}>
+                                                {iconUrl && <img src={iconUrl} className="w-full h-full object-cover" alt={node.type} />}
+                                                {isCompleted && <div className="absolute inset-0 bg-black/60 flex items-center justify-center"><span className="text-[#C8AA6E] text-4xl font-bold">✓</span></div>}
+                                            </button>
+                                            <div className={`absolute -bottom-8 px-3 py-1 rounded-full border bg-black/90 backdrop-blur-md whitespace-nowrap font-bold text-xs tracking-widest uppercase transition-all ${getTypeStyle(node.type)} ${isAvailable ? 'scale-110 shadow-lg z-30' : 'opacity-70 scale-90'}`}>{labelText}</div>
+                                        </div>
+                                    )
+                                })}
+                            </div>
+                        ))}
+                    </div>
+                </div>
+                )
+};
 
-// --- 主组件 ---
+                const ShopView = ({onLeave, onBuyCard, onBuyRelic, gold, deck, relics, championName}) => {
+    const cardStock = useMemo(() => shuffle(Object.values(CARD_DATABASE).filter(c => c.rarity !== 'BASIC' && (c.hero === 'Neutral' || c.hero === championName))).slice(0, 5), [championName]);
+    const relicStock = useMemo(() => Object.values(RELIC_DATABASE).filter(r => r.rarity !== 'PASSIVE' && !relics.includes(r.id)).slice(0, 3), [relics]);
+                const [purchasedItems, setPurchasedItems] = useState([]);
+    const handleBuy = (item, type) => { if (gold >= item.price && !purchasedItems.includes(item.id)) {setPurchasedItems([...purchasedItems, item.id]); if (type === 'CARD') onBuyCard(item); if (type === 'RELIC') onBuyRelic(item); } };
+                return (
+                <div className="absolute inset-0 z-50 bg-[#0a0a0f] flex flex-col items-center justify-center bg-[url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/TwistedFate_0.jpg')] bg-cover bg-center">
+                    <div className="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
+                    <div className="relative z-10 w-full max-w-6xl px-10 py-6 flex flex-col h-full">
+                        <div className="flex justify-between items-center mb-8 border-b border-[#C8AA6E] pb-4">
+                            <div className="flex items-center gap-4">
+                                <div className="w-16 h-16 rounded-full border-2 border-[#C8AA6E] overflow-hidden bg-black"><img src={`${ITEM_URL}/3400.png`} className="w-full h-full object-cover" /></div>
+                                <div><h2 className="text-3xl font-bold text-[#C8AA6E]">黑市商人</h2><p className="text-[#A09B8C] italic">"只要给钱，什么都卖。"</p></div>
+                            </div>
+                            <div className="flex items-center gap-2 text-4xl font-bold text-yellow-400 bg-black/50 px-6 py-2 rounded-lg border border-yellow-600"><Coins size={32} /> {gold}</div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-12 flex-1 overflow-y-auto">
+                            <div>
+                                <h3 className="text-xl text-[#F0E6D2] mb-4 uppercase tracking-widest border-l-4 border-blue-500 pl-3">技能卷轴</h3>
+                                <div className="flex flex-wrap gap-4">
+                                    {cardStock.map(card => {
+                                        const isBought = purchasedItems.includes(card.id);
+                                        return (
+                                            <div key={card.id} onClick={() => !isBought && handleBuy(card, 'CARD')} className={`w-32 h-48 relative group transition-all ${isBought ? 'opacity-20 grayscale pointer-events-none' : 'hover:scale-105 cursor-pointer'}`}>
+                                                <img src={card.img} className="w-full h-full object-cover rounded border border-slate-600" />
+                                                <div className="absolute bottom-0 left-0 right-0 bg-black/90 text-center py-1 text-xs font-bold text-[#C8AA6E] border-t border-[#C8AA6E]">{card.price} G</div>
+                                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-40 bg-black border border-[#C8AA6E] p-2 z-50 hidden group-hover:block text-center pointer-events-none text-xs text-white"><div className="font-bold mb-1">{card.name}</div>{card.description}</div>
+                                            </div>
+                                        )
+                                    })}
+                                </div>
+                            </div>
+                            <div>
+                                <h3 className="text-xl text-[#F0E6D2] mb-4 uppercase tracking-widest border-l-4 border-purple-500 pl-3">海克斯装备</h3>
+                                <div className="flex flex-wrap gap-6">
+                                    {relicStock.map(relic => {
+                                        const isBought = purchasedItems.includes(relic.id);
+                                        return (
+                                            <div key={relic.id} onClick={() => !isBought && handleBuy(relic, 'RELIC')} className={`w-20 h-20 relative group transition-all ${isBought ? 'opacity-20 grayscale pointer-events-none' : 'hover:scale-110 cursor-pointer'}`}>
+                                                <img src={relic.img} className="w-full h-full object-cover rounded-lg border-2 border-[#C8AA6E] shadow-[0_0_10px_#C8AA6E]" />
+                                                <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-black/80 px-2 rounded text-yellow-400 font-bold text-sm whitespace-nowrap">{relic.price} G</div>
+                                                <RelicTooltip relic={relic}><div className="w-full h-full absolute inset-0"></div></RelicTooltip>
+                                            </div>
+                                        )
+                                    })}
+                                </div>
+                            </div>
+                        </div>
+                        <div className="mt-auto flex justify-end pt-6 border-t border-[#C8AA6E]/30"><button onClick={onLeave} className="px-8 py-3 bg-[#C8AA6E] hover:bg-[#F0E6D2] text-black font-bold uppercase tracking-widest rounded transition-colors flex items-center gap-2">离开 <ChevronRight /></button></div>
+                    </div>
+                </div>
+                )
+};
 
-export default function LegendsOfTheSpire() {
+                const ChestView = ({onLeave, onRelicReward, relics, act}) => {
+    // 根据当前章节过滤遗物：ACT1只能获得通用遗物，ACT2可以获得ACT1+ACT2，ACT3可以获得所有
+    const availableRelics = Object.values(RELIC_DATABASE).filter(r => {
+        if (r.rarity === 'PASSIVE' || r.rarity === 'BASIC' || relics.includes(r.id)) return false;
+                // 章节专属遗物检查
+                if (r.id === 'Cull' || r.id === 'DarkSeal') return act === 1; // ACT1专属
+        if (r.id === 'QSS' || r.id === 'Executioner') return act >= 2; // ACT2专属
+        if (r.id === 'Nashor') return act >= 3; // ACT3专属
+                return true; // 通用遗物所有章节都可以获得
+    });
+    const rewards = useMemo(() => shuffle(availableRelics).slice(0, 3), [relics, act]);
+                const [rewardChosen, setRewardChosen] = useState(false);
+    const handleChoose = (relic) => { if (rewardChosen) return; setRewardChosen(true); onRelicReward(relic); };
+                return (
+                <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/90">
+                    <div className="relative z-10 max-w-4xl bg-[#091428]/90 border-2 border-[#C8AA6E] p-10 text-center rounded-xl shadow-[0_0_50px_#C8AA6E]">
+                        <div className="w-24 h-24 mx-auto mb-6 rounded-full border-4 border-[#C8AA6E] overflow-hidden bg-black flex items-center justify-center"><img src={`${ITEM_URL}/3400.png`} className="w-full h-full object-cover" /></div>
+                        <h2 className="text-4xl font-bold text-[#C8AA6E] mb-6">海克斯宝箱</h2>
+                        <p className="text-[#F0E6D2] text-lg mb-8">打开宝箱，选择一件强大的装备来武装自己。</p>
+                        <div className="flex justify-center gap-8">
+                            {rewards.map((relic) => (
+                                <div key={relic.id} onClick={() => handleChoose(relic)} className={`w-36 relative group transition-all p-4 rounded-lg border-2 ${rewardChosen ? 'opacity-40 pointer-events-none' : 'hover:scale-110 cursor-pointer border-[#C8AA6E] shadow-xl hover:shadow-[0_0_20px_#C8AA6E]'}`}>
+                                    <img src={relic.img} className="w-full h-auto object-cover rounded-lg" />
+                                    <div className="font-bold text-[#F0E6D2] mt-3">{relic.name}</div>
+                                    <div className="text-xs text-[#A09B8C] mt-1">{relic.description}</div>
+                                    {rewardChosen && <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-3xl font-bold text-green-400">已选</div>}
+                                </div>
+                            ))}
+                        </div>
+                        <button onClick={onLeave} className="mt-8 px-8 py-3 border border-slate-600 text-slate-400 hover:text-white hover:border-white rounded uppercase tracking-widest" disabled={!rewardChosen}>关闭宝箱</button>
+                    </div>
+                </div>
+                );
+};
+
+                const EventView = ({onLeave, onReward}) => (
+                <div className="absolute inset-0 z-50 flex items-center justify-center bg-black">
+                    <div className="absolute inset-0 bg-[url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ryze_0.jpg')] bg-cover bg-center opacity-40"></div>
+                    <div className="relative z-10 max-w-2xl bg-[#091428]/90 border-2 border-[#C8AA6E] p-10 text-center rounded-xl shadow-[0_0_50px_#0AC8B9]">
+                        <div className="w-24 h-24 mx-auto mb-6 rounded-full border-4 border-[#C8AA6E] overflow-hidden"><img src={`${ITEM_URL}/3340.png`} className="w-full h-full object-cover" /></div>
+                        <h2 className="text-4xl font-bold text-[#C8AA6E] mb-6">神秘信号</h2>
+                        <p className="text-[#F0E6D2] text-lg mb-8 leading-relaxed">你在草丛中发现了一个遗落的守卫眼，旁边似乎还散落着一些物资...</p>
+                        <div className="grid grid-cols-1 gap-4">
+                            <button onClick={() => { onReward({ type: 'BUFF', stat: 'strength', value: 2 }); }} className="p-4 bg-slate-800 hover:bg-red-900/50 border border-slate-600 hover:border-red-500 rounded transition-all flex items-center gap-4 group text-left"><div className="p-3 bg-black rounded border border-slate-700 group-hover:border-red-500"><Sword className="text-red-500" /></div><div><div className="font-bold text-[#F0E6D2]">训练</div><div className="text-sm text-slate-400">永久获得 <span className="text-red-400">+2 力量</span></div></div></button>
+                            <button onClick={() => { onReward({ type: 'RELIC_RANDOM' }); }} className="p-4 bg-slate-800 hover:bg-purple-900/50 border border-slate-600 hover:border-purple-500 rounded transition-all flex items-center gap-4 group text-left"><div className="p-3 bg-black rounded border border-slate-700 group-hover:border-purple-500"><Gift className="text-purple-500" /></div><div><div className="font-bold text-[#F0E6D2]">搜寻</div><div className="text-sm text-slate-400">获得一件 <span className="text-purple-400">随机装备</span></div></div></button>
+                        </div>
+                    </div>
+                </div>
+                );
+
+                const RewardView = ({onSkip, onCardSelect, goldReward, championName}) => {
+    const rewards = useMemo(() => { const all = Object.values(CARD_DATABASE).filter(c => c.rarity !== 'BASIC' && c.rarity !== 'PASSIVE' && (c.hero === 'Neutral' || c.hero === championName)); return shuffle(all).slice(0, 3); }, [championName]);
+                return (
+                <div className="absolute inset-0 z-50 bg-black/90 flex items-center justify-center">
+                    <div className="max-w-4xl bg-[#091428]/90 border-2 border-[#C8AA6E] p-10 text-center rounded-xl shadow-[0_0_50px_#C8AA6E]">
+                        <h2 className="text-4xl font-bold text-[#C8AA6E] mb-6">奖励</h2>
+                        <div className="text-2xl text-yellow-400 mb-8 flex items-center justify-center gap-2">
+                            <Coins size={28} className="text-yellow-400" />
+                            <span>金币 +{goldReward}</span>
+                        </div>
+                        <div className="flex justify-center gap-6 my-8">
+                            {rewards.map(c => (
+                                <div
+                                    key={c.id}
+                                    onClick={() => onCardSelect(c.id)}
+                                    className="w-48 h-64 bg-[#1E2328] border-2 border-[#C8AA6E] rounded-lg overflow-hidden cursor-pointer hover:scale-110 hover:shadow-[0_0_20px_#C8AA6E] transition-all group relative"
+                                >
+                                    <div className="w-full h-40 bg-black overflow-hidden relative">
+                                        <img src={c.img} className="w-full h-full object-cover opacity-90 group-hover:opacity-100" alt={c.name} />
+                                        <div className="absolute top-2 left-2 w-8 h-8 bg-[#091428] rounded-full border border-[#C8AA6E] flex items-center justify-center text-[#C8AA6E] font-bold text-sm">{c.cost}</div>
+                                    </div>
+                                    <div className="p-3 flex flex-col h-24">
+                                        <div className="text-sm font-bold text-[#F0E6D2] mb-1 line-clamp-1">{c.name}</div>
+                                        <div className="text-[10px] text-[#A09B8C] leading-tight line-clamp-2">{c.description}</div>
+                                        <div className="mt-auto text-[8px] text-slate-500 uppercase font-bold">{c.type}</div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                        <button onClick={onSkip} className="mt-6 px-8 py-3 border border-slate-600 text-slate-400 hover:text-white hover:border-white rounded uppercase tracking-widest transition-all">跳过</button>
+                    </div>
+                </div>
+                );
+};
+
+                const RestView = ({onRest}) => (
+                <div className="absolute inset-0 z-50 bg-[url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Soraka_0.jpg')] bg-cover bg-center flex items-center justify-center">
+                    <div className="absolute inset-0 bg-black/70"></div>
+                    <div className="relative z-10 flex flex-col gap-8 text-center items-center">
+                        <div className="w-24 h-24 rounded-full border-4 border-[#0AC8B9] overflow-hidden bg-black shadow-[0_0_50px_#0AC8B9]"><img src={`${ITEM_URL}/2003.png`} className="w-full h-full object-cover" /></div>
+                        <h2 className="text-5xl font-serif text-[#0AC8B9] drop-shadow-[0_0_10px_#0AC8B9]">泉水憩息</h2>
+                        <button onClick={onRest} className="group w-64 h-80 bg-slate-900/80 border-2 border-[#0AC8B9] rounded-xl flex flex-col items-center justify-center hover:bg-[#0AC8B9]/20 transition-all cursor-pointer">
+                            <Heart size={64} className="text-red-500 mb-4 group-hover:scale-110 transition-transform" />
+                            <h3 className="text-2xl font-bold text-white mb-2">回复</h3>
+                            <p className="text-[#0AC8B9]">回复 30% 生命值</p>
+                        </button>
+                    </div>
+                </div>
+                );
+
+                export default function LegendsOfTheSpire() {
     const [view, setView] = useState('MENU');
-    const [mapData, setMapData] = useState({ grid: [], nodes: [], nodeMap: new Map() });
-    const [currentFloor, setCurrentFloor] = useState(0);
-    const [currentAct, setCurrentAct] = useState(1);
-    const [masterDeck, setMasterDeck] = useState([]);
-    const [champion, setChampion] = useState(null);
-    const [currentHp, setCurrentHp] = useState(80);
-    const [maxHp, setMaxHp] = useState(80);
-    const [gold, setGold] = useState(100);
-    const [relics, setRelics] = useState([]);
-    const [baseStr, setBaseStr] = useState(0);
-    const [activeNode, setActiveNode] = useState(null);
-    const [usedEnemies, setUsedEnemies] = useState([]);
-    const [showCodex, setShowCodex] = useState(false);
-    const [showDeck, setShowDeck] = useState(false);
-    const [toasts, setToasts] = useState([]);
-    const [lockedChoices, setLockedChoices] = useState(new Set()); // 三选一：已锁定的选项
+                const [mapData, setMapData] = useState({grid: [], nodes: [], nodeMap: new Map() });
+                const [currentFloor, setCurrentFloor] = useState(0);
+                const [currentAct, setCurrentAct] = useState(1);
+                const [masterDeck, setMasterDeck] = useState([]);
+                const [champion, setChampion] = useState(null);
+                const [currentHp, setCurrentHp] = useState(80);
+                const [maxHp, setMaxHp] = useState(80);
+                const [gold, setGold] = useState(100);
+                const [relics, setRelics] = useState([]);
+                const [baseStr, setBaseStr] = useState(0);
+                const [activeNode, setActiveNode] = useState(null);
+                const [usedEnemies, setUsedEnemies] = useState([]);
+                const [showDeck, setShowDeck] = useState(false);
+                const [toasts, setToasts] = useState([]);
+                const [lockedChoices, setLockedChoices] = useState(new Set()); // 三选一：已锁定的选项
 
-    const [unlockedChamps, setUnlockedChamps] = useState(() => {
-        try {
-            const d = localStorage.getItem(UNLOCK_KEY);
-            if (!d) return Object.keys(CHAMPION_POOL);
+const [unlockedChamps, setUnlockedChamps] = useState(() => {
+    try {
+        const d = localStorage.getItem(UNLOCK_KEY);
+                if (!d) return Object.keys(CHAMPION_POOL);
 
-            let saved = JSON.parse(d);
-            // 修复旧版本的ID (Thresh_Hero -> Thresh, Katarina_Hero -> Katarina)
-            saved = saved.map(id => {
-                if (id === 'Thresh_Hero') return 'Thresh';
+                let saved = JSON.parse(d);
+        // 修复旧版本的ID (Thresh_Hero -> Thresh, Katarina_Hero -> Katarina)
+        saved = saved.map(id => {
+            if (id === 'Thresh_Hero') return 'Thresh';
                 if (id === 'Katarina_Hero') return 'Katarina';
                 return id;
-            });
-            return saved;
-        } catch {
-            return Object.keys(CHAMPION_POOL);
-        }
-    });
-    const [hasSave, setHasSave] = useState(false);
-    const [showUpdateLog, setShowUpdateLog] = useState(() => {
-        const lastVersion = localStorage.getItem('last_version');
-        return lastVersion !== 'v0.8.0';
-    });
-    const [loginComplete, setLoginComplete] = useState(false);
-    const [currentUser, setCurrentUser] = useState(null);
-    const [showDeadEndPrompt, setShowDeadEndPrompt] = useState(false);
-    const [bgmStarted, setBgmStarted] = useState(false);
+        });
+                return saved;
+    } catch {
+        return Object.keys(CHAMPION_POOL);
+    }
+});
+                const [hasSave, setHasSave] = useState(false);
+const [showUpdateLog, setShowUpdateLog] = useState(() => {
+    const lastVersion = localStorage.getItem('last_version');
+                return lastVersion !== 'v0.8.0';
+});
+                const [loginComplete, setLoginComplete] = useState(false);
+                const [currentUser, setCurrentUser] = useState(null);
+                const [showDeadEndPrompt, setShowDeadEndPrompt] = useState(false);
+                const [bgmStarted, setBgmStarted] = useState(false);
 
-    const getSaveKey = (user) => user ? `${SAVE_KEY}_${user.email}` : SAVE_KEY;
+const getSaveKey = (user) => user ? `${SAVE_KEY}_${user.email}` : SAVE_KEY;
 
-    const serializeMapData = () => {
-        const serializable = {
-            ...mapData,
-            nodeMap: mapData.nodeMap instanceof Map
+const serializeMapData = () => {
+    const serializable = {
+                    ...mapData,
+                    nodeMap: mapData.nodeMap instanceof Map
                 ? Object.fromEntries(mapData.nodeMap)
                 : mapData.nodeMap
-        };
-        return serializable;
     };
+                return serializable;
+};
 
-    const applySaveData = (data) => {
-        if (!data) return;
-        const restoredMapData = { ...data.mapData };
-        if (restoredMapData.nodeMap && !(restoredMapData.nodeMap instanceof Map)) {
-            restoredMapData.nodeMap = new Map(Object.entries(restoredMapData.nodeMap));
-        } else if (!restoredMapData.nodeMap) {
-            restoredMapData.nodeMap = new Map();
-        }
-        setBgmStarted(true);
-        setMapData(restoredMapData);
-        setCurrentFloor(data.currentFloor);
-        setCurrentAct(data.currentAct || 1);
-        setMasterDeck(data.masterDeck);
-        setChampion(data.champion);
-        setCurrentHp(data.currentHp);
-        setMaxHp(data.maxHp);
-        setGold(data.gold);
-        setRelics(data.relics);
-        setBaseStr(data.baseStr);
-        setActiveNode(data.activeNode);
-        setUsedEnemies(data.usedEnemies);
-        setView(data.view);
-    };
+const applySaveData = (data) => {
+    if (!data) return;
+                const restoredMapData = {...data.mapData};
+                if (restoredMapData.nodeMap && !(restoredMapData.nodeMap instanceof Map)) {
+                    restoredMapData.nodeMap = new Map(Object.entries(restoredMapData.nodeMap));
+    } else if (!restoredMapData.nodeMap) {
+                    restoredMapData.nodeMap = new Map();
+    }
+                setBgmStarted(true);
+                setMapData(restoredMapData);
+                setCurrentFloor(data.currentFloor);
+                setCurrentAct(data.currentAct || 1);
+                setMasterDeck(data.masterDeck);
+                setChampion(data.champion);
+                setCurrentHp(data.currentHp);
+                setMaxHp(data.maxHp);
+                setGold(data.gold);
+                setRelics(data.relics);
+                setBaseStr(data.baseStr);
+                setActiveNode(data.activeNode);
+                setUsedEnemies(data.usedEnemies);
+                setView(data.view);
+};
 
-    const restoreUserSave = (user) => {
-        if (!user) return false;
-        const key = getSaveKey(user);
-        const stored = localStorage.getItem(key);
-        if (stored) {
-            applySaveData(JSON.parse(stored));
-            setHasSave(true);
-            return true;
-        }
-        return false;
-    };
+const restoreUserSave = (user) => {
+    if (!user) return false;
+                const key = getSaveKey(user);
+                const stored = localStorage.getItem(key);
+                if (stored) {
+                    applySaveData(JSON.parse(stored));
+                setHasSave(true);
+                return true;
+    }
+                return false;
+};
 
-    const hasAvailableNeighbors = (nodesSnapshot = mapData.nodes, gridSnapshot = mapData.grid, totalFloors = mapData.totalFloors || 10) => {
-        if (!activeNode) return true; // 起点默认可选
-        const neighbors = getHexNeighbors(activeNode.row, activeNode.col, totalFloors, gridSnapshot?.[0]?.length || 11);
-        const availableNeighbors = neighbors
-            .map(([r, c]) => gridSnapshot?.[r]?.[c])
-            .filter(n => {
-                if (!n || n.explored) return false;
+const hasAvailableNeighbors = (nodesSnapshot = mapData.nodes, gridSnapshot = mapData.grid, totalFloors = mapData.totalFloors || 10) => {
+    if (!activeNode) return true; // 起点默认可选
+                const neighbors = getHexNeighbors(activeNode.row, activeNode.col, totalFloors, gridSnapshot?.[0]?.length || 11);
+                const availableNeighbors = neighbors
+        .map(([r, c]) => gridSnapshot?.[r]?.[c])
+        .filter(n => {
+            if (!n || n.explored) return false;
                 const nKey = `${n.row}-${n.col}`;
                 if (lockedChoices.has(nKey)) return false;
                 return true;
-            });
-        return availableNeighbors.length > 0;
-    };
-
-    useEffect(() => {
-        const storedUser = authService.getCurrentUser();
-        if (!storedUser) return;
-        setCurrentUser(storedUser);
-        const restored = restoreUserSave(storedUser);
-        setLoginComplete(true);
-        if (!restored) {
-            setView('CHAMPION_SELECT');
-        }
-    }, []);
-
-    useEffect(() => {
-        const key = getSaveKey(currentUser);
-        setHasSave(Boolean(localStorage.getItem(key)));
-    }, [currentUser]);
-
-    useEffect(() => {
-        if (['MENU', 'CHAMPION_SELECT', 'GAMEOVER', 'VICTORY_ALL'].includes(view)) return;
-        const serializableMapData = serializeMapData();
-        const key = getSaveKey(currentUser);
-        localStorage.setItem(key, JSON.stringify({ view, mapData: serializableMapData, currentFloor, currentAct, masterDeck, champion, currentHp, maxHp, gold, relics, baseStr, activeNode, usedEnemies }));
-    }, [view, currentHp, gold, currentFloor, currentAct, champion, masterDeck, relics, baseStr, activeNode, usedEnemies, currentUser]);
-
-    const handleContinue = async () => {
-        await unlockAudio();
-        const s = localStorage.getItem(getSaveKey(currentUser));
-        if (s) {
-            const data = JSON.parse(s);
-            applySaveData(data);
-        }
-    };
-
-    const handleNewGame = async () => {
-        await unlockAudio(); // 解锁音频
-        localStorage.removeItem(SAVE_KEY);
-        if (currentUser) {
-            localStorage.removeItem(getSaveKey(currentUser));
-        }
-        setHasSave(false);
-        setBgmStarted(true); // 立即启动BGM
-        setView('CHAMPION_SELECT');
-    };
-
-    const handleLoginSuccess = async (user) => {
-        setCurrentUser(user);
-        const restored = restoreUserSave(user);
-        if (!restored) {
-            await handleNewGame();
-        }
-        setLoginComplete(true);
-    };
-
-    const handleLogout = () => {
-        authService.logout();
-        setCurrentUser(null);
-        setLoginComplete(false);
-        setView('MENU');
-        setHasSave(false);
-        setMapData({ grid: [], nodes: [], nodeMap: new Map() });
-        setChampion(null);
-    };
-
-    const handleRestartMap = () => {
-        if (!window.confirm('检测到死胡同，重新生成地图会清除当前进度。是否继续？')) return;
-        const resetMap = generateGridMap(currentAct, []);
-        setMapData(resetMap);
-        if (resetMap.startNode) {
-            setActiveNode(resetMap.startNode);
-        }
-        setLockedChoices(new Set());
-        setShowDeadEndPrompt(!hasAvailableNeighbors(resetMap.nodes, resetMap.grid, resetMap.totalFloors));
-        setView('MAP');
-    };
-
-    const handleChampionSelect = (selectedChamp) => {
-        // 播放英雄语音
-        playChampionVoice(selectedChamp.id);
-        setChampion(selectedChamp);
-        setMaxHp(selectedChamp.maxHp);
-        setCurrentHp(selectedChamp.maxHp);
-        setMasterDeck([...STARTING_DECK_BASIC, ...selectedChamp.initialCards]);
-        setRelics([RELIC_DATABASE[selectedChamp.relicId].id]);
-        setBaseStr(0);
-        setGold(0);
-
-        // 使用v4地图生成器（带死胡同检测和三选一机制）
-        const newMapData = generateGridMap(1, []); // act=1, usedEnemies=[]
-        setMapData(newMapData);
-        setShowDeadEndPrompt(!hasAvailableNeighbors(newMapData.nodes, newMapData.grid, newMapData.totalFloors));
-
-        // 设置初始activeNode为startNode
-        if (newMapData.startNode) {
-            setActiveNode(newMapData.startNode);
-        }
-
-        setCurrentFloor(0);
-        setCurrentAct(1);
-        setUsedEnemies([]);
-        setLockedChoices(new Set()); // 清空锁定选项
-        setView('MAP');
-    };
-
-    const completeNode = () => {
-        if (!activeNode || !mapData || !mapData.nodes) return;
-
-        // v4自由探索系统：标记当前节点为已探索
-        const newNodes = [...mapData.nodes];
-        const idx = newNodes.findIndex(n => n.row === activeNode.row && n.col === activeNode.col);
-        if (idx === -1) return;
-
-        // 标记为已探索（不再使用status，使用explored属性）
-        newNodes[idx].explored = true;
-        newNodes[idx].status = 'COMPLETED';
-
-        // 更新mapData（保持grid和nodes同步）
-        const newGrid = mapData.grid ? mapData.grid.map(row => [...row]) : [];
-        newNodes.forEach(node => {
-            if (newGrid[node.row] && newGrid[node.row][node.col]) {
-                newGrid[node.row][node.col] = node;
-            }
         });
+    return availableNeighbors.length > 0;
+};
 
-        setMapData({ ...mapData, grid: newGrid, nodes: newNodes });
-        setShowDeadEndPrompt(!hasAvailableNeighbors(newNodes, newGrid, mapData.totalFloors || 10));
+useEffect(() => {
+    const storedUser = authService.getCurrentUser();
+                if (!storedUser) return;
+                setCurrentUser(storedUser);
+                const restored = restoreUserSave(storedUser);
+                setLoginComplete(true);
+                if (!restored) {
+                    setView('CHAMPION_SELECT');
+    }
+}, []);
 
-        // 注意：不清空锁定选项，锁定的选项应该永久锁定
-        // 只有在移动到新节点时，才会重新计算可用选项（但已锁定的选项仍然锁定）
+useEffect(() => {
+    const key = getSaveKey(currentUser);
+                setHasSave(Boolean(localStorage.getItem(key)));
+}, [currentUser]);
 
-        // 检查是否到达BOSS
-        if (activeNode.type === 'BOSS') {
-            // 章节通关逻辑
-            if (currentAct < 3) {
-                const nextAct = currentAct + 1;
+useEffect(() => {
+    if (['MENU', 'CHAMPION_SELECT', 'GAMEOVER', 'VICTORY_ALL'].includes(view)) return;
+                const serializableMapData = serializeMapData();
+                const key = getSaveKey(currentUser);
+                localStorage.setItem(key, JSON.stringify({view, mapData: serializableMapData, currentFloor, currentAct, masterDeck, champion, currentHp, maxHp, gold, relics, baseStr, activeNode, usedEnemies }));
+}, [view, currentHp, gold, currentFloor, currentAct, champion, masterDeck, relics, baseStr, activeNode, usedEnemies, currentUser]);
+
+const handleContinue = async () => {
+                    await unlockAudio();
+                const s = localStorage.getItem(getSaveKey(currentUser));
+                if (s) {
+        const data = JSON.parse(s);
+                applySaveData(data);
+    }
+};
+
+const handleNewGame = async () => {
+                    await unlockAudio(); // 解锁音频
+                localStorage.removeItem(SAVE_KEY);
+                if (currentUser) {
+                    localStorage.removeItem(getSaveKey(currentUser));
+    }
+                setHasSave(false);
+                setBgmStarted(true); // 立即启动BGM
+                setView('CHAMPION_SELECT');
+};
+
+const handleLoginSuccess = async (user) => {
+                    setCurrentUser(user);
+                const restored = restoreUserSave(user);
+                if (!restored) {
+                    await handleNewGame();
+    }
+                setLoginComplete(true);
+};
+
+const handleLogout = () => {
+                    authService.logout();
+                setCurrentUser(null);
+                setLoginComplete(false);
+                setView('MENU');
+                setHasSave(false);
+                setMapData({grid: [], nodes: [], nodeMap: new Map() });
+                setChampion(null);
+};
+
+const handleRestartMap = () => {
+    if (!window.confirm('检测到死胡同，重新生成地图会清除当前进度。是否继续？')) return;
+                const resetMap = generateGridMap(currentAct, []);
+                setMapData(resetMap);
+                if (resetMap.startNode) {
+                    setActiveNode(resetMap.startNode);
+    }
+                setLockedChoices(new Set());
+                setShowDeadEndPrompt(!hasAvailableNeighbors(resetMap.nodes, resetMap.grid, resetMap.totalFloors));
+                setView('MAP');
+};
+
+const handleChampionSelect = (selectedChamp) => {
+                    // 播放英雄语音
+                    playChampionVoice(selectedChamp.id);
+                setChampion(selectedChamp);
+                setMaxHp(selectedChamp.maxHp);
+                setCurrentHp(selectedChamp.maxHp);
+                setMasterDeck([...STARTING_DECK_BASIC, ...selectedChamp.initialCards]);
+                setRelics([RELIC_DATABASE[selectedChamp.relicId].id]);
+                setBaseStr(0);
+                setGold(0);
+
+                // 使用v4地图生成器（带死胡同检测和三选一机制）
+                const newMapData = generateGridMap(1, []); // act=1, usedEnemies=[]
+                setMapData(newMapData);
+                setShowDeadEndPrompt(!hasAvailableNeighbors(newMapData.nodes, newMapData.grid, newMapData.totalFloors));
+
+                // 设置初始activeNode为startNode
+                if (newMapData.startNode) {
+                    setActiveNode(newMapData.startNode);
+    }
+
+                setCurrentFloor(0);
+                setCurrentAct(1);
+                setUsedEnemies([]);
+                setLockedChoices(new Set()); // 清空锁定选项
+                setView('MAP');
+};
+
+const completeNode = () => {
+    if (!activeNode || !mapData || !mapData.nodes) return;
+
+                // v4自由探索系统：标记当前节点为已探索
+                const newNodes = [...mapData.nodes];
+    const idx = newNodes.findIndex(n => n.row === activeNode.row && n.col === activeNode.col);
+                if (idx === -1) return;
+
+                // 标记为已探索（不再使用status，使用explored属性）
+                newNodes[idx].explored = true;
+                newNodes[idx].status = 'COMPLETED';
+
+    // 更新mapData（保持grid和nodes同步）
+    const newGrid = mapData.grid ? mapData.grid.map(row => [...row]) : [];
+    newNodes.forEach(node => {
+        if (newGrid[node.row] && newGrid[node.row][node.col]) {
+                    newGrid[node.row][node.col] = node;
+        }
+    });
+
+                setMapData({...mapData, grid: newGrid, nodes: newNodes });
+                setShowDeadEndPrompt(!hasAvailableNeighbors(newNodes, newGrid, mapData.totalFloors || 10));
+
+                // 注意：不清空锁定选项，锁定的选项应该永久锁定
+                // 只有在移动到新节点时，才会重新计算可用选项（但已锁定的选项仍然锁定）
+
+                // 检查是否到达BOSS
+                if (activeNode.type === 'BOSS') {
+        // 章节通关逻辑
+        if (currentAct < 3) {
+            const nextAct = currentAct + 1;
                 setCurrentAct(nextAct);
                 setCurrentFloor(0);
                 const nextMapData = generateGridMap(nextAct, []); // v4生成器
@@ -782,223 +963,223 @@ export default function LegendsOfTheSpire() {
                 setShowDeadEndPrompt(!hasAvailableNeighbors(nextMapData.nodes, nextMapData.grid, nextMapData.totalFloors));
                 if (nextMapData.startNode) {
                     setActiveNode(nextMapData.startNode);
-                }
+            }
                 // 清空锁定选项
                 setLockedChoices(new Set());
                 // 章节奖励：回复 50% 生命
                 setCurrentHp(Math.min(maxHp, currentHp + Math.floor(maxHp * 0.5)));
                 alert(`第 ${currentAct} 章通关！进入下一章...`);
                 setView('MAP');
-            } else {
-                // 游戏通关
-                const allIds = Object.keys(CHAMPION_POOL);
-                const locked = allIds.filter(id => !unlockedChamps.includes(id));
-                if (locked.length > 0) {
-                    const newUnlock = locked[Math.floor(Math.random() * locked.length)];
-                    const updated = [...unlockedChamps, newUnlock];
-                    setUnlockedChamps(updated);
-                    localStorage.setItem(UNLOCK_KEY, JSON.stringify(updated));
-                    alert(`恭喜通关！新英雄解锁: ${CHAMPION_POOL[newUnlock].name}`);
-                }
+        } else {
+            // 游戏通关
+            const allIds = Object.keys(CHAMPION_POOL);
+            const locked = allIds.filter(id => !unlockedChamps.includes(id));
+            if (locked.length > 0) {
+                const newUnlock = locked[Math.floor(Math.random() * locked.length)];
+                const updated = [...unlockedChamps, newUnlock];
+                setUnlockedChamps(updated);
+                localStorage.setItem(UNLOCK_KEY, JSON.stringify(updated));
+                alert(`恭喜通关！新英雄解锁: ${CHAMPION_POOL[newUnlock].name}`);
+            }
                 localStorage.removeItem(SAVE_KEY);
                 setView('VICTORY_ALL');
-            }
-        } else {
-            // 继续探索，返回地图视图
-            setView('MAP');
         }
-    };
+    } else {
+                    // 继续探索，返回地图视图
+                    setView('MAP');
+    }
+};
 
-    const handleNodeSelect = (node) => {
-        // v4自由探索系统：基于六边形邻接规则，不依赖DAG
-        // 三选一机制：当玩家选择一个节点后，锁定其他选项
+const handleNodeSelect = (node) => {
+    // v4自由探索系统：基于六边形邻接规则，不依赖DAG
+    // 三选一机制：当玩家选择一个节点后，锁定其他选项
 
-        if (!activeNode) {
-            // 起点：只能选择起点本身
-            if (node.row !== mapData.startNode?.row || node.col !== mapData.startNode?.col) return;
-        } else {
-            // 检查节点是否在已锁定的选项中
-            const nodeKey = `${node.row}-${node.col}`;
-            if (lockedChoices.has(nodeKey)) {
-                return; // 已锁定的选项不能选择
-            }
+    if (!activeNode) {
+        // 起点：只能选择起点本身
+        if (node.row !== mapData.startNode?.row || node.col !== mapData.startNode?.col) return;
+    } else {
+        // 检查节点是否在已锁定的选项中
+        const nodeKey = `${node.row}-${node.col}`;
+                if (lockedChoices.has(nodeKey)) {
+            return; // 已锁定的选项不能选择
+        }
 
-            // 获取当前节点的所有未探索邻居（排除已锁定的选项）
-            const neighbors = getHexNeighbors(activeNode.row, activeNode.col, mapData.totalFloors || 10, mapData.grid?.[0]?.length || 11);
-            const availableNeighbors = neighbors
-                .map(([r, c]) => mapData.grid?.[r]?.[c])
-                .filter(n => {
-                    if (!n || n.explored) return false;
-                    // 排除已锁定的选项
-                    const nKey = `${n.row}-${n.col}`;
-                    if (lockedChoices.has(nKey)) return false;
-                    return true;
-                });
+                // 获取当前节点的所有未探索邻居（排除已锁定的选项）
+                const neighbors = getHexNeighbors(activeNode.row, activeNode.col, mapData.totalFloors || 10, mapData.grid?.[0]?.length || 11);
+                const availableNeighbors = neighbors
+            .map(([r, c]) => mapData.grid?.[r]?.[c])
+            .filter(n => {
+                if (!n || n.explored) return false;
+                // 排除已锁定的选项
+                const nKey = `${n.row}-${n.col}`;
+                if (lockedChoices.has(nKey)) return false;
+                return true;
+            });
 
-            // 检查选择的节点是否是可用邻居
-            const isNeighbor = availableNeighbors.some(n => n.row === node.row && n.col === node.col);
-            if (!isNeighbor) {
-                return; // 不是可用邻居，不能选择
-            }
+        // 检查选择的节点是否是可用邻居
+        const isNeighbor = availableNeighbors.some(n => n.row === node.row && n.col === node.col);
+                if (!isNeighbor) {
+            return; // 不是可用邻居，不能选择
+        }
 
-            // 【关键修复】三选一锁定逻辑：只锁定UI实际显示的3个选项中的未选择选项
-            // 必须与GridMapView_v3.jsx的getAvailableNodes()逻辑完全一致
-            let displayedChoices = availableNeighbors;
-            if (availableNeighbors.length > 3) {
-                // 使用与UI相同的排序和哈希逻辑
-                const sorted = [...availableNeighbors].sort((a, b) => {
-                    const seedA = `${a.row}-${a.col}`;
-                    const seedB = `${b.row}-${b.col}`;
-                    return seedA.localeCompare(seedB);
-                });
+                // 【关键修复】三选一锁定逻辑：只锁定UI实际显示的3个选项中的未选择选项
+                // 必须与GridMapView_v3.jsx的getAvailableNodes()逻辑完全一致
+                let displayedChoices = availableNeighbors;
+        if (availableNeighbors.length > 3) {
+            // 使用与UI相同的排序和哈希逻辑
+            const sorted = [...availableNeighbors].sort((a, b) => {
+                const seedA = `${a.row}-${a.col}`;
+                const seedB = `${b.row}-${b.col}`;
+                return seedA.localeCompare(seedB);
+            });
                 const hash = (activeNode.row * 1000 + activeNode.col) % sorted.length;
                 displayedChoices = [];
                 for (let i = 0; i < 3; i++) {
                     displayedChoices.push(sorted[(hash + i) % sorted.length]);
-                }
             }
+        }
 
-            // 只锁定UI显示的3个选项中的未选择选项
-            const newLockedChoices = new Set(lockedChoices);
-            displayedChoices.forEach(n => {
-                if (n.row !== node.row || n.col !== node.col) {
+                // 只锁定UI显示的3个选项中的未选择选项
+                const newLockedChoices = new Set(lockedChoices);
+        displayedChoices.forEach(n => {
+            if (n.row !== node.row || n.col !== node.col) {
                     newLockedChoices.add(`${n.row}-${n.col}`);
-                }
-            });
-            setLockedChoices(newLockedChoices);
-        }
+            }
+        });
+                setLockedChoices(newLockedChoices);
+    }
 
-        setActiveNode(node);
-        setCurrentFloor(node.row);
+                setActiveNode(node);
+                setCurrentFloor(node.row);
 
-        switch (node.type) {
-            case 'BATTLE': case 'BOSS': setView('COMBAT'); break;
-            case 'REST': setView('REST'); break;
-            case 'SHOP': setView('SHOP'); break;
-            case 'EVENT': setView('EVENT'); break;
-            case 'CHEST': setView('CHEST'); break;
-            default: break;
-        }
-    };
+                switch (node.type) {
+        case 'BATTLE': case 'BOSS': setView('COMBAT'); break;
+                case 'REST': setView('REST'); break;
+                case 'SHOP': setView('SHOP'); break;
+                case 'EVENT': setView('EVENT'); break;
+                case 'CHEST': setView('CHEST'); break;
+                default: break;
+    }
+};
 
-    // Toast通知系统
-    const showToast = (message, type = 'default') => {
-        const id = Date.now();
-        setToasts(prev => [...prev, { id, message, type }]);
-        setTimeout(() => {
-            setToasts(prev => prev.filter(t => t.id !== id));
-        }, 3000);
-    };
+// Toast通知系统
+const showToast = (message, type = 'default') => {
+    const id = Date.now();
+    setToasts(prev => [...prev, {id, message, type}]);
+    setTimeout(() => {
+                    setToasts(prev => prev.filter(t => t.id !== id));
+    }, 3000);
+};
 
-    const handleBattleWin = (battleResult) => {
-        // 处理战斗结果（可能是旧格式的remainingHp数字，也可能是新格式的对象）
-        const result = typeof battleResult === 'number'
-            ? { finalHp: battleResult, gainedStr: 0, gainedMaxHp: 0 }
-            : battleResult;
+const handleBattleWin = (battleResult) => {
+    // 处理战斗结果（可能是旧格式的remainingHp数字，也可能是新格式的对象）
+    const result = typeof battleResult === 'number'
+                ? {finalHp: battleResult, gainedStr: 0, gainedMaxHp: 0 }
+                : battleResult;
 
-        console.log('[战斗胜利] battleResult:', result); // 调试日志
-        console.log('[当前属性] baseStr:', baseStr, 'maxHp:', maxHp); // 调试日志
+                console.log('[战斗胜利] battleResult:', result); // 调试日志
+                console.log('[当前属性] baseStr:', baseStr, 'maxHp:', maxHp); // 调试日志
 
-        // 盖伦被动：战斗结束恢复HP
-        let passiveHeal = champion.relicId === "GarenPassive" ? 6 : 0;
+                // 盖伦被动：战斗结束恢复HP
+                let passiveHeal = champion.relicId === "GarenPassive" ? 6 : 0;
 
-        // 内瑟斯被动：将战斗中获得的力量永久化
-        if (result.gainedStr > 0) {
-            console.log('[内瑟斯] 永久力量增长:', result.gainedStr, '→', baseStr + result.gainedStr); // 调试日志
-            setBaseStr(prev => prev + result.gainedStr);
-            showToast(`永久力量 +${result.gainedStr}`, 'strength');
-        }
+    // 内瑟斯被动：将战斗中获得的力量永久化
+    if (result.gainedStr > 0) {
+                    console.log('[内瑟斯] 永久力量增长:', result.gainedStr, '→', baseStr + result.gainedStr); // 调试日志
+        setBaseStr(prev => prev + result.gainedStr);
+                showToast(`永久力量 +${result.gainedStr}`, 'strength');
+    }
 
-        // 锤石被动：永久增加最大生命值
-        if (result.gainedMaxHp > 0) {
-            console.log('[锤石] 最大HP增长:', result.gainedMaxHp, '→', maxHp + result.gainedMaxHp); // 调试日志
-            setMaxHp(prev => prev + result.gainedMaxHp);
-            passiveHeal += result.gainedMaxHp; // 最大HP增长也算作恢复
-            showToast(`最大生命值 +${result.gainedMaxHp}`, 'maxHp');
-        }
+    // 锤石被动：永久增加最大生命值
+    if (result.gainedMaxHp > 0) {
+                    console.log('[锤石] 最大HP增长:', result.gainedMaxHp, '→', maxHp + result.gainedMaxHp); // 调试日志
+        setMaxHp(prev => prev + result.gainedMaxHp);
+                passiveHeal += result.gainedMaxHp; // 最大HP增长也算作恢复
+                showToast(`最大生命值 +${result.gainedMaxHp}`, 'maxHp');
+    }
 
-        // 卡牌大师被动：战斗胜利额外金币
-        if (champion && champion.relicId === "TwistedFatePassive") {
-            console.log('[卡牌大师] 获得额外金币: +15'); // 调试日志
-            setGold(prev => prev + 15);
-            showToast('灌铅骰子: +15 金币', 'gold');
-        }
+                // 卡牌大师被动：战斗胜利额外金币
+                if (champion && champion.relicId === "TwistedFatePassive") {
+                    console.log('[卡牌大师] 获得额外金币: +15'); // 调试日志
+        setGold(prev => prev + 15);
+                showToast('灌铅骰子: +15 金币', 'gold');
+    }
 
-        setCurrentHp(Math.min(maxHp + (result.gainedMaxHp || 0), result.finalHp + passiveHeal));
-        setView('REWARD');
-    };
-    const handleBuyCard = (card) => { setGold(prev => prev - card.price); setMasterDeck(prev => [...prev, card.id]); };
-    const handleRelicReward = (relic) => { setRelics(prev => [...prev, relic.id]); if (relic.onPickup) { const ns = relic.onPickup({ maxHp, currentHp }); setMaxHp(ns.maxHp); setCurrentHp(ns.currentHp); } completeNode(); };
-    const handleBuyRelic = (relic) => { setGold(prev => prev - relic.price); handleRelicReward(relic); };
-    const handleEventReward = (reward) => {
-        if (reward.type === 'BUFF' && reward.stat === 'strength') setBaseStr(prev => prev + reward.value);
-        if (reward.type === 'RELIC_RANDOM') { const pool = Object.values(RELIC_DATABASE).filter(r => r.rarity !== 'PASSIVE' && !relics.includes(r.id)); if (pool.length > 0) handleRelicReward(shuffle(pool)[0]); }
-        if (reward.type === 'UPGRADE_RANDOM') {
-            // 随机升级一张卡
-            const upgradableIndices = masterDeck.map((id, idx) => !id.endsWith('+') ? idx : -1).filter(i => i !== -1);
-            if (upgradableIndices.length > 0) {
-                const randomIdx = upgradableIndices[Math.floor(Math.random() * upgradableIndices.length)];
+                setCurrentHp(Math.min(maxHp + (result.gainedMaxHp || 0), result.finalHp + passiveHeal));
+                setView('REWARD');
+};
+const handleBuyCard = (card) => {setGold(prev => prev - card.price); setMasterDeck(prev => [...prev, card.id]); };
+const handleRelicReward = (relic) => {setRelics(prev => [...prev, relic.id]); if (relic.onPickup) { const ns = relic.onPickup({maxHp, currentHp}); setMaxHp(ns.maxHp); setCurrentHp(ns.currentHp); } completeNode(); };
+const handleBuyRelic = (relic) => {setGold(prev => prev - relic.price); handleRelicReward(relic); };
+const handleEventReward = (reward) => {
+    if (reward.type === 'BUFF' && reward.stat === 'strength') setBaseStr(prev => prev + reward.value);
+                if (reward.type === 'RELIC_RANDOM') { const pool = Object.values(RELIC_DATABASE).filter(r => r.rarity !== 'PASSIVE' && !relics.includes(r.id)); if (pool.length > 0) handleRelicReward(shuffle(pool)[0]); }
+                if (reward.type === 'UPGRADE_RANDOM') {
+        // 随机升级一张卡
+        const upgradableIndices = masterDeck.map((id, idx) => !id.endsWith('+') ? idx : -1).filter(i => i !== -1);
+        if (upgradableIndices.length > 0) {
+            const randomIdx = upgradableIndices[Math.floor(Math.random() * upgradableIndices.length)];
                 const newDeck = [...masterDeck];
                 newDeck[randomIdx] = newDeck[randomIdx] + '+';
                 setMasterDeck(newDeck);
-            }
         }
-        completeNode();
-    };
-    const handleCardReward = (cardId) => { setMasterDeck([...masterDeck, cardId]); setGold(gold + 50); completeNode(); };
+    }
+                completeNode();
+};
+const handleCardReward = (cardId) => {setMasterDeck([...masterDeck, cardId]); setGold(gold + 50); completeNode(); };
 
-    const handleUpgradeCard = (cardId) => {
-        // 升级指定卡牌（找到第一个匹配的未升级版本）
-        const idx = masterDeck.findIndex(id => id === cardId);
-        if (idx !== -1) {
-            const newDeck = [...masterDeck];
-            newDeck[idx] = cardId + '+';
-            setMasterDeck(newDeck);
-            setGold(prev => prev - 100);
-        }
-    };
+const handleUpgradeCard = (cardId) => {
+    // 升级指定卡牌（找到第一个匹配的未升级版本）
+    const idx = masterDeck.findIndex(id => id === cardId);
+                if (idx !== -1) {
+        const newDeck = [...masterDeck];
+                newDeck[idx] = cardId + '+';
+                setMasterDeck(newDeck);
+        setGold(prev => prev - 100);
+    }
+};
 
-    const handleBuyMana = () => {
-        // 增加最大法力值 (这里需要 GameState 支持，或者由 Relic 实现，简化起见，我们添加一个特殊的被动遗物)
-        // 由于没有直接的 maxMana 状态（写死在 BattleScene），我们需要通过遗物来修改
-        // 或者在 App 中添加 maxMana 状态传给 BattleScene
-        // 这里简单实现：添加一个隐藏遗物 "ManaGem"
-        setRelics(prev => [...prev, "ManaGem"]);
-        setGold(prev => prev - 200);
-    };
+const handleBuyMana = () => {
+                    // 增加最大法力值 (这里需要 GameState 支持，或者由 Relic 实现，简化起见，我们添加一个特殊的被动遗物)
+                    // 由于没有直接的 maxMana 状态（写死在 BattleScene），我们需要通过遗物来修改
+                    // 或者在 App 中添加 maxMana 状态传给 BattleScene
+                    // 这里简单实现：添加一个隐藏遗物 "ManaGem"
+                    setRelics(prev => [...prev, "ManaGem"]);
+    setGold(prev => prev - 200);
+};
 
-    const handleSkipReward = () => { setGold(gold + 50); completeNode(); };
-    const handleRest = () => { setCurrentHp(Math.min(maxHp, currentHp + Math.floor(maxHp * 0.3))); completeNode(); };
+const handleSkipReward = () => {setGold(gold + 50); completeNode(); };
+const handleRest = () => {setCurrentHp(Math.min(maxHp, currentHp + Math.floor(maxHp * 0.3))); completeNode(); };
 
-    const restartGame = () => { setView('CHAMPION_SELECT'); setMasterDeck([]); setCurrentHp(80); setMaxHp(80); setGold(100); setRelics([]); setBaseStr(0); setChampion(null); setUsedEnemies([]); };
-    const getCurrentBgm = () => (view === 'COMBAT' ? BGM_BATTLE_URL : BGM_MAP_URL);
-    const playSfx = (type) => {
-        const url = SFX[type] || SFX.ATTACK;
-        if (!url) return;
-        const audio = new Audio(url);
-        // 根据音效类型调整音量
-        if (type === 'ATTACK_SWING' || type === 'ATTACK_HIT') {
-            audio.volume = 0.5;
-        } else if (type === 'BLOCK_SHIELD') {
-            audio.volume = 0.4;
-        } else if (type === 'HIT_TAKEN') {
-            audio.volume = 0.6;
-        } else {
-            audio.volume = 0.4;
-        }
-        audio.play().catch(() => { });
-    };
-    const playChampionVoice = (championKey) => {
-        if (!championKey) return;
-        const voiceUrl = `${VOICE_URL}/${championKey}.ogg`;
-        const audio = new Audio(voiceUrl);
-        audio.volume = 0.6;
-        audio.play().catch(e => console.log("Champion voice play failed", e));
-    };
+const restartGame = () => {setView('CHAMPION_SELECT'); setMasterDeck([]); setCurrentHp(80); setMaxHp(80); setGold(100); setRelics([]); setBaseStr(0); setChampion(null); setUsedEnemies([]); };
+const getCurrentBgm = () => (view === 'COMBAT' ? BGM_BATTLE_URL : BGM_MAP_URL);
+const playSfx = (type) => {
+    const url = SFX[type] || SFX.ATTACK;
+                if (!url) return;
+                const audio = new Audio(url);
+                // 根据音效类型调整音量
+                if (type === 'ATTACK_SWING' || type === 'ATTACK_HIT') {
+                    audio.volume = 0.5;
+    } else if (type === 'BLOCK_SHIELD') {
+                    audio.volume = 0.4;
+    } else if (type === 'HIT_TAKEN') {
+                    audio.volume = 0.6;
+    } else {
+                    audio.volume = 0.4;
+    }
+    audio.play().catch(() => { });
+};
+const playChampionVoice = (championKey) => {
+    if (!championKey) return;
+                const voiceUrl = `${VOICE_URL}/${championKey}.ogg`;
+                const audio = new Audio(voiceUrl);
+                audio.volume = 0.6;
+    audio.play().catch(e => console.log("Champion voice play failed", e));
+};
 
-    const renderView = () => {
-        switch (view) {
-            case 'MENU': return (
+const renderView = () => {
+    switch (view) {
+        case 'MENU': return (
                 <div className="h-screen w-full bg-slate-900 flex flex-col items-center justify-center text-white bg-[url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ryze_0.jpg')] bg-cover bg-center">
                     <div className="absolute inset-0 bg-black/60"></div>
                     <div className="z-10 text-center"><h1 className="text-8xl font-black text-[#C8AA6E] mb-8 drop-shadow-lg tracking-widest">峡谷尖塔</h1><div className="flex flex-col gap-4 w-64 mx-auto">{hasSave && (<button onClick={handleContinue} className="px-8 py-4 bg-[#0AC8B9] hover:bg-white hover:text-[#0AC8B9] text-black font-bold rounded flex items-center justify-center gap-2 transition-all"><Play fill="currentColor" /> 继续征程</button>)}<button onClick={handleNewGame} className="px-8 py-4 border-2 border-[#C8AA6E] hover:bg-[#C8AA6E] hover:text-black text-[#C8AA6E] font-bold rounded flex items-center justify-center gap-2 transition-all"><RotateCcw /> 新游戏</button></div><p className="mt-8 text-slate-400 text-sm">v0.8.0 Beta</p></div>
@@ -1047,9 +1228,9 @@ export default function LegendsOfTheSpire() {
                         </div>
                     )}
                 </div>
-            );
-            case 'CHAMPION_SELECT': return <ChampionSelect onChampionSelect={handleChampionSelect} unlockedIds={unlockedChamps} currentUser={currentUser} />;
-            case 'MAP': return (
+                );
+                case 'CHAMPION_SELECT': return <ChampionSelect onChampionSelect={handleChampionSelect} unlockedIds={unlockedChamps} currentUser={currentUser} />;
+                case 'MAP': return (
                 <div className="relative w-full h-full">
                     {/* [DEV ONLY] 跳关调试按钮 */}
                     <div className="absolute top-20 left-1/2 -translate-x-1/2 z-[100] flex gap-2">
@@ -1083,146 +1264,153 @@ export default function LegendsOfTheSpire() {
                     </div>
                     <GridMapView_v3 mapData={mapData} onNodeSelect={handleNodeSelect} currentFloor={currentFloor} act={currentAct} activeNode={activeNode} lockedChoices={lockedChoices} />
                 </div>
-            );
-            case 'SHOP': return <ShopView gold={gold} deck={masterDeck} relics={relics} onLeave={() => completeNode()} onBuyCard={handleBuyCard} onBuyRelic={handleBuyRelic} onUpgradeCard={handleUpgradeCard} onBuyMana={handleBuyMana} championName={champion.name} />;
-            case 'EVENT': return <EventView onLeave={() => completeNode()} onReward={handleEventReward} />;
-            case 'CHEST': return <ChestView onLeave={() => completeNode()} onRelicReward={handleRelicReward} relics={relics} act={currentAct} />;
-            case 'COMBAT': return champion ? <BattleScene heroData={{ ...champion, maxHp, currentHp, relics, baseStr }} enemyId={activeNode?.enemyId} initialDeck={masterDeck} onWin={handleBattleWin} onLose={() => { localStorage.removeItem(SAVE_KEY); setView('GAMEOVER'); }} floorIndex={currentFloor} act={currentAct} /> : <div>Loading...</div>;
-            case 'REWARD': return <RewardView goldReward={50} onCardSelect={handleCardReward} onSkip={handleSkipReward} championName={champion.name} />;
-            case 'REST': return <RestView onRest={handleRest} />;
-            case 'VICTORY_ALL': return <div className="h-screen w-full bg-[#0AC8B9]/20 flex flex-col items-center justify-center text-white"><h1 className="text-6xl font-bold text-[#0AC8B9]">传奇永不熄灭！</h1><button onClick={() => setView('MENU')} className="mt-8 px-8 py-3 bg-[#0AC8B9] text-black font-bold rounded">回到菜单</button></div>;
-            case 'GAMEOVER': return <div className="h-screen w-full bg-black flex flex-col items-center justify-center text-white"><h1 className="text-6xl font-bold text-red-600">战败</h1><button onClick={() => setView('MENU')} className="mt-8 px-8 py-3 bg-red-800 rounded font-bold">回到菜单</button></div>;
-            default: return <div>Loading...</div>;
-        }
-    };
-
-    if (!loginComplete) {
-        return <LoginView onLogin={handleLoginSuccess} />;
+                );
+                case 'SHOP': return <ShopView gold={gold} deck={masterDeck} relics={relics} onLeave={() => completeNode()} onBuyCard={handleBuyCard} onBuyRelic={handleBuyRelic} onUpgradeCard={handleUpgradeCard} onBuyMana={handleBuyMana} championName={champion.name} />;
+                case 'EVENT': return <EventView onLeave={() => completeNode()} onReward={handleEventReward} />;
+                case 'CHEST': return <ChestView onLeave={() => completeNode()} onRelicReward={handleRelicReward} relics={relics} act={currentAct} />;
+                case 'COMBAT': return champion ? <BattleScene heroData={{ ...champion, maxHp, currentHp, relics, baseStr }} enemyId={activeNode?.enemyId} initialDeck={masterDeck} onWin={handleBattleWin} onLose={() => { localStorage.removeItem(SAVE_KEY); setView('GAMEOVER'); }} floorIndex={currentFloor} act={currentAct} /> : <div>Loading...</div>;
+                case 'REWARD': return <RewardView goldReward={50} onCardSelect={handleCardReward} onSkip={handleSkipReward} championName={champion.name} />;
+                case 'REST': return <RestView onRest={handleRest} />;
+                case 'VICTORY_ALL': return <div className="h-screen w-full bg-[#0AC8B9]/20 flex flex-col items-center justify-center text-white"><h1 className="text-6xl font-bold text-[#0AC8B9]">传奇永不熄灭！</h1><button onClick={() => setView('MENU')} className="mt-8 px-8 py-3 bg-[#0AC8B9] text-black font-bold rounded">回到菜单</button></div>;
+                case 'GAMEOVER': return <div className="h-screen w-full bg-black flex flex-col items-center justify-center text-white"><h1 className="text-6xl font-bold text-red-600">战败</h1><button onClick={() => setView('MENU')} className="mt-8 px-8 py-3 bg-red-800 rounded font-bold">回到菜单</button></div>;
+                default: return <div>Loading...</div>;
     }
+};
 
-    const renderUserPanel = () => {
-        if (!currentUser) return null;
-        return (
-            <div className="absolute top-4 right-28 z-[120] flex items-center gap-3 bg-gradient-to-r from-black/70 to-slate-900/70 px-4 py-2 rounded-full border border-white/20 shadow-[0_0_30px_rgba(0,0,0,0.7)] text-sm text-white">
-                <div className="flex items-center gap-2">
-                    <UserSquare className="w-5 h-5 text-amber-400" />
-                    <div className="flex flex-col text-xs uppercase tracking-[0.3em] text-right">
-                        <span className="font-semibold">{currentUser.username || currentUser.email}</span>
-                        <span className="text-white/60">Authenticated</span>
-                    </div>
-                </div>
-                <button onClick={handleLogout} className="flex items-center gap-1 px-3 py-1 border border-transparent rounded-full bg-white/10 hover:bg-white/30 transition text-xs uppercase tracking-[0.3em]">
-                    <LogOut className="w-3 h-3" />
-                    Logout
-                </button>
-            </div>
-        )
-    };
+                if (!loginComplete) {
+    return <LoginView onLogin={handleLoginSuccess} />;
+}
 
-    const handleResetProgress = () => {
-        if (!currentUser) return;
-        if (!window.confirm('重置会清除该账号现有进度并重新进入选人，请确认继续。')) return;
-        localStorage.removeItem(getSaveKey(currentUser));
-        setHasSave(false);
-        setMapData({ grid: [], nodes: [], nodeMap: new Map() });
-        setActiveNode(null);
-        setChampion(null);
-        setView('CHAMPION_SELECT');
-    };
-
-    // [DEV ONLY] 跳转到指定ACT（测试用）
-    const handleSkipToAct = (targetAct) => {
-        if (!champion) return;
-        setMapData(null); // 触发加载屏幕
-        setTimeout(() => {
-            const newMapData = generateGridMap(targetAct, []);
-            setMapData(newMapData);
-            setShowDeadEndPrompt(!hasAvailableNeighbors(newMapData.nodes, newMapData.grid, newMapData.totalFloors));
-            if (newMapData.startNode) {
-                setActiveNode(newMapData.startNode);
-            }
-            setCurrentAct(targetAct);
-            setCurrentFloor(0);
-            setLockedChoices(new Set());
-            // 恢复一些HP以便测试
-            setCurrentHp(Math.min(maxHp, currentHp + Math.floor(maxHp * 0.5)));
-            setView('MAP');
-        }, 100);
-    };
-
-    return (
-        <div className="relative h-screen w-full bg-[#091428] font-sans select-none overflow-hidden">
-            <AudioPlayer src={bgmStarted || view !== 'MENU' ? getCurrentBgm() : null} />
-            {renderUserPanel()}
-            {view === 'MAP' && showDeadEndPrompt && (
-                <div className="absolute inset-0 z-[110] flex flex-col items-center justify-center bg-black/70 text-white px-6 text-center">
-                    <div className="bg-slate-900/80 border border-red-500/60 p-6 rounded-lg shadow-[0_0_30px_rgba(0,0,0,0.8)] max-w-xl">
-                        <p className="text-lg font-semibold text-red-300 mb-3">死胡同警告</p>
-                        <p className="text-sm text-slate-200 mb-4">
-                            当前地图没有可用节点可选，建议重新生成地图并重新选英雄，否则会在 Act 3 被卡住。
-                        </p>
-                        <div className="flex flex-wrap items-center justify-center gap-3">
-                            <button onClick={handleRestartMap} className="px-5 py-2 rounded-full bg-red-500 hover:bg-red-400 text-xs uppercase tracking-[0.4em]">重新生成</button>
-                            <button onClick={() => setShowDeadEndPrompt(false)} className="px-5 py-2 rounded-full border border-white/30 hover:border-white text-xs uppercase tracking-[0.4em]">稍后</button>
+const renderUserPanel = () => {
+    if (!currentUser) return null;
+                return (
+                <div className="absolute top-4 right-28 z-[120] flex items-center gap-3 bg-gradient-to-r from-black/70 to-slate-900/70 px-4 py-2 rounded-full border border-white/20 shadow-[0_0_30px_rgba(0,0,0,0.7)] text-sm text-white">
+                    <div className="flex items-center gap-2">
+                        <UserSquare className="w-5 h-5 text-amber-400" />
+                        <div className="flex flex-col text-xs uppercase tracking-[0.3em] text-right">
+                            <span className="font-semibold">{currentUser.username || currentUser.email}</span>
+                            <span className="text-white/60">Authenticated</span>
                         </div>
                     </div>
+                    <button onClick={handleLogout} className="flex items-center gap-1 px-3 py-1 border border-transparent rounded-full bg-white/10 hover:bg-white/30 transition text-xs uppercase tracking-[0.3em]">
+                        <LogOut className="w-3 h-3" />
+                        Logout
+                    </button>
                 </div>
-            )}
-            {view !== 'GAMEOVER' && view !== 'VICTORY_ALL' && view !== 'MENU' && view !== 'CHAMPION_SELECT' && champion && (
-                <>
-                    {view === 'MAP' && currentUser && (
-                        <div className="absolute top-24 right-5 z-[115] flex flex-col items-end gap-1 text-right">
-                            <button
-                                onClick={handleResetProgress}
-                                className="px-3 py-1 rounded-full border border-red-500 text-red-200 bg-black/60 hover:bg-red-500/20 transition text-xs uppercase tracking-[0.4em]"
-                            >
-                                RESET PROGRESS
-                            </button>
-                            <p className="text-[10px] uppercase tracking-[0.3em] text-red-400">
-                                重置并回到选人画面.
-                            </p>
+                )
+};
+
+const handleResetProgress = () => {
+    if (!currentUser) return;
+                if (!window.confirm('重置会清除该账号现有进度并重新进入选人，请确认继续。')) return;
+                localStorage.removeItem(getSaveKey(currentUser));
+                setHasSave(false);
+                setMapData({grid: [], nodes: [], nodeMap: new Map() });
+                setActiveNode(null);
+                setChampion(null);
+                setView('CHAMPION_SELECT');
+};
+
+// [DEV ONLY] 跳转到指定ACT（测试用）
+const handleSkipToAct = (targetAct) => {
+    if (!champion) return;
+                setMapData(null); // 触发加载屏幕
+    setTimeout(() => {
+        const newMapData = generateGridMap(targetAct, []);
+                setMapData(newMapData);
+                setShowDeadEndPrompt(!hasAvailableNeighbors(newMapData.nodes, newMapData.grid, newMapData.totalFloors));
+                if (newMapData.startNode) {
+                    setActiveNode(newMapData.startNode);
+        }
+                setCurrentAct(targetAct);
+                setCurrentFloor(0);
+                setLockedChoices(new Set());
+                // 恢复一些HP以便测试
+                setCurrentHp(Math.min(maxHp, currentHp + Math.floor(maxHp * 0.5)));
+                setView('MAP');
+    }, 100);
+};
+
+                return (
+                <div className="relative h-screen w-full bg-[#091428] font-sans select-none overflow-hidden">
+                    <AudioPlayer src={bgmStarted || view !== 'MENU' ? getCurrentBgm() : null} />
+                    {renderUserPanel()}
+                    {view === 'MAP' && showDeadEndPrompt && (
+                        <div className="absolute inset-0 z-[110] flex flex-col items-center justify-center bg-black/70 text-white px-6 text-center">
+                            <div className="bg-slate-900/80 border border-red-500/60 p-6 rounded-lg shadow-[0_0_30px_rgba(0,0,0,0.8)] max-w-xl">
+                                <p className="text-lg font-semibold text-red-300 mb-3">死胡同警告</p>
+                                <p className="text-sm text-slate-200 mb-4">
+                                    当前地图没有可用节点可选，建议重新生成地图并重新选英雄，否则会在 Act 3 被卡住。
+                                </p>
+                                <div className="flex flex-wrap items-center justify-center gap-3">
+                                    <button onClick={handleRestartMap} className="px-5 py-2 rounded-full bg-red-500 hover:bg-red-400 text-xs uppercase tracking-[0.4em]">重新生成</button>
+                                    <button onClick={() => setShowDeadEndPrompt(false)} className="px-5 py-2 rounded-full border border-white/30 hover:border-white text-xs uppercase tracking-[0.4em]">稍后</button>
+                                </div>
+                            </div>
                         </div>
                     )}
-                    <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-black to-transparent z-50 flex items-center justify-between px-8 pointer-events-none">
-                        <div className="flex items-center gap-6 pointer-events-auto">
-                            <div className="relative group">
-                                <img src={champion.avatar} className="w-12 h-12 rounded-full border-2 border-[#C8AA6E] shadow-lg" />
-                                <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-[#091428] rounded-full border border-[#C8AA6E] flex items-center justify-center text-xs font-bold text-[#C8AA6E]">{currentFloor + 1}F</div>
-                            </div>
-                            <div className="flex items-center gap-4">
-                                <div className="flex flex-col">
-                                    <span className="text-[#F0E6D2] font-bold text-lg shadow-black drop-shadow-md flex items-center gap-2">
-                                        {champion.name}
-                                        <RelicTooltip relic={RELIC_DATABASE[champion.relicId]}>
-                                            <img src={RELIC_DATABASE[champion.relicId].img}
-                                                className="w-6 h-6 rounded border border-yellow-400 bg-black/50 cursor-help hover:scale-110 transition-transform"
-                                            />
-                                        </RelicTooltip>
-                                    </span>
-                                    <div className="flex items-center gap-4 text-sm font-bold"><span className="text-red-400 flex items-center gap-1"><Heart size={14} fill="currentColor" /> {currentHp}/{maxHp}</span><span className="text-yellow-400 flex items-center gap-1"><Coins size={14} fill="currentColor" /> {gold}</span></div>
+                    {view !== 'GAMEOVER' && view !== 'VICTORY_ALL' && view !== 'MENU' && view !== 'CHAMPION_SELECT' && champion && (
+                        <>
+                            {view === 'MAP' && currentUser && (
+                                <div className="absolute top-24 right-5 z-[115] flex flex-col items-end gap-1 text-right">
+                                    <button
+                                        onClick={() => setShowCollection(true)}
+                                        className="px-3 py-1 rounded-full border border-amber-500 text-amber-200 bg-black/60 hover:bg-amber-500/20 transition text-xs uppercase tracking-[0.4em] mb-2"
+                                    >
+                                        COLLECTION
+                                    </button>
+                                    <button
+                                        onClick={handleResetProgress}
+                                        className="px-3 py-1 rounded-full border border-red-500 text-red-200 bg-black/60 hover:bg-red-500/20 transition text-xs uppercase tracking-[0.4em]"
+                                    >
+                                        RESET PROGRESS
+                                    </button>
+                                    <p className="text-[10px] uppercase tracking-[0.3em] text-red-400">
+                                        重置并回到选人画面.
+                                    </p>
                                 </div>
-                                {/* 遗物栏 - 紧邻被动技能右侧 */}
-                                <div className="flex gap-2 flex-wrap max-w-md">
-                                    {relics.filter(rid => rid !== champion.relicId).map((rid, i) => {
-                                        const relic = RELIC_DATABASE[rid];
-                                        return (
-                                            <RelicTooltip key={i} relic={relic}>
-                                                <div className="w-9 h-9 rounded border border-[#C8AA6E]/50 bg-black/50 relative group cursor-help hover:scale-110 transition-transform">
-                                                    <img src={relic.img} className="w-full h-full object-cover" />
-                                                </div>
-                                            </RelicTooltip>
-                                        );
-                                    })}
+                            )}
+                            <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-black to-transparent z-50 flex items-center justify-between px-8 pointer-events-none">
+                                <div className="flex items-center gap-6 pointer-events-auto">
+                                    <div className="relative group">
+                                        <img src={champion.avatar} className="w-12 h-12 rounded-full border-2 border-[#C8AA6E] shadow-lg" />
+                                        <div className="absolute -bottom-2 -right-2 w-6 h-6 bg-[#091428] rounded-full border border-[#C8AA6E] flex items-center justify-center text-xs font-bold text-[#C8AA6E]">{currentFloor + 1}F</div>
+                                    </div>
+                                    <div className="flex items-center gap-4">
+                                        <div className="flex flex-col">
+                                            <span className="text-[#F0E6D2] font-bold text-lg shadow-black drop-shadow-md flex items-center gap-2">
+                                                {champion.name}
+                                                <RelicTooltip relic={RELIC_DATABASE[champion.relicId]}>
+                                                    <img src={RELIC_DATABASE[champion.relicId].img}
+                                                        className="w-6 h-6 rounded border border-yellow-400 bg-black/50 cursor-help hover:scale-110 transition-transform"
+                                                    />
+                                                </RelicTooltip>
+                                            </span>
+                                            <div className="flex items-center gap-4 text-sm font-bold"><span className="text-red-400 flex items-center gap-1"><Heart size={14} fill="currentColor" /> {currentHp}/{maxHp}</span><span className="text-yellow-400 flex items-center gap-1"><Coins size={14} fill="currentColor" /> {gold}</span></div>
+                                        </div>
+                                        {/* 遗物栏 - 紧邻被动技能右侧 */}
+                                        <div className="flex gap-2 flex-wrap max-w-md">
+                                            {relics.filter(rid => rid !== champion.relicId).map((rid, i) => {
+                                                const relic = RELIC_DATABASE[rid];
+                                                return (
+                                                    <RelicTooltip key={i} relic={relic}>
+                                                        <div className="w-9 h-9 rounded border border-[#C8AA6E]/50 bg-black/50 relative group cursor-help hover:scale-110 transition-transform">
+                                                            <img src={relic.img} className="w-full h-full object-cover" />
+                                                        </div>
+                                                    </RelicTooltip>
+                                                );
+                                            })}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </>
-            )}
-            {renderView()}
-            {showCodex && <CodexView onClose={() => setShowCodex(false)} />}
-            {showDeck && <DeckView deck={masterDeck} onClose={() => setShowDeck(false)} />}
-            <ToastContainer toasts={toasts} />
-        </div>
-    );
+                        </>
+                    )}
+                    {renderView()}
+                    {showCollection && <CollectionSystem onClose={() => setShowCollection(false)} />}
+                    {showDeck && <DeckView deck={masterDeck} onClose={() => setShowDeck(false)} />}
+                    <ToastContainer toasts={toasts} />
+                </div>
+                );
 }
+                ```
