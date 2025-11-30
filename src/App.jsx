@@ -1157,9 +1157,8 @@ export default function LegendsOfTheSpire() {
             <div className="absolute top-4 right-28 z-[120] flex items-center gap-3 bg-gradient-to-r from-black/70 to-slate-900/70 px-4 py-2 rounded-full border border-white/20 shadow-[0_0_30px_rgba(0,0,0,0.7)] text-sm text-white">
                 <div className="flex items-center gap-2">
                     <UserSquare className="w-5 h-5 text-amber-400" />
-                    <div className="flex flex-col text-xs uppercase tracking-[0.3em] text-right">
-                        <span className="font-semibold">{currentUser.username || currentUser.email}</span>
-                        <span className="text-white/60">Authenticated</span>
+                    <div className="text-xs uppercase tracking-[0.3em] text-right font-semibold">
+                        {currentUser.username || currentUser.email}
                     </div>
                 </div>
                 <button onClick={handleLogout} className="flex items-center gap-1 px-3 py-1 border border-transparent rounded-full bg-white/10 hover:bg-white/30 transition text-xs uppercase tracking-[0.3em]">
@@ -1179,6 +1178,11 @@ export default function LegendsOfTheSpire() {
         setActiveNode(null);
         setChampion(null);
         setView('CHAMPION_SELECT');
+    };
+
+    const handleExitBattle = () => {
+        if (view !== 'BATTLE') return;
+        setView('MAP');
     };
 
     // [DEV ONLY] 跳转到指定ACT（测试用）
@@ -1235,7 +1239,7 @@ export default function LegendsOfTheSpire() {
                             </button>
                         </div>
                     )}
-                    <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-black to-transparent z-50 flex items-center justify-between px-8 pointer-events-none">
+                    <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-black to-transparent z-50 flex items-center justify-between px-8 pointer-events-none relative">
                         <div className="flex items-center gap-6 pointer-events-auto">
                             <div className="relative group">
                                 <img src={champion.avatar} className="w-12 h-12 rounded-full border-2 border-[#C8AA6E] shadow-lg" />
@@ -1268,6 +1272,16 @@ export default function LegendsOfTheSpire() {
                                 </div>
                             </div>
                         </div>
+                        {view === 'BATTLE' && (
+                            <div className="absolute left-1/2 -translate-x-1/2 pointer-events-auto">
+                                <button
+                                    onClick={handleExitBattle}
+                                    className="px-5 py-2 rounded-full border border-white/40 bg-black/60 text-white text-xs uppercase tracking-[0.4em] hover:bg-white/10 transition"
+                                >
+                                    退出战斗
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </>
             )}
