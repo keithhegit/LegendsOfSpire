@@ -549,6 +549,7 @@ export default function LegendsOfTheSpire() {
     const [activeNode, setActiveNode] = useState(null);
     const [usedEnemies, setUsedEnemies] = useState([]);
     const [showCodex, setShowCodex] = useState(false);
+    const [showCollection, setShowCollection] = useState(false);
     const [showDeck, setShowDeck] = useState(false);
     const [toasts, setToasts] = useState([]);
     const [lockedChoices, setLockedChoices] = useState(new Set()); // 三选一：已锁定的选项
