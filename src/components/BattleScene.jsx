@@ -10,6 +10,8 @@ import { playSfx, playChampionVoice } from '../utils/audioManager';
 import { applyCardEffects, calculateBlockValue } from '../utils/cardEffectHandler';
 import Card from './shared/Card';
 
+const DEX_BLOCK_PER_STACK = 5;
+
 const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex, act }) => {
     const getScaledEnemy = (enemyId, floor, currentAct) => {
         const baseEnemy = ENEMY_POOL[enemyId];
@@ -36,8 +38,17 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
     const [dmgOverlay, setDmgOverlay] = useState(null);
     const [heroAnim, setHeroAnim] = useState("");
     const [enemyAnim, setEnemyAnim] = useState("");
-    const [playerStatus, setPlayerStatus] = useState({ strength: heroData.baseStr || 0, weak: 0, vulnerable: 0 });
-    const [enemyStatus, setEnemyStatus] = useState({ strength: 0, weak: 0, vulnerable: 0 });
+    const [playerStatus, setPlayerStatus] = useState({
+        strength: heroData.baseStr || 0,
+        weak: 0,
+        vulnerable: 0,
+        dexterity: 0,
+        nextTurnBlock: 0,
+        nextTurnStrength: 0,
+        nextTurnMana: 0,
+        nextDrawBonus: 0
+    });
+    const [enemyStatus, setEnemyStatus] = useState({ strength: 0, weak: 0, vulnerable: 0, mark: 0, markDamage: 0 });
 
     // 被动技能状态追踪
     const [rivenAttackCount, setRivenAttackCount] = useState(0); // 瑞文：攻击计数
@@ -196,7 +207,12 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
                 ...effectUpdates.playerStatus
             }));
         }
-        if (effectUpdates.enemyStatus) setEnemyStatus(effectUpdates.enemyStatus);
+        if (effectUpdates.enemyStatus) {
+            setEnemyStatus(prev => ({
+                ...prev,
+                ...effectUpdates.enemyStatus
+            }));
+        }
 
         // 盲僧被动：技能牌后设置buff
         if (card.type === 'SKILL' && heroData.relicId === "LeeSinPassive") {
@@ -312,6 +328,11 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
                 baseDmg = Math.floor(baseDmg * 1.5);
             }
 
+            // 标记额外伤害 (如破绽刺击)
+            if (effectUpdates.bonusIfMarked && (currentEnemyStatus.mark || 0) > 0) {
+                baseDmg += effectUpdates.bonusIfMarked;
+            }
+
             // FIX: 下一次攻击翻倍 (NEXT_ATTACK_DOUBLE)
             if (playerStatus.nextAttackDouble) {
                 baseDmg *= 2;
@@ -368,6 +389,27 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
                     setDeathMarkDamage(prev => prev + dmgToHp);
                 }
 
+                // 标记触发：额外伤害并消耗层数
+                if (dmgToHp > 0 && (currentEnemyStatus.mark || 0) > 0 && (currentEnemyStatus.markDamage || 0) > 0) {
+                    const triggerDmg = currentEnemyStatus.markDamage;
+                    setEnemyHp(h => Math.max(0, h - triggerDmg));
+                    total += triggerDmg;
+                    const updatedMark = Math.max(0, (currentEnemyStatus.mark || 0) - 1);
+                    currentEnemyStatus.mark = updatedMark;
+                    if (updatedMark === 0) {
+                        currentEnemyStatus.markDamage = 0;
+                    }
+                    setEnemyStatus(prev => ({
+                        ...prev,
+                        mark: updatedMark,
+                        markDamage: currentEnemyStatus.markDamage
+                    }));
+                    setTimeout(() => {
+                        setDmgOverlay({ val: `标记 ${triggerDmg}`, target: 'ENEMY', color: 'text-orange-400' });
+                        setTimeout(() => setDmgOverlay(null), 250);
+                    }, i * 300 + 150);
+                }
+
                 if (heroData.relics.includes("VampiricScepter")) setPlayerHp(h => Math.min(heroData.maxHp, h + 1));
                 if (heroData.relicId === "DariusPassive") setEnemyStatus(s => ({ ...s, weak: s.weak + 1 }));
 
@@ -383,8 +425,7 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
         if (card.block) {
             // 玩家获得格挡时播放格挡音效
             playSfx('BLOCK_SHIELD');
-            // FIX: 灵巧 (Dexterity) 加成
-            setPlayerBlock(b => b + card.block + (playerStatus.dexterity || 0));
+            setPlayerBlock(b => b + card.block);
         }
     };
 
@@ -500,6 +541,12 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
     const applyNextTurnEffects = () => {
         setPlayerStatus(prev => {
             const updates = { ...prev };
+
+            // 灵巧：回合开始获得护甲，并清空层数
+            if (prev.dexterity > 0) {
+                setPlayerBlock(b => b + prev.dexterity * DEX_BLOCK_PER_STACK);
+                updates.dexterity = 0;
+            }
 
             // 下回合法力 (蓄能冥想)
             if (prev.nextTurnMana > 0) {

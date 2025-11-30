@@ -81,14 +81,14 @@ export const CARD_DATABASE = {
 
   // Lux
   LuxQ: { id: 'LuxQ', name: '光之束缚', type: 'ATTACK', cost: 1, value: 8, rarity: 'COMMON', hero: 'Lux', target: 'single', effect: 'VULNERABLE', effectValue: 1, description: '对单体造成9点伤害并施加1层易伤。', img: `${SPELL_URL}/LuxLightBinding.png`, price: 50 },
-  LuxW: { id: 'LuxW', name: '结界护盾', type: 'SKILL', cost: 1, value: 6, rarity: 'UNCOMMON', hero: 'Lux', target: 'self', effect: 'DRAW_NEXT', effectValue: 1, description: '获得6护甲；下回合抽1张牌。', img: `${SPELL_URL}/LuxPrismaticWave.png`, price: 80 },
+  LuxW: { id: 'LuxW', name: '结界护盾', type: 'SKILL', cost: 1, value: 6, block: 6, rarity: 'UNCOMMON', hero: 'Lux', target: 'self', effect: 'DRAW_NEXT', effectValue: 1, description: '获得6护甲；下回合抽1张牌。', img: `${SPELL_URL}/LuxPrismaticWave.png`, price: 80 },
   LuxE: { id: 'LuxE', name: '透光奇点', type: 'ATTACK', cost: 2, value: 12, rarity: 'UNCOMMON', hero: 'Lux', target: 'single', effect: 'BONUS_PER_EXTRA_MANA', effectValue: 2, description: '对单体造成12伤害；若本回合你获得额外法力则每点法力+2伤害。', img: `${SPELL_URL}/LuxLightStrikeKugel.png`, price: 100 },
   LuxR: { id: 'LuxR', name: '终极闪光', type: 'ATTACK', cost: 3, value: 28, rarity: 'RARE', hero: 'Lux', target: 'single', effect: 'CONDITIONAL_DOUBLE', effectValue: 4, description: '对单体造成30伤害；若本回合打出≥4张牌则伤害翻倍。', img: `${SPELL_URL}/LuxR.png`, price: 150 },
 
   // Jinx
   JinxQ: { id: 'JinxQ', name: '机枪扫射', type: 'ATTACK', cost: 1, value: 8, rarity: 'COMMON', hero: 'Jinx', target: 'single', effect: 'MULTI_HIT', effectValue: 3, isMultiHit: true, hits: 3, description: '对单体造成三段击打（总伤害24）。', img: `${SPELL_URL}/JinxQ.png`, price: 50 },
   JinxW: { id: 'JinxW', name: '电磁炮', type: 'ATTACK', cost: 1, value: 10, rarity: 'UNCOMMON', hero: 'Jinx', target: 'single', effect: 'VULNERABLE', effectValue: 2, description: '对目标造成10伤害并施加2层易伤。', img: `${SPELL_URL}/JinxW.png`, price: 80 },
-  JinxE: { id: 'JinxE', name: '火箭陷阱', type: 'SKILL', cost: 1, value: 0, rarity: 'UNCOMMON', hero: 'Jinx', target: 'mark', effect: 'MARK_TRIGGER', effectValue: 12, description: '给目标放置标记；标记被触发时对该目标造成12点伤害。', img: `${SPELL_URL}/JinxE.png`, price: 100 },
+  JinxE: { id: 'JinxE', name: '火箭陷阱', type: 'SKILL', cost: 1, value: 0, rarity: 'UNCOMMON', hero: 'Jinx', target: 'mark', effect: 'MARK', effectValue: 1, effect2: 'MARK_TRIGGER', effectValue2: 12, description: '给目标放置标记；标记被触发时对该目标造成12点伤害。', img: `${SPELL_URL}/JinxE.png`, price: 100 },
   JinxR: { id: 'JinxR', name: '超究极飞弹', type: 'ATTACK', cost: 3, value: 25, rarity: 'RARE', hero: 'Jinx', target: 'single', effect: 'LOW_HP_BONUS', effectValue: 25, description: '对单体造成25伤害；若目标HP<50%再造成25。', img: `${SPELL_URL}/JinxR.png`, price: 150 },
 
   // Yasuo

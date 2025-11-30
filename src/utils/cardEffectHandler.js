@@ -331,8 +331,11 @@ function applyEffect(effectType, value, context, updates) {
             break;
 
         case 'MARK_TRIGGER':
-            // 标记触发 - Trigger when mark consumed
-            updates.markTriggerDamage = value;
+            // 标记触发 - Store额外伤害，等待被攻击时结算
+            updates.enemyStatus = {
+                ...(updates.enemyStatus || enemyStatus),
+                markDamage: ((updates.enemyStatus?.markDamage || enemyStatus.markDamage) || 0) + value
+            };
             break;
 
         case 'STUN_IF_WEAK':
