@@ -8,6 +8,7 @@ import ChampionSelect from './components/ChampionSelect';
 import BattleScene from './components/BattleScene';
 import LoginView from './components/LoginView'; // 登录界面
 import ToastContainer from './components/shared/Toast'; // 导入 ToastContainer
+import CollectionSystem from './components/CollectionSystem';
 import { unlockAudio } from './utils/audioContext'; // 音频解锁工具
 import { getHexNeighbors } from './utils/hexagonGrid'; // 六边形邻居帮助函数
 import { authService } from './services/authService';

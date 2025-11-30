@@ -1,21 +1,21 @@
 ﻿import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Search, Filter, Shield, Sword, Zap, BookOpen, User, Hexagon, Layers, Info } from 'lucide-react';
+import { X, Search, Filter, Shield, Sword, Zap, BookOpen, User, Hexagon, Layers, Info, Skull } from 'lucide-react';
 import { CARD_DATABASE } from '../data/cards';
 import { RELIC_DATABASE } from '../data/relics';
 
-// 鏁堟灉璇嶆潯鏁版嵁
+// 效果词条
 const EFFECT_GLOSSARY = [
-    { id: 'VULNERABLE', name: '鏄撲激', icon: <Zap className="text-yellow-400" />, desc: '鍙楀埌鐨勪激瀹冲鍔?50%銆? },
-    { id: 'WEAK', name: '铏氬急', icon: <Shield className="text-blue-400" />, desc: '閫犳垚鐨勪激瀹冲噺灏?25%銆? },
-    { id: 'STUN', name: '鐪╂檿', icon: <Zap className="text-purple-400" />, desc: '鏃犳硶琛屽姩涓€鍥炲悎銆? },
-    { id: 'BLEED', name: '娴佽', icon: <Sword className="text-red-500" />, desc: '鍥炲悎缁撴潫鏃跺彈鍒颁激瀹炽€? },
-    { id: 'POISON', name: '涓瘨', icon: <Skull className="text-green-500" />, desc: '鍥炲悎缁撴潫鏃跺彈鍒颁激瀹筹紝灞傛暟閫掑噺銆? },
-    { id: 'BLOCK', name: '鎶ょ敳', icon: <Shield className="text-blue-300" />, desc: '鎶垫尅涓嬩竴娆″彈鍒扮殑浼ゅ銆傚洖鍚堢粨鏉熸椂娑堝け銆? },
-    { id: 'STRENGTH', name: '鍔涢噺', icon: <Sword className="text-red-400" />, desc: '澧炲姞鏀诲嚮鐗岄€犳垚鐨勪激瀹炽€? },
-    { id: 'MULTI_HIT', name: '澶氭鏀诲嚮', icon: <Layers className="text-orange-400" />, desc: '閫犳垚澶氭浼ゅ銆? },
-    { id: 'CRIT', name: '鏆村嚮', icon: <Zap className="text-yellow-500" />, desc: '閫犳垚鍙屽€嶄激瀹炽€? },
-    { id: 'DEATHMARK', name: '姝讳骸鍗拌', icon: <Skull className="text-red-600" />, desc: '绱Н鏈熼棿鍙楀埌鐨勪激瀹筹紝鍗拌缁撴潫鏃剁垎鍙戙€? },
+    { id: 'VULNERABLE', name: 'Vulnerable', icon: <Zap className="text-yellow-400" />, desc: 'Target takes 50% more damage while this is active.' },
+    { id: 'WEAK', name: 'Weak', icon: <Shield className="text-blue-400" />, desc: 'Enemy deals 25% less damage on its next attack.' },
+    { id: 'STUN', name: 'Stun', icon: <Zap className="text-purple-400" />, desc: 'Prevents the enemy from acting for one turn.' },
+    { id: 'BLEED', name: 'Bleed', icon: <Sword className="text-red-500" />, desc: 'Deals damage over time at the end of each turn.' },
+    { id: 'POISON', name: 'Poison', icon: <Skull className="text-green-500" />, desc: 'Stacks damage that triggers every turn until the stack decays.' },
+    { id: 'BLOCK', name: 'Block', icon: <Shield className="text-blue-300" />, desc: 'Absorbs incoming damage before HP is reduced.' },
+    { id: 'STRENGTH', name: 'Strength', icon: <Sword className="text-red-400" />, desc: 'Increases the damage of all attack cards.' },
+    { id: 'MULTI_HIT', name: 'Multi Hit', icon: <Layers className="text-orange-400" />, desc: 'Card hits multiple times; each strike benefits from buffs.' },
+    { id: 'CRIT', name: 'Critical', icon: <Zap className="text-yellow-500" />, desc: 'A critical strike deals double damage.' },
+    { id: 'DEATHMARK', name: 'Death Mark', icon: <Skull className="text-red-600" />, desc: 'Stores damage dealt for a few turns, then releases it in a burst.' },
 ];
 
 const CollectionSystem = ({ onClose }) => {
@@ -27,14 +27,13 @@ const CollectionSystem = ({ onClose }) => {
     // 鏁版嵁澶勭悊
     const allCards = useMemo(() => Object.values(CARD_DATABASE), []);
     const allRelics = useMemo(() => Object.values(RELIC_DATABASE), []);
-    const allHeroes = useMemo(() => {
-        // 浠庡崱鐗屾暟鎹腑鎻愬彇鑻遍泟鍒楄〃 (杩欓噷绠€鍗曞鐞嗭紝瀹為檯搴斾粠 CHAMPION_POOL 鑾峰彇锛屼絾缁勪欢鍐呮棤娉曠洿鎺ヨ闂?App.jsx 鐨勬暟鎹?
-        // 鎴戜滑鍙互閫氳繃 props 浼犲叆锛屾垨鑰呰繖閲岀‖缂栫爜/浠?cards 鎺ㄦ柇
-        // 涓轰簡鏂逛究锛岃繖閲岀‖缂栫爜宸茬煡鐨勮嫳闆勫垪琛?        return [
+    const allHeroes = useMemo(
+        () => [
             "Garen", "Darius", "Lux", "Jinx", "Yasuo", "Sona", "Ekko", "Sylas", "Urgot", "Viktor",
             "Riven", "TwistedFate", "LeeSin", "Vayne", "Teemo", "Zed", "Nasus", "Irelia", "Thresh", "Katarina"
-        ];
-    }, []);
+        ],
+        []
+    );
 
     // 杩囨护鍗＄墝
     const filteredCards = useMemo(() => {
@@ -63,7 +62,7 @@ const CollectionSystem = ({ onClose }) => {
             <div className="p-3">
                 <div className="flex justify-between items-start mb-1">
                     <h3 className="text-amber-100 font-bold text-sm truncate">{card.name}</h3>
-                    <span className="text-xs text-amber-500 font-mono">{card.cost}璐?/span>
+                    <span className="text-xs text-amber-500 font-mono">{card.cost} Mana</span>
                 </div>
                 <div className="text-[10px] text-slate-400 mb-2 flex gap-2">
                     <span className={`uppercase ${getRarityColor(card.rarity)}`}>{card.rarity}</span>
@@ -295,8 +294,5 @@ const getRarityColor = (rarity) => {
         default: return 'text-slate-400';
     }
 };
-
-// 瀵煎叆 Skull 鍥炬爣闇€瑕佷粠 lucide-react 瀵煎叆
-import { Skull } from 'lucide-react';
 
 export default CollectionSystem;
