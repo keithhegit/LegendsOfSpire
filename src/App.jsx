@@ -1217,4 +1217,3 @@ export default function LegendsOfTheSpire() {
         </div>
     );
 }
-```
