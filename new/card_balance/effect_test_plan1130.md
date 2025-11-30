@@ -37,6 +37,31 @@
 | **CONDITIONAL_DOUBLE** | `LuxR` | 终极闪光 | 本回合出牌≥4 | 打出卡牌 | 伤害翻倍（需先打出 3 张其他牌）。 | 待测试（需要专用卡组保证抽到该牌并满足条件，计划在 Batch2 Phase2.5 执行）。 |
 | **LOW_HP_BONUS** | `JinxR` | 超究极飞弹 | 敌人HP<50% | 打出卡牌 | 造成额外伤害（需先将敌人打至半血以下）。 | 待测试（尚未抽到该牌，Batch2 Phase2.5 补测）。 |
 
+### ✨ R 技能覆盖现状（cards.js + BattleScene）
+
+| 英雄 | R 技能 / Effect | 状态（参考 Batch 计划） |
+| :--- | :--- | :--- |
+| 盖伦 | `GarenR` / `EXECUTE_SCALE` | ✅ `BattleScene.jsx` L281-L284 已按缺血加成计算（Batch1 完成，待线上复测）。 |
+| 德莱厄斯 | `DariusR` / `BLEED_EXECUTE` | ⚠️ 仅在 `cardEffectHandler.js` 写回 `bleedExecute`，前端未消费；列入 Batch2 Phase2.1。 |
+| 拉克丝 | `LuxR` / `CONDITIONAL_DOUBLE` | ✅ 逻辑已接入（L286-L289），但需要 Batch2 Phase2.5 的专用测试卡组验证。 |
+| 金克丝 | `JinxR` / `LOW_HP_BONUS` | ✅ L291-L294 处理低血加伤，Batch2 Phase2.5 复测中。 |
+| 亚索 | `YasuoR` / `SCALE_BY_CRIT` | ⚠️ L296-L309 依赖暴击计数，当前 crit 系统只接入 `YasuoQ`，需 Phase2.2 完成全量暴击流程。 |
+| 娑娜 | `SonaR` / `PER_CARD_BONUS` | ⛔ BattleScene 未读取 `perCardBonus`，排期在 Batch2 Phase2.1（Quick Win）。 |
+| 艾克 | `EkkoR` / `HEAL_AND_DAMAGE` | ⛔ 尚未实现“同时伤害并回复”逻辑，列入 Batch2 Phase2.3。 |
+| 塞拉斯 | `SylasR` / `COPY_ENEMY_ACTION` | ⛔ 未接管 `nextEnemyAction`，Batch2 Phase2.5 待实现。 |
+| 厄加特 | `UrgotR` / `LOW_HP_EXECUTE` | ⛔ 没有阈值检验，Batch2 Phase2.1 需新增直接击杀逻辑。 |
+| 维克托 | `ViktorR` / `DRAW_ON_USE` | ⛔ 未触发额外抽牌，Batch2 Phase2.3 需补。 |
+| 瑞文 | （缺失） | ⛔ `champions.js` 有瑞文但 `cards.js` 未定义 `RivenR`；需依据 Batch4 设计补卡。 |
+| 卡牌大师 | （缺失） | ⛔ `TwistedFate` 仅有 Q/W/E；Batch5（资源机制）前需补 `CardMasterR`。 |
+| 李青 | `LeeR` / `REMOVE_BUFF` | ⛔ 仅 effect 占位，敌人增益移除逻辑未写；归档 Batch2 Phase2.3。 |
+| 薇恩 | （缺失） | ⛔ 当前只有 `VaynePassive`/Q/E；需新增 `VayneR`（或将被动拆分）以符合 20 英雄要求。 |
+| 提莫 | （缺失） | ⛔ `cards.js` 尚无 `TeemoR`；需依 Batch4 污染机制补卡。 |
+| 锤石 | `ThreshR` / `WEAK_VULN_AND_PERMAHP` | ⛔ 仅记录状态，未处理“击杀加最大生命”；排入 Batch3 Phase3.3。 |
+| 内瑟斯 | `NasusR` / `TEMP_STR` | ⛔ `tempStrength` 没有结算入口；Batch3 Phase3.3 实现。 |
+| 艾瑞莉娅 | `IreliaR` / `ALL_ATTACKS_BONUS` | ⛔ 未对本回合其它攻击追加伤害；计划在 Batch2 Phase2.5。 |
+| 卡特琳娜 | `KatarinaR` / `MULTI_STRIKE_SEGMENTS` | ⛔ 尚未拆分多段伤害；列入 Batch2 Phase2.4（历史追踪）。 |
+| 劫 | `ZedR` / `DEATHMARK` | ✅ L388-L510 追踪印记伤害并在倒计时结束爆发（Batch2 已接入，待 QA）。 |
+
 ---
 
 ## 🔵 Batch 2: 高级战斗机制 (Advanced Combat)

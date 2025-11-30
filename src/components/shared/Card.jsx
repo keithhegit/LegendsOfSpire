@@ -14,12 +14,14 @@ const Card = ({ cardId, index, totalCards, canPlay, onPlay }) => {
   }
   
   const card = {
-      ...baseCard,
-      name: isUpgraded ? `${baseCard.name}+` : baseCard.name,
-      value: isUpgraded && baseCard.value ? baseCard.value + 3 : baseCard.value,
-      block: isUpgraded && baseCard.block ? baseCard.block + 3 : baseCard.block,
-      description: isUpgraded ? baseCard.description.replace(/(\d+)/g, (match) => parseInt(match) + 3) : baseCard.description
+    ...baseCard,
+    name: isUpgraded ? `${baseCard.name}+` : baseCard.name,
+    value: isUpgraded && baseCard.value ? baseCard.value + 3 : baseCard.value,
+    block: isUpgraded && baseCard.block ? baseCard.block + 3 : baseCard.block,
+    description: isUpgraded ? baseCard.description.replace(/(\d+)/g, match => parseInt(match) + 3) : baseCard.description
   };
+
+  const isUltimate = card.hero && card.hero !== 'Neutral' && baseId.endsWith('R');
   
   // 堆叠逻辑计算
   const overlap = totalCards > 5 ? -40 : 10; 
@@ -54,10 +56,19 @@ const Card = ({ cardId, index, totalCards, canPlay, onPlay }) => {
         rotate: 0
       } : {}}
       className={`
-        w-40 h-60 bg-[#1E2328] border-2 rounded-lg flex flex-col items-center overflow-hidden shadow-2xl 
+        w-40 h-60 bg-[#1E2328] border-2 rounded-lg flex flex-col items-center overflow-hidden shadow-2xl relative
         ${canPlay ? 'border-[#C8AA6E] cursor-grab active:cursor-grabbing' : 'border-slate-700 opacity-60 cursor-not-allowed'}
+        ${isUltimate ? 'border-yellow-300/90 shadow-[0_0_28px_rgba(255,215,0,0.55)]' : ''}
       `}
     >
+      {isUltimate && (
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 rounded-lg border border-yellow-200/80 ring-1 ring-yellow-400/40 shadow-[0_0_35px_rgba(255,215,0,0.8)] animate-pulse"
+        >
+          <div className="absolute inset-[-4px] rounded-xl bg-gradient-to-r from-yellow-200/15 via-transparent to-yellow-200/15 blur-sm" />
+        </div>
+      )}
       {/* 卡牌图片 */}
       <div className="w-full h-40 bg-black overflow-hidden relative pointer-events-none">
         <img src={card.img} className="w-full h-full object-cover opacity-90" alt={card.name} />
