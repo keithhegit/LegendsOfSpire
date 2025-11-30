@@ -51,11 +51,11 @@
 | 塞拉斯 | `SylasR` / `COPY_ENEMY_ACTION` | ⛔ 未接管 `nextEnemyAction`，Batch2 Phase2.5 待实现。 |
 | 厄加特 | `UrgotR` / `LOW_HP_EXECUTE` | ⛔ 没有阈值检验，Batch2 Phase2.1 需新增直接击杀逻辑。 |
 | 维克托 | `ViktorR` / `DRAW_ON_USE` | ⛔ 未触发额外抽牌，Batch2 Phase2.3 需补。 |
-| 瑞文 | （缺失） | ⛔ `champions.js` 有瑞文但 `cards.js` 未定义 `RivenR`；需依据 Batch4 设计补卡。 |
-| 卡牌大师 | （缺失） | ⛔ `TwistedFate` 仅有 Q/W/E；Batch5（资源机制）前需补 `CardMasterR`。 |
+| 瑞文 | `RivenR` / `STRENGTH + LOW_HP_BONUS` | ⚠️ 卡牌已写入 `cards.js`，但 BattleScene 仍缺“激活放逐之锋后获得力量与残血加伤”的逻辑；排入 Batch2 Phase2.1。 |
+| 卡牌大师 | `TwistedFateR` / `DRAW + NEXT_ATTACK_BONUS` | ⚠️ 新卡提供抽牌与下一击增伤，BattleScene 需读取 `effectUpdates.nextAttackBonus`；归入 Batch2 Phase2.1。 |
 | 李青 | `LeeR` / `REMOVE_BUFF` | ⛔ 仅 effect 占位，敌人增益移除逻辑未写；归档 Batch2 Phase2.3。 |
-| 薇恩 | （缺失） | ⛔ 当前只有 `VaynePassive`/Q/E；需新增 `VayneR`（或将被动拆分）以符合 20 英雄要求。 |
-| 提莫 | （缺失） | ⛔ `cards.js` 尚无 `TeemoR`；需依 Batch4 污染机制补卡。 |
+| 薇恩 | `VayneR` / `STRENGTH + NEXT_ATTACK_DOUBLE` | ⚠️ R 技能已补齐，需在 BattleScene 中叠加力量并复用 `nextAttackDouble` 逻辑；同样排进 Phase2.1。 |
+| 提莫 | `TeemoR` / `POISON + WEAK` | ⚠️ 卡片现已存在，但未实现“蘑菇爆炸追加毒+虚弱”；视同批次与毒系机制一起实现。 |
 | 锤石 | `ThreshR` / `WEAK_VULN_AND_PERMAHP` | ⛔ 仅记录状态，未处理“击杀加最大生命”；排入 Batch3 Phase3.3。 |
 | 内瑟斯 | `NasusR` / `TEMP_STR` | ⛔ `tempStrength` 没有结算入口；Batch3 Phase3.3 实现。 |
 | 艾瑞莉娅 | `IreliaR` / `ALL_ATTACKS_BONUS` | ⛔ 未对本回合其它攻击追加伤害；计划在 Batch2 Phase2.5。 |

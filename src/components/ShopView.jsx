@@ -98,11 +98,29 @@ const ShopView = ({ onLeave, onBuyCard, onBuyRelic, onUpgradeCard, onBuyMana, go
                         <div className="flex flex-wrap gap-4">
                             {cardStock.map(card => {
                                 const isBought = purchasedItems.includes(card.id);
+                                const isUltimateCard = card.hero && card.hero !== 'Neutral' && card.id.endsWith('R');
+                                const hoverable = !isBought ? 'hover:scale-105 cursor-pointer' : 'opacity-20 grayscale pointer-events-none';
+                                const borderClass = isUltimateCard ? 'border-yellow-300 shadow-[0_0_25px_rgba(255,215,0,0.55)]' : 'border-slate-600';
                                 return (
-                                    <div key={card.id} onClick={() => !isBought && handleBuy(card, 'CARD')} className={`w-32 h-48 relative group transition-all ${isBought ? 'opacity-20 grayscale pointer-events-none' : 'hover:scale-105 cursor-pointer'}`}>
-                                        <img src={card.img} className="w-full h-full object-cover rounded border border-slate-600" />
+                                    <div
+                                        key={card.id}
+                                        onClick={() => !isBought && handleBuy(card, 'CARD')}
+                                        className={`w-32 h-48 relative group transition-all rounded-lg overflow-hidden ${hoverable}`}
+                                    >
+                                        {isUltimateCard && (
+                                            <div className="pointer-events-none absolute inset-0 rounded-lg border border-yellow-200/80 ring-1 ring-yellow-400/40 shadow-[0_0_30px_rgba(255,215,0,0.7)] animate-pulse">
+                                                <div className="absolute inset-[-6px] rounded-xl bg-gradient-to-r from-yellow-200/15 via-transparent to-yellow-200/15 blur-sm" />
+                                            </div>
+                                        )}
+                                        <img src={card.img} className={`w-full h-full object-cover rounded-lg border ${borderClass}`} />
                                         <div className="absolute bottom-0 left-0 right-0 bg-black/90 text-center py-1 text-xs font-bold text-[#C8AA6E] border-t border-[#C8AA6E]">{card.price} G</div>
-                                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-40 bg-black border border-[#C8AA6E] p-2 z-50 hidden group-hover:block text-center pointer-events-none text-xs text-white"><div className="font-bold mb-1">{card.name}</div>{card.description}</div>
+                                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-40 bg-black border border-[#C8AA6E] p-2 z-50 hidden group-hover:block text-center pointer-events-none text-xs text-white">
+                                            <div className="font-bold mb-1 flex items-center justify-center gap-1">
+                                                {card.name}
+                                                {isUltimateCard && <span className="text-[9px] text-yellow-300 font-bold">R</span>}
+                                            </div>
+                                            {card.description}
+                                        </div>
                                     </div>
                                 )
                             })}

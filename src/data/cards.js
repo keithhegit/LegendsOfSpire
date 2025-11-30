@@ -129,9 +129,16 @@ export const CARD_DATABASE = {
 
   LeeR: { id: 'LeeR', name: '猛龙摆尾', type: 'ATTACK', cost: 3, value: 20, rarity: 'RARE', hero: 'LeeSin', target: 'single', effect: 'REMOVE_BUFF', effectValue: 1, description: '对目标造成20伤并移除目标的一个增益。', img: `${SPELL_URL}/LeeR.png`, price: 150 },
 
+  // Riven
+  RivenR: { id: 'RivenR', name: '放逐之锋', type: 'ATTACK', cost: 3, value: 16, rarity: 'RARE', hero: 'Riven', target: 'single', effect: 'STRENGTH', effectValue: 4, effect2: 'LOW_HP_BONUS', effectValue2: 16, description: '激活放逐之锋，立即获得4点力量，并对残血目标额外造成16点伤害。', img: `${SPELL_URL}/RivenFengShuiEngine.png`, price: 150 },
+
+  // Twisted Fate
+  TwistedFateR: { id: 'TwistedFateR', name: '命运', type: 'SKILL', cost: 3, value: 0, rarity: 'RARE', hero: 'TwistedFate', target: 'self', effect: 'DRAW', effectValue: 2, effect2: 'NEXT_ATTACK_BONUS', effectValue2: 6, description: '揭示战场抽2张牌，并让下一次攻击额外造成6点伤害。', img: `${SPELL_URL}/Destiny.png`, price: 150 },
+
   // Vayne
   VayneQ: { id: 'VayneQ', name: '翻滚', type: 'ATTACK', cost: 0, value: 6, rarity: 'COMMON', hero: 'Vayne', target: 'single', effect: 'NEXT_HIT_DOUBLE', effectValue: 2, description: '造成4伤；下一次对同一目标的攻击伤害翻倍。', img: `${SPELL_URL}/VayneTumble.png`, price: 30 },
   VayneE: { id: 'VayneE', name: '墙角突袭', type: 'ATTACK', cost: 1, value: 8, rarity: 'UNCOMMON', hero: 'Vayne', target: 'single', effect: 'STUN_IF_WEAK', effectValue: 1, description: '对目标造成6伤；若目标虚弱则使其眩晕1回合。', img: `${SPELL_URL}/VayneCondemn.png`, price: 100 },
+  VayneR: { id: 'VayneR', name: '终极时刻', type: 'POWER', cost: 3, value: 0, rarity: 'RARE', hero: 'Vayne', target: 'self', effect: 'STRENGTH', effectValue: 4, effect2: 'NEXT_ATTACK_DOUBLE', effectValue2: 1, description: '进入终极猎杀状态，获得4点力量且下一次攻击伤害翻倍。', img: `${SPELL_URL}/VayneInquisition.png`, price: 150 },
   ZedR: { id: 'ZedR', name: '死亡印记', type: 'SKILL', cost: 3, value: 0, rarity: 'RARE', hero: 'Zed', target: 'single', effect: 'DEATHMARK', effectValue: 3, description: '对目标施加印记（3回合）；若在印记期间造成致命伤害，则额外造成等量伤害。', img: `${SPELL_URL}/ZedR.png`, price: 150 },
   ZedQ: { id: 'ZedQ', name: '手里剑', type: 'ATTACK', cost: 1, value: 9, rarity: 'COMMON', hero: 'Zed', target: 'single', effect: 'MULTI_HIT', effectValue: 3, description: '对目标造成三段伤害，总计9点。', img: `${SPELL_URL}/ZedQ.png`, price: 50 },
   ZedW: { id: 'ZedW', name: '影分身', type: 'SKILL', cost: 1, value: 0, rarity: 'UNCOMMON', hero: 'Zed', target: 'self', effect: 'COPY_NEXT_ATTACK', effectValue: 50, description: '召唤影分身：在本回合复制下一次对单体的攻击（分身造成50%伤害）。', img: `${SPELL_URL}/ZedW.png`, price: 80 },
@@ -147,6 +154,7 @@ export const CARD_DATABASE = {
   TeemoQ: { id: 'TeemoQ', name: '致盲吹箭', type: 'ATTACK', cost: 1, value: 6, rarity: 'COMMON', hero: 'Teemo', target: 'single', effect: 'WEAK', effectValue: 2, description: '造成6伤并使目标虚弱2（致盲效果）。', img: `${SPELL_URL}/TeemoQ.png`, price: 50 },
   TeemoW: { id: 'TeemoW', name: '疾速行军', type: 'SKILL', cost: 1, value: 5, rarity: 'UNCOMMON', hero: 'Teemo', target: 'self', effect: 'DRAW', effectValue: 1, description: '抽1张牌并获得5护甲。', img: `${SPELL_URL}/TeemoW.png`, price: 80 },
   TeemoE: { id: 'TeemoE', name: '毒性射击', type: 'ATTACK', cost: 1, value: 0, rarity: 'UNCOMMON', hero: 'Teemo', target: 'single', effect: 'POISON', effectValue: 3, description: '对目标施加3层毒（目标单体持续伤害）。', img: `${SPELL_URL}/TeemoE.png`, price: 100 },
+  TeemoR: { id: 'TeemoR', name: '剧毒陷阱', type: 'SKILL', cost: 3, value: 0, rarity: 'RARE', hero: 'Teemo', target: 'single', effect: 'POISON', effectValue: 6, effect2: 'WEAK', effectValue2: 2, description: '埋下剧毒蘑菇，对目标施加6层中毒并附加2层虚弱。', img: `${SPELL_URL}/BantamTrap.png`, price: 150 },
 
   // Thresh
   ThreshQ: { id: 'ThreshQ', name: '死亡判决', type: 'ATTACK', cost: 1, value: 8, rarity: 'COMMON', hero: 'Thresh', target: 'single', effect: 'PULL', effectValue: 1, description: '造成8伤并拉近目标（使其下一次攻击伤害+2）。', img: `${SPELL_URL}/ThreshQ.png`, price: 50 },
