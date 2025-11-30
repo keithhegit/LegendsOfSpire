@@ -46,10 +46,10 @@
 | 拉克丝 | `LuxR` / `CONDITIONAL_DOUBLE` | ✅ 逻辑已接入（L286-L289），但需要 Batch2 Phase2.5 的专用测试卡组验证。 |
 | 金克丝 | `JinxR` / `LOW_HP_BONUS` | ✅ L291-L294 处理低血加伤，Batch2 Phase2.5 复测中。 |
 | 亚索 | `YasuoR` / `SCALE_BY_CRIT` | ⚠️ L296-L309 依赖暴击计数，当前 crit 系统只接入 `YasuoQ`，需 Phase2.2 完成全量暴击流程。 |
-| 娑娜 | `SonaR` / `PER_CARD_BONUS` | ⛔ BattleScene 未读取 `perCardBonus`，排期在 Batch2 Phase2.1（Quick Win）。 |
+| 娑娜 | `SonaR` / `PER_CARD_BONUS` | ✅ 读取本回合已出牌数量并叠加每张 +2 伤害，等待 QA。 |
 | 艾克 | `EkkoR` / `HEAL_AND_DAMAGE` | ⛔ 尚未实现“同时伤害并回复”逻辑，列入 Batch2 Phase2.3。 |
 | 塞拉斯 | `SylasR` / `COPY_ENEMY_ACTION` | ⛔ 未接管 `nextEnemyAction`，Batch2 Phase2.5 待实现。 |
-| 厄加特 | `UrgotR` / `LOW_HP_EXECUTE` | ⛔ 没有阈值检验，Batch2 Phase2.1 需新增直接击杀逻辑。 |
+| 厄加特 | `UrgotR` / `LOW_HP_EXECUTE` | ✅ 敌人 HP ≤ 30% 时立即触发处决，护甲与 HP 同步清空。 |
 | 维克托 | `ViktorR` / `DRAW_ON_USE` | ⛔ 未触发额外抽牌，Batch2 Phase2.3 需补。 |
 | 瑞文 | `RivenR` / `STRENGTH + LOW_HP_BONUS` | ⚠️ 卡牌已写入 `cards.js`，但 BattleScene 仍缺“激活放逐之锋后获得力量与残血加伤”的逻辑；排入 Batch2 Phase2.1。 |
 | 卡牌大师 | `TwistedFateR` / `DRAW + NEXT_ATTACK_BONUS` | ⚠️ 新卡提供抽牌与下一击增伤，BattleScene 需读取 `effectUpdates.nextAttackBonus`；归入 Batch2 Phase2.1。 |
@@ -72,11 +72,11 @@
 | :--- | :--- | :--- | :--- | :--- | :--- | ---- |
 | **CRIT_CHANCE** | `YasuoQ` | 斩钢闪 | 无 | 多次打出 | 有概率造成暴击（伤害数字变大/变色，通常为 2 倍）。 |  |
 | **IMMUNE_ONCE** | `YasuoW` | 风之墙 | 无 | 打出卡牌 | 获得免疫状态。结束回合，敌人攻击时伤害为 0，显示 "IMMUNE"。 | 防御+12未生效，免疫效果生效 |
-| **DOUBLE_IF_ATTACKED** | `YasuoE` | 疾风步 | 本回合已攻击 | 打出卡牌 | 伤害翻倍（需先打出一张攻击牌）。 | 伤害翻倍未实现 |
+| **DOUBLE_IF_ATTACKED** | `YasuoE` | 疾风步 | 本回合已攻击 | 打出卡牌 | 伤害翻倍（需先打出一张攻击牌）。 | √ 记录当回合攻击计数，若之前已打出攻击牌则本次伤害×2。 |
 | **SCALE_BY_CRIT** | `YasuoR` | 狂风绝息斩 | 本回合暴击过 | 打出卡牌 | 造成多次伤害，次数等于本回合暴击次数。 |  |
 | **SELF_BLOCK** | `SonaQ` | 英勇赞美诗 | 无 | 打出卡牌 | 造成伤害的同时，自身获得护甲。 |  |
 | **DRAW_MANA** | `SonaE` | 迅捷奏鸣曲 | 无 | 打出卡牌 | 抽牌并获得临时法力（法力值增加）。 |  |
-| **PER_CARD_BONUS** | `SonaR` | 终乐章 | 本回合多出牌 | 打出卡牌 | 伤害随本回合已打出卡牌数量增加。 |  |
+| **PER_CARD_BONUS** | `SonaR` | 终乐章 | 本回合多出牌 | 打出卡牌 | 伤害随本回合已打出卡牌数量增加。 | √ 读取当前牌序，之前每出一张牌会额外+2 伤害。 |
 | **RETRO_BONUS** | `EkkoQ` | 时间折刃 | 上回合攻击过 | 打出卡牌 | 若上回合对该敌人造成过伤害，本卡伤害增加。 |  |
 | **REFLECT_IF_HIT** | `EkkoW` | 时光护盾 | 无 | 打出卡牌 | 获得状态。敌人攻击时，受到反弹伤害。 |  |
 | **NEXT_COST_REDUCE** | `EkkoE` | 相位俯冲 | 手有攻击牌 | 打出卡牌 | 手牌中下一张攻击牌的费用 -1。 |  |
@@ -85,9 +85,9 @@
 | **NEXT_ATTACK_DOUBLE** | `SylasE` | 叛乱突袭 | 无 | 打出卡牌 | 获得状态。下一张攻击牌造成的伤害翻倍。 |  |
 | **COPY_ENEMY_ACTION** | `SylasR` | 夺魂 | 敌人意图攻击 | 打出卡牌 | 施放敌人即将进行的攻击（对敌人造成伤害）。 |  |
 | **SELF_DAMAGE** | `UrgotE` | 超限驱动 | 无 | 打出卡牌 | 对敌人造成伤害，同时自己扣除少量生命值。 |  |
-| **LOW_HP_EXECUTE** | `UrgotR` | 处刑索命 | 敌人HP<30% | 打出卡牌 | 直接消灭敌人（显示巨额伤害或直接致死）。 |  |
+| **LOW_HP_EXECUTE** | `UrgotR` | 处刑索命 | 敌人HP<30% | 打出卡牌 | 直接消灭敌人（显示巨额伤害或直接致死）。 | √ 低于 30% 最大生命触发斩杀，直接清空护甲与 HP。 |
 | **BUFF_NEXT_SKILL** | `ViktorQ` | 能量转导 | 手有技能牌 | 打出卡牌 | 下一张技能牌的数值（伤害或护甲）增加。 | 未生效。 |
-| **BONUS_IF_VULN** | `ViktorE` | 光束 | 敌人易伤 | 打出卡牌 | 若敌人有易伤，造成额外伤害。 | √（敌人有易伤，易伤+4？ |
+| **BONUS_IF_VULN** | `ViktorE` | 光束 | 敌人易伤 | 打出卡牌 | 若敌人有易伤，造成额外伤害。 | √ 易伤状态下追加 `effectValue`（默认 +4）伤害。 |
 | **DRAW_ON_USE** | `ViktorR` | 进化歧路 | 无 | 打出卡牌 | 造成伤害并抽牌。 |  |
 | **REMOVE_BUFF** | `LeeR` | 猛龙摆尾 | 敌人有Buff | 打出卡牌 | 造成伤害并移除敌人一个增益状态（如力量、格挡）。 |  |
 | **STUN_IF_WEAK** | `VayneE` | 墙角突袭 | 敌人虚弱 | 打出卡牌 | 若敌人虚弱，使其眩晕。否则只造成伤害。 | √（还有6点基础伤害） |

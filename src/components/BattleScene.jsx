@@ -58,6 +58,7 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
     const [katarinaAttackCount, setKatarinaAttackCount] = useState(0); // 卡特琳娜：攻击计数
     const [lastPlayedCard, setLastPlayedCard] = useState(null); // 追踪最后打出的牌
     const [cardsPlayedCount, setCardsPlayedCount] = useState(0); // 本回合打出的卡牌数量
+    const [attacksThisTurn, setAttacksThisTurn] = useState(0); // 本回合打出的攻击牌数量
     // Batch 2: 暴击系统
     const [critCount, setCritCount] = useState(0);
     // Batch 2: 伤害历史追踪
@@ -111,6 +112,7 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
         let drawCount = 5; if (heroData.relicId === "JinxPassive") drawCount = 6;
         drawCards(drawCount);
         setCardsPlayedCount(0); // 重置卡牌计数
+        setAttacksThisTurn(0); // 重置攻击计数
         setCritCount(0); // Batch 2: 重置暴击计数
         if (heroData.relicId === "ViktorPassive" && Math.random() < 0.5) {
             const basicCard = shuffle(['Strike', 'Defend'])[0];
@@ -160,6 +162,9 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
             console.error(`Card not found in database: ${baseId}`);
             return;
         }
+
+        const cardsPlayedBefore = cardsPlayedCount;
+        const attackCountBeforeCard = attacksThisTurn;
 
         // 如果是升级卡牌，增强属性
         let card = {
@@ -284,8 +289,8 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
             }
 
             // FIX: 条件双倍 (CONDITIONAL_DOUBLE) - LuxR
-            if (effectUpdates.conditionalDouble && cardsPlayedCount >= 4) {
-                baseDmg *= 2; // 这里的 cardsPlayedCount 包含当前这张牌，所以如果是第4张打出，count已经是4
+            if (effectUpdates.conditionalDouble && cardsPlayedIncludingCurrent >= effectUpdates.conditionalDouble) {
+                baseDmg *= 2; // 满足本回合出牌数量要求后伤害翻倍
             }
 
             // FIX: 低血加成 (LOW_HP_BONUS) - JinxR
@@ -322,6 +327,8 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
 
             // FIX: 提前合并状态用于计算 (解决 Vulnerable 异步问题)
             const currentEnemyStatus = { ...enemyStatus, ...effectUpdates.enemyStatus };
+            const cardsPlayedIncludingCurrent = cardsPlayedBefore + 1;
+            const priorCardsThisTurn = Math.max(0, cardsPlayedIncludingCurrent - 1);
 
             // 易伤加成应用于基础伤害 (方案A) - 使用合并后的状态
             if (currentEnemyStatus.vulnerable > 0) {
@@ -333,10 +340,22 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
                 baseDmg += effectUpdates.bonusIfMarked;
             }
 
+            if (effectUpdates.bonusIfVuln && currentEnemyStatus.vulnerable > 0) {
+                baseDmg += effectUpdates.bonusIfVuln;
+            }
+
             // FIX: 下一次攻击翻倍 (NEXT_ATTACK_DOUBLE)
             if (playerStatus.nextAttackDouble) {
                 baseDmg *= 2;
                 setPlayerStatus(prev => ({ ...prev, nextAttackDouble: false }));
+            }
+
+            if (effectUpdates.doubleIfAttacked && attackCountBeforeCard > 0) {
+                baseDmg *= 2;
+            }
+
+            if (effectUpdates.bonusPerCard && priorCardsThisTurn > 0) {
+                baseDmg += effectUpdates.bonusPerCard * priorCardsThisTurn;
             }
 
             // 卡特琳娜被动：每打出3张攻击牌后，下一张(第4张)攻击牌伤害翻倍
@@ -345,7 +364,10 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
                 setKatarinaAttackCount(0); // 重置计数器
             }
 
-            for (let i = 0; i < hits; i++) {
+            const shouldExecute = effectUpdates.executeThreshold && (enemyHp <= enemyConfig.maxHp * (effectUpdates.executeThreshold / 100));
+
+            const processMultiHit = () => {
+                for (let i = 0; i < hits; i++) {
                 let finalDmg = baseDmg; // 每次击打使用已计算易伤的基础伤害
                 if (heroData.relicId === "YasuoPassive" && Math.random() < 0.1) finalDmg = Math.floor(finalDmg * 2);
                 if (heroData.relics.includes("InfinityEdge")) finalDmg = Math.floor(finalDmg * 1.5);
@@ -419,6 +441,17 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
                     setDmgOverlay({ val: hitDmg, target: 'ENEMY' });
                     setTimeout(() => setDmgOverlay(null), 250);
                 }, i * 300);
+                }
+            };
+
+            if (shouldExecute) {
+                setEnemyBlock(0);
+                setEnemyHp(0);
+                setDmgOverlay({ val: 'EXECUTE!', target: 'ENEMY', color: 'text-amber-300' });
+                setTimeout(() => setDmgOverlay(null), 600);
+                playSfx('HIT_TAKEN');
+            } else {
+                processMultiHit();
             }
             // setDmgOverlay({ val: total, target: 'ENEMY' }); setTimeout(() => setDmgOverlay(null), 800);
         }
@@ -426,6 +459,10 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
             // 玩家获得格挡时播放格挡音效
             playSfx('BLOCK_SHIELD');
             setPlayerBlock(b => b + card.block);
+        }
+
+        if (card.type === 'ATTACK') {
+            setAttacksThisTurn(prev => prev + 1);
         }
     };
 
