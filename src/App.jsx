@@ -1209,12 +1209,16 @@ export default function LegendsOfTheSpire() {
                 <div className="absolute inset-0 z-[110] flex flex-col items-center justify-center bg-black/70 text-white px-6 text-center">
                     <div className="bg-slate-900/80 border border-red-500/60 p-6 rounded-lg shadow-[0_0_30px_rgba(0,0,0,0.8)] max-w-xl">
                         <p className="text-lg font-semibold text-red-300 mb-3">死胡同警告</p>
-                        <p className="text-sm text-slate-200 mb-4">
-                            当前地图没有可用节点可选，建议重新生成地图并重新选英雄，否则会在 Act 3 被卡住。
+                        <p className="text-sm text-slate-200 mb-4 leading-relaxed">
+                            刺客 - 艾克对你大吼：“时间不在于你拥有多少，而在于你怎样使用。”你被时间的 R 技能「时空断裂」击中，即将被回溯到泉水边。
                         </p>
-                        <div className="flex flex-wrap items-center justify-center gap-3">
-                            <button onClick={handleRestartMap} className="px-5 py-2 rounded-full bg-red-500 hover:bg-red-400 text-xs uppercase tracking-[0.4em]">重新生成</button>
-                            <button onClick={() => setShowDeadEndPrompt(false)} className="px-5 py-2 rounded-full border border-white/30 hover:border-white text-xs uppercase tracking-[0.4em]">稍后</button>
+                        <div className="flex items-center justify-center">
+                            <button
+                                onClick={handleRestartMap}
+                                className="px-6 py-2 rounded-full bg-red-500 hover:bg-red-400 text-xs uppercase tracking-[0.4em]"
+                            >
+                                确认
+                            </button>
                         </div>
                     </div>
                 </div>
