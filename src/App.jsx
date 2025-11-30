@@ -1221,6 +1221,7 @@ export default function LegendsOfTheSpire() {
             )}
             {renderView()}
             {showCodex && <CodexView onClose={() => setShowCodex(false)} />}
+            {showCollection && <CollectionSystem onClose={() => setShowCollection(false)} />}
             {showDeck && <DeckView deck={masterDeck} onClose={() => setShowDeck(false)} />}
             <ToastContainer toasts={toasts} />
         </div>
