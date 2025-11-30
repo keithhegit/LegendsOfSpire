@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { Sword, Shield, Zap, Skull, Heart, RefreshCw, AlertTriangle, Flame, XCircle, Activity, Map as MapIcon, Gift, Anchor, Coins, ShoppingBag, ChevronRight, Star, Play, Pause, Volume2, VolumeX, Landmark, Lock, RotateCcw, Save, ArrowRight, BookOpen, Layers, UserSquare, LogOut, Backpack, Trophy } from 'lucide-react';
+import { Sword, Shield, Zap, Skull, Heart, RefreshCw, AlertTriangle, Flame, XCircle, Activity, Map as MapIcon, Gift, Anchor, Coins, ShoppingBag, ChevronRight, Star, Play, Pause, Volume2, VolumeX, Landmark, Lock, RotateCcw, Save, ArrowRight, Layers, UserSquare, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { generateGridMap } from './data/gridMapLayout_v4'; // v4生成器（带死胡同检测）
 import { CARD_DATABASE } from './data/cards'; // 卡牌数据
@@ -17,6 +17,9 @@ const CDN_URL = `https://ddragon.leagueoflegends.com/cdn/${CDN_VERSION}`;
 const LOADING_URL = "https://ddragon.leagueoflegends.com/cdn/img/champion/loading";
 const SPLASH_URL = "https://ddragon.leagueoflegends.com/cdn/img/champion/splash";
 const ITEM_URL = `${CDN_URL}/img/item`;
+const COLLECTION_ICON = `${ITEM_URL}/3802.png`;
+const ACHIEVEMENT_ICON = `${ITEM_URL}/3190.png`;
+const BACKPACK_ICON = `${ITEM_URL}/2052.png`;
 const SPELL_URL = `${CDN_URL}/img/spell`;
 const PASSIVE_URL = `${CDN_URL}/img/passive`;
 const PROFILEICON_URL = `${CDN_URL}/img/profileicon`;
@@ -1090,7 +1093,12 @@ export default function LegendsOfTheSpire() {
                             onClick={() => setShowCollection(true)}
                             className="w-12 h-12 bg-slate-900/90 border border-[#C8AA6E] rounded-lg flex items-center justify-center hover:scale-110 transition-transform group relative shadow-lg shadow-black/50"
                         >
-                            <BookOpen className="w-6 h-6 text-[#C8AA6E]" />
+                            <img
+                                src={COLLECTION_ICON}
+                                alt="图鉴入口"
+                                className="w-8 h-8 object-contain drop-shadow-[0_0_8px_rgba(200,170,110,0.7)]"
+                                draggable="false"
+                            />
                             <div className="absolute right-full mr-3 bg-slate-900 text-[#C8AA6E] text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap border border-[#C8AA6E]/30 pointer-events-none">
                                 图鉴 (Collection)
                             </div>
@@ -1099,7 +1107,12 @@ export default function LegendsOfTheSpire() {
                         <button
                             className="w-12 h-12 bg-slate-900/80 border border-slate-600 rounded-lg flex items-center justify-center opacity-60 cursor-not-allowed group relative grayscale"
                         >
-                            <Backpack className="w-6 h-6 text-slate-400" />
+                            <img
+                                src={BACKPACK_ICON}
+                                alt="背包占位"
+                                className="w-8 h-8 object-contain"
+                                draggable="false"
+                            />
                             <div className="absolute right-full mr-3 bg-slate-900 text-slate-400 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap border border-slate-600/30 pointer-events-none">
                                 背包 (Coming Soon)
                             </div>
@@ -1108,7 +1121,12 @@ export default function LegendsOfTheSpire() {
                         <button
                             className="w-12 h-12 bg-slate-900/80 border border-slate-600 rounded-lg flex items-center justify-center opacity-60 cursor-not-allowed group relative grayscale"
                         >
-                            <Trophy className="w-6 h-6 text-slate-400" />
+                            <img
+                                src={ACHIEVEMENT_ICON}
+                                alt="成就占位"
+                                className="w-8 h-8 object-contain"
+                                draggable="false"
+                            />
                             <div className="absolute right-full mr-3 bg-slate-900 text-slate-400 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap border border-slate-600/30 pointer-events-none">
                                 成就 (Coming Soon)
                             </div>
