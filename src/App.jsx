@@ -1181,7 +1181,7 @@ export default function LegendsOfTheSpire() {
     };
 
     const handleExitBattle = () => {
-        if (view !== 'BATTLE') return;
+        if (view !== 'COMBAT') return;
         setView('MAP');
     };
 
@@ -1272,7 +1272,7 @@ export default function LegendsOfTheSpire() {
                                 </div>
                             </div>
                         </div>
-                        {view === 'BATTLE' && (
+                        {view === 'COMBAT' && (
                             <div className="absolute left-1/2 -translate-x-1/2 pointer-events-auto">
                                 <button
                                     onClick={handleExitBattle}
