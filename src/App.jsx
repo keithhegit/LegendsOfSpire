@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { Sword, Shield, Zap, Skull, Heart, RefreshCw, AlertTriangle, Flame, XCircle, Activity, Map as MapIcon, Gift, Anchor, Coins, ShoppingBag, ChevronRight, Star, Play, Pause, Volume2, VolumeX, Landmark, Lock, RotateCcw, Save, ArrowRight, BookOpen, Layers, UserSquare, LogOut } from 'lucide-react';
+import { Sword, Shield, Zap, Skull, Heart, RefreshCw, AlertTriangle, Flame, XCircle, Activity, Map as MapIcon, Gift, Anchor, Coins, ShoppingBag, ChevronRight, Star, Play, Pause, Volume2, VolumeX, Landmark, Lock, RotateCcw, Save, ArrowRight, BookOpen, Layers, UserSquare, LogOut, Backpack, Trophy } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { generateGridMap } from './data/gridMapLayout_v4'; // v4生成器（带死胡同检测）
 import { CARD_DATABASE } from './data/cards'; // 卡牌数据
@@ -1080,6 +1080,37 @@ export default function LegendsOfTheSpire() {
                                 }`}
                         >
                             🧪 ACT 3
+                        </button>
+                    </div>
+                    {/* 右侧功能侧边栏 */}
+                    <div className="absolute top-32 right-6 z-[100] flex flex-col gap-4">
+                        {/* 图鉴系统 (Collection) */}
+                        <button
+                            onClick={() => setShowCollection(true)}
+                            className="w-12 h-12 bg-slate-900/90 border border-[#C8AA6E] rounded-lg flex items-center justify-center hover:scale-110 transition-transform group relative shadow-lg shadow-black/50"
+                        >
+                            <BookOpen className="w-6 h-6 text-[#C8AA6E]" />
+                            <div className="absolute right-full mr-3 bg-slate-900 text-[#C8AA6E] text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap border border-[#C8AA6E]/30 pointer-events-none">
+                                图鉴 (Collection)
+                            </div>
+                        </button>
+                        {/* 背包系统 (Coming Soon) */}
+                        <button
+                            className="w-12 h-12 bg-slate-900/80 border border-slate-600 rounded-lg flex items-center justify-center opacity-60 cursor-not-allowed group relative grayscale"
+                        >
+                            <Backpack className="w-6 h-6 text-slate-400" />
+                            <div className="absolute right-full mr-3 bg-slate-900 text-slate-400 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap border border-slate-600/30 pointer-events-none">
+                                背包 (Coming Soon)
+                            </div>
+                        </button>
+                        {/* 成就系统 (Coming Soon) */}
+                        <button
+                            className="w-12 h-12 bg-slate-900/80 border border-slate-600 rounded-lg flex items-center justify-center opacity-60 cursor-not-allowed group relative grayscale"
+                        >
+                            <Trophy className="w-6 h-6 text-slate-400" />
+                            <div className="absolute right-full mr-3 bg-slate-900 text-slate-400 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap border border-slate-600/30 pointer-events-none">
+                                成就 (Coming Soon)
+                            </div>
                         </button>
                     </div>
                     <GridMapView_v3 mapData={mapData} onNodeSelect={handleNodeSelect} currentFloor={currentFloor} act={currentAct} activeNode={activeNode} lockedChoices={lockedChoices} />
