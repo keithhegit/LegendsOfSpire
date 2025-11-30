@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Sword, Shield, Zap, Skull, Heart, RefreshCw, AlertTriangle, Flame, XCircle, Activity, Map as MapIcon, Gift, Anchor, Coins, ShoppingBag, ChevronRight, Star, Play, Pause, Volume2, VolumeX, Landmark, Lock, RotateCcw, Save, ArrowRight, BookOpen, Layers, UserSquare, LogOut } from 'lucide-react';
+const CDN_VERSION = "14.10.1";
 const CDN_URL = `https://ddragon.leagueoflegends.com/cdn/${CDN_VERSION}`;
 const LOADING_URL = "https://ddragon.leagueoflegends.com/cdn/img/champion/loading";
 const SPLASH_URL = "https://ddragon.leagueoflegends.com/cdn/img/champion/splash";
