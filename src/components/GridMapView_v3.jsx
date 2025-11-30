@@ -132,7 +132,8 @@ const GridMapView_v3 = ({ mapData, onNodeSelect, activeNode, currentFloor, act, 
         <img
           src={loadingImages[loadingProgress]}
           alt="Loading"
-          className="w-full h-full object-cover"
+          className="max-w-full max-h-full object-contain"
+          draggable="false"
         />
       </div>
     );
