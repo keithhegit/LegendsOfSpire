@@ -1087,16 +1087,16 @@ export default function LegendsOfTheSpire() {
                         </button>
                     </div>
                     {/* 右侧功能侧边栏 */}
-                    <div className="absolute top-32 right-6 z-[100] flex flex-col gap-4">
+                    <div className="absolute top-32 right-6 z-[100] flex flex-col gap-5">
                         {/* 图鉴系统 (Collection) */}
                         <button
                             onClick={() => setShowCollection(true)}
-                            className="w-12 h-12 bg-slate-900/90 border border-[#C8AA6E] rounded-lg flex items-center justify-center hover:scale-110 transition-transform group relative shadow-lg shadow-black/50"
+                            className="w-16 h-16 bg-slate-900/90 border border-[#C8AA6E] rounded-lg flex items-center justify-center hover:scale-110 transition-transform group relative shadow-lg shadow-black/50"
                         >
                             <img
                                 src={COLLECTION_ICON}
                                 alt="图鉴入口"
-                                className="w-8 h-8 object-contain drop-shadow-[0_0_8px_rgba(200,170,110,0.7)]"
+                                className="w-12 h-12 object-contain drop-shadow-[0_0_8px_rgba(200,170,110,0.7)]"
                                 draggable="false"
                             />
                             <div className="absolute right-full mr-3 bg-slate-900 text-[#C8AA6E] text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap border border-[#C8AA6E]/30 pointer-events-none">
@@ -1105,12 +1105,12 @@ export default function LegendsOfTheSpire() {
                         </button>
                         {/* 背包系统 (Coming Soon) */}
                         <button
-                            className="w-12 h-12 bg-slate-900/80 border border-slate-600 rounded-lg flex items-center justify-center opacity-60 cursor-not-allowed group relative grayscale"
+                            className="w-16 h-16 bg-slate-900/80 border border-slate-600 rounded-lg flex items-center justify-center opacity-60 cursor-not-allowed group relative grayscale"
                         >
                             <img
                                 src={BACKPACK_ICON}
                                 alt="背包占位"
-                                className="w-8 h-8 object-contain"
+                                className="w-12 h-12 object-contain"
                                 draggable="false"
                             />
                             <div className="absolute right-full mr-3 bg-slate-900 text-slate-400 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap border border-slate-600/30 pointer-events-none">
@@ -1119,12 +1119,12 @@ export default function LegendsOfTheSpire() {
                         </button>
                         {/* 成就系统 (Coming Soon) */}
                         <button
-                            className="w-12 h-12 bg-slate-900/80 border border-slate-600 rounded-lg flex items-center justify-center opacity-60 cursor-not-allowed group relative grayscale"
+                            className="w-16 h-16 bg-slate-900/80 border border-slate-600 rounded-lg flex items-center justify-center opacity-60 cursor-not-allowed group relative grayscale"
                         >
                             <img
                                 src={ACHIEVEMENT_ICON}
                                 alt="成就占位"
-                                className="w-8 h-8 object-contain"
+                                className="w-12 h-12 object-contain"
                                 draggable="false"
                             />
                             <div className="absolute right-full mr-3 bg-slate-900 text-slate-400 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap border border-slate-600/30 pointer-events-none">
@@ -1226,16 +1226,13 @@ export default function LegendsOfTheSpire() {
             {view !== 'GAMEOVER' && view !== 'VICTORY_ALL' && view !== 'MENU' && view !== 'CHAMPION_SELECT' && champion && (
                 <>
                     {view === 'MAP' && currentUser && (
-                        <div className="absolute top-24 right-5 z-[115] flex flex-col items-end gap-1 text-right">
+                        <div className="absolute top-24 right-5 z-[115] flex flex-col items-end text-right">
                             <button
                                 onClick={handleResetProgress}
-                                className="px-3 py-1 rounded-full border border-red-500 text-red-200 bg-black/60 hover:bg-red-500/20 transition text-xs uppercase tracking-[0.4em]"
+                                className="px-4 py-1.5 rounded-full border border-red-500 text-red-200 bg-black/60 hover:bg-red-500/20 transition text-xs uppercase tracking-[0.4em]"
                             >
-                                RESET PROGRESS
+                                重置进度
                             </button>
-                            <p className="text-[10px] uppercase tracking-[0.3em] text-red-400">
-                                重置并回到选人画面.
-                            </p>
                         </div>
                     )}
                     <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-black to-transparent z-50 flex items-center justify-between px-8 pointer-events-none">
