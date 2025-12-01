@@ -74,6 +74,18 @@
 
 > 所有阶段完成后，20 位英雄的 R 技能将具备独立测试用例、诊断入口与 UI 反馈。若用户在实战遇到问题，按上述阶段定位即可。
 
+#### Phase 2.2 进行中：R 技能优先任务（不触发 Phase 2.3）
+
+| 英雄 | 目标机制 | 当前缺口 | 计划落点 | 备注 |
+| :--- | :--- | :--- | :--- | :--- |
+| 瑞文 `RivenR` | 激活后立即 +力量、敌人低血额外伤害 | `BattleScene.jsx` 仅写入状态，未在攻击流程读取 `tempStrength / lowHpBonus` | Phase2.2 内补齐状态消费，并在 HUD 中追加残血阈值提示 | 需与 Phase2.2 暴击公式兼容，避免重复翻倍 |
+| 卡牌大师 `TwistedFateR` | 抽牌 + 下一击加成 | 仅有卡面定义；`nextAttackBonus` 未衔接 R 技能入口 | 在 playCard -> SKILL/ATTACK 分支复用 `playerStatus.nextAttackBonus` 流程 | 验证需用 GM 卡组保证立即抽到攻击牌 |
+| 薇恩 `VayneR` | 力量 + 下一张攻击翻倍 | R 技能已入库但未写前端：`strength` 添加成功，`nextAttackDouble` 未触发 | 调用现有 `nextAttackDouble` 重置逻辑，并补充 HUD 反馈 | 与薇恩被动（连续三击）叠加，需测试冲突 |
+| 艾瑞莉娅 `IreliaR` | 本回合所有攻击+伤害 | `allAttacksBonus` 未落地 | 在攻击牌流程读取 `playerStatus.allAttacksBonus` 并在回合结束清零 | 同步在状态栏展示剩余加成 |
+| 提莫 `TeemoR` | 蘑菇陷阱：延迟触发毒+虚弱 | 仅有卡面；`TRAP_TRIGGER` 未接管战斗 loop | Phase2.2 先实现最小版本：记录陷阱并在敌人行动时触发 | 完整 DOT/陷阱系统延伸到 R4 |
+
+> 每完成一项，需在表格“状态”列更新为 ✅ 并补充实测步骤，保证 Phase2.2 仍旧是唯一信息源。
+
 ---
 
 ## 🔵 Batch 2: 高级战斗机制 (Advanced Combat)
@@ -82,7 +94,7 @@
 
 | 效果 ID | 测试卡牌 (ID) | 卡牌名称 | 前置条件 | 验证步骤 | 预期结果 | 实测结果 |
 | :--- | :--- | :--- | :--- | :--- | :--- | ---- |
-| **CRIT_CHANCE** | `YasuoQ` | 斩钢闪 | 无 | 多次打出 | 有概率造成暴击（伤害数字变大/变色，通常为 2 倍）。 | √ 力量 6 时对应 30% 暴击率；测试牌组多次打出可看到 “CRIT!” 飘字与伤害×2，`critCount` 正常累积。 |
+| **CRIT_CHANCE** | `YasuoQ` | 斩钢闪 | 无 | 多次打出 | 有概率造成暴击（伤害数字变大/变色，通常为 2 倍）。 | √ HUD 显示 `10% + 力量×1%`（示例：力量 8 → 18%）；实战中可看到 “CRITICAL HIT” 飘字与伤害×2，`critCount` 正常累积。 |
 | **IMMUNE_ONCE** | `YasuoW` | 风之墙 | 无 | 打出卡牌 | 获得免疫状态。结束回合，敌人攻击时伤害为 0，显示 "IMMUNE"。 | 防御+12未生效，免疫效果生效 |
 | **DOUBLE_IF_ATTACKED** | `YasuoE` | 疾风步 | 本回合已攻击 | 打出卡牌 | 伤害翻倍（需先打出一张攻击牌）。 | √ 记录当回合攻击计数，若之前已打出攻击牌则本次伤害×2。 |
 | **SCALE_BY_CRIT** | `YasuoR` | 狂风绝息斩 | 本回合暴击过 | 打出卡牌 | 造成多次伤害，次数等于本回合暴击次数。 | √ 先用斩钢闪打出 2 次暴击后立刻释放，面板伤害自动按 `critCount` 倍数结算，飘字出现 2 段并同步清零计数。 |
@@ -335,7 +347,7 @@
 2. **CRIT_CHANCE 实现** (YasuoQ) - 30分钟
    ```javascript
    if (card.effect === 'CRIT_CHANCE') {
-     const critChance = (playerStatus.strength || 0) * 0.05; // 每点力量5%
+     const critChance = (playerStatus.strength || 0) * 0.01; // 每点力量1%
      if (Math.random() < critChance) {
        baseDmg *= 2;
        setCritCount(prev => prev + 1);
@@ -355,9 +367,11 @@
 
 **执行记录（2025-12-01）**
 
-- ✅ 在 `BattleScene.jsx` 初始化 `critChance / critDamageMultiplier`，并在回合开始时重置 `critCount`。
-- ✅ 多段攻击统一使用合并后的 `playerStatus`/`enemyStatus`，每段命中独立判定暴击（支持 `CRIT_IF_VULN` 强制暴击），触发时显示 “CRIT!” 飘字并累积 `critCount`。
-- ✅ `YasuoQ` 叠加暴击率→`YasuoR` 按 `critCount` 倍数结算流程完成，Batch 2 表格与 R 技能覆盖表已更新实测结果。
+- ✅ **暴击公式统一**：亚索 = `10% + 力量×1% + Buff`；其他英雄 = `0% + 力量×1% + Buff`。所有来源最终写入 `playerStatus.critChance`，只保留一种暴击机制，避免重复翻倍。
+- ✅ **多段判定**：在 `BattleScene.jsx` 的 `processMultiHit()` 中，逐段命中前合并最新 `playerStatus/ enemyStatus`，用 `didCrit` flag 同步播放 “CRITICAL HIT” 飘字 + 重击音效，并向控制台输出 `CRIT_DEBUG`（卡牌ID、命中序、概率、最终伤害等）。
+- ✅ **可视化调试**：HUD 固化到英雄立绘下方，实时展示 `Crt Chance / Crt Count` 与 `Base / Str / Buff` 拆分；QA 可直接观察暴击率是否符合期望。
+- ✅ **R 技能联动**：`YasuoR` 读取 `critCount` 结算倍伤，R 技能表与 Batch2 表格同步写入新的测试方法。
+- 🔄 **下一步**：在 Phase2.2 内优先补完 R 技能（瑞文/卡牌大师/薇恩/艾瑞莉娅等）的前端逻辑，再进入 Phase2.3（吸血 & 反伤）。
 
 ---
 

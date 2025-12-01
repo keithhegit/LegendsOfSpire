@@ -52,7 +52,7 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
     });
     const [enemyStatus, setEnemyStatus] = useState({ strength: 0, weak: 0, vulnerable: 0, mark: 0, markDamage: 0 });
     const heroBaseCritChance = heroData?.id === 'Yasuo' ? 10 : 0;
-    const heroStrengthCritMultiplier = heroData?.id === 'Yasuo' ? 1 : 5;
+    const heroStrengthCritMultiplier = 1; // 所有英雄每点力量统一+1%暴击
 
     // 被动技能状态追踪
     const [rivenAttackCount, setRivenAttackCount] = useState(0); // 瑞文：攻击计数
