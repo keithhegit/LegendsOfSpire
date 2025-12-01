@@ -50,6 +50,7 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
         nextDrawBonus: 0,
         critChance: 0,
         critDamageMultiplier: 2,
+        buffNextSkill: 0,
         tempStrength: 0,
         globalAttackBonus: 0
     });
@@ -109,6 +110,27 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
         deckRef.current = { drawPile, hand, discardPile };
         forceUpdate();
         playSfx('DRAW');
+    };
+
+    const applyDirectDamage = (rawDamage, label = 'DMG') => {
+        if (rawDamage <= 0) return;
+        setEnemyBlock(prevBlock => {
+            const blockAbsorb = Math.min(prevBlock, rawDamage);
+            const leftover = rawDamage - blockAbsorb;
+            if (leftover > 0) {
+                setEnemyHp(prevHp => {
+                    const newHp = Math.max(0, prevHp - leftover);
+                    setDealtDamageThisTurn(true);
+                    if (enemyStatus.deathMark > 0) {
+                        setDeathMarkDamage(prev => prev + leftover);
+                    }
+                    return newHp;
+                });
+            }
+            setDmgOverlay({ val: `${label} ${rawDamage}`, target: 'ENEMY' });
+            setTimeout(() => setDmgOverlay(null), 400);
+            return prevBlock - blockAbsorb;
+        });
     };
 
     const startTurnLogic = () => {
@@ -225,11 +247,22 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
             ...enemyStatus,
             ...(effectUpdates.enemyStatus || {})
         };
+        let skillBonusPool = 0;
+        if (card.type === 'SKILL' && (playerStatus.buffNextSkill || 0) > 0) {
+            skillBonusPool = playerStatus.buffNextSkill;
+            setPlayerStatus(prev => ({ ...prev, buffNextSkill: 0 }));
+        }
+
         if (effectUpdates.drawCount > 0) drawCards(effectUpdates.drawCount);
         if (effectUpdates.playerHp !== undefined && effectUpdates.playerHp !== null) setPlayerHp(effectUpdates.playerHp);
         if (effectUpdates.manaChange) setPlayerMana(m => Math.min(initialMana, m + effectUpdates.manaChange));
-        if (effectUpdates.healAndDamage) {
-            setPlayerHp(h => Math.min(heroData.maxHp, h + effectUpdates.healAndDamage));
+        if (effectUpdates.healAmount) {
+            setPlayerHp(h => Math.min(heroData.maxHp, h + effectUpdates.healAmount));
+        }
+        if (effectUpdates.damageAmount) {
+            const directDamage = effectUpdates.damageAmount + (card.type === 'SKILL' ? skillBonusPool : 0);
+            if (card.type === 'SKILL') skillBonusPool = 0;
+            applyDirectDamage(directDamage, 'SKILL');
         }
 
         // FIX: 金币奖励 (Bug #2)
@@ -404,6 +437,8 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
 
             const shouldExecute = effectUpdates.executeThreshold && (enemyHp <= enemyConfig.maxHp * (effectUpdates.executeThreshold / 100));
 
+            const lifelinkValue = effectUpdates.lifelinkAmount || 0;
+
             const processMultiHit = () => {
                 for (let i = 0; i < hits; i++) {
                     let finalDmg = baseDmg; // 每次击打使用已计算易伤的基础伤害
@@ -456,6 +491,9 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
                     }
 
                     setEnemyHp(h => Math.max(0, h - dmgToHp)); total += dmgToHp;
+                    if (lifelinkValue > 0 && dmgToHp > 0) {
+                        setPlayerHp(h => Math.min(heroData.maxHp, h + dmgToHp));
+                    }
 
                     // Batch 2: 记录造成伤害 (用于 RETRO_BONUS)
                     if (dmgToHp > 0) setDealtDamageThisTurn(true);
@@ -512,7 +550,12 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
         if (card.block) {
             // 玩家获得格挡时播放格挡音效
             playSfx('BLOCK_SHIELD');
-            setPlayerBlock(b => b + card.block);
+            let blockGain = card.block;
+            if (card.type === 'SKILL' && skillBonusPool > 0) {
+                blockGain += skillBonusPool;
+                skillBonusPool = 0;
+            }
+            setPlayerBlock(b => b + blockGain);
         }
 
         if (card.type === 'ATTACK') {
@@ -741,6 +784,9 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
                     // 玩家格挡时播放格挡音效
                     playSfx('BLOCK_SHIELD');
                     remBlock -= finalDmg;
+                    if (playerStatus.reflectDamage > 0) {
+                        applyDirectDamage(playerStatus.reflectDamage, 'REFLECT');
+                    }
                 } else {
                     let pierce = finalDmg - remBlock;
                     remBlock = 0;
@@ -748,6 +794,9 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
                     // 玩家受击时播放受击音效
                     setTimeout(() => playSfx('HIT_TAKEN'), 250);
                     if (heroData.relics.includes("BrambleVest")) setEnemyHp(h => Math.max(0, h - 3));
+                    if (playerStatus.reflectDamage > 0) {
+                        applyDirectDamage(playerStatus.reflectDamage, 'REFLECT');
+                    }
                 }
                 total += finalDmg;
             }
