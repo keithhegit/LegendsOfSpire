@@ -46,7 +46,9 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
         nextTurnBlock: 0,
         nextTurnStrength: 0,
         nextTurnMana: 0,
-        nextDrawBonus: 0
+        nextDrawBonus: 0,
+        critChance: 0,
+        critDamageMultiplier: 2
     });
     const [enemyStatus, setEnemyStatus] = useState({ strength: 0, weak: 0, vulnerable: 0, mark: 0, markDamage: 0 });
 
@@ -114,6 +116,15 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
         setCardsPlayedCount(0); // 重置卡牌计数
         setAttacksThisTurn(0); // 重置攻击计数
         setCritCount(0); // Batch 2: 重置暴击计数
+        setPlayerStatus(prev => ({
+            ...prev,
+            critChance: 0,
+            lifelink: 0,
+            reflectDamage: 0,
+            buffNextSkill: 0,
+            nextAttackCostReduce: 0,
+            critDamageMultiplier: prev.critDamageMultiplier || 2
+        }));
         if (heroData.relicId === "ViktorPassive" && Math.random() < 0.5) {
             const basicCard = shuffle(['Strike', 'Defend'])[0];
             let { hand } = deckRef.current;
@@ -194,11 +205,25 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
 
         // 处理卡牌效果
         const effectUpdates = applyCardEffects(card, {
-            playerHp, maxHp: heroData.maxHp, playerStatus, enemyStatus
+            playerHp,
+            maxHp: heroData.maxHp,
+            playerStatus,
+            enemyStatus
         });
+        const mergedPlayerStatus = {
+            ...playerStatus,
+            ...(effectUpdates.playerStatus || {})
+        };
+        const mergedEnemyStatus = {
+            ...enemyStatus,
+            ...(effectUpdates.enemyStatus || {})
+        };
         if (effectUpdates.drawCount > 0) drawCards(effectUpdates.drawCount);
         if (effectUpdates.playerHp !== undefined && effectUpdates.playerHp !== null) setPlayerHp(effectUpdates.playerHp);
         if (effectUpdates.manaChange) setPlayerMana(m => Math.min(initialMana, m + effectUpdates.manaChange));
+        if (effectUpdates.healAndDamage) {
+            setPlayerHp(h => Math.min(heroData.maxHp, h + effectUpdates.healAndDamage));
+        }
 
         // FIX: 金币奖励 (Bug #2)
         if (effectUpdates.goldGain) {
@@ -255,12 +280,12 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
                 playSfx('ATTACK_HIT');
             }, 200);
             // FIX Bug #1: MULTI_HIT伤害计算 - 易伤应该加成基础伤害，然后再乘以次数
-            let baseDmg = card.value + playerStatus.strength;
-            if (playerStatus.weak > 0) baseDmg = Math.floor(baseDmg * 0.75);
+            let baseDmg = card.value + (mergedPlayerStatus.strength || 0);
+            if (mergedPlayerStatus.weak > 0) baseDmg = Math.floor(baseDmg * 0.75);
 
             // FIX Bug #8: 首次攻击加倍 (耀光)
-            if (!playerStatus.firstAttackUsed && playerStatus.firstAttackBonus) {
-                baseDmg += playerStatus.firstAttackBonus;
+            if (!mergedPlayerStatus.firstAttackUsed && mergedPlayerStatus.firstAttackBonus) {
+                baseDmg += mergedPlayerStatus.firstAttackBonus;
                 setPlayerStatus(prev => ({ ...prev, firstAttackUsed: true }));
             }
 
@@ -277,8 +302,8 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
             }
 
             // FIX: 下一次攻击加成 (NEXT_ATTACK_BONUS) - VayneQ
-            if (playerStatus.nextAttackBonus > 0) {
-                baseDmg += playerStatus.nextAttackBonus;
+            if ((mergedPlayerStatus.nextAttackBonus || 0) > 0) {
+                baseDmg += mergedPlayerStatus.nextAttackBonus;
                 setPlayerStatus(prev => ({ ...prev, nextAttackBonus: 0 }));
             }
 
@@ -298,19 +323,9 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
                 baseDmg += effectUpdates.lowHpBonus;
             }
 
-            // Batch 2: 暴击系统 (CRIT_CHANCE) - YasuoQ
-            if (card.effect === 'CRIT_CHANCE') {
-                const critChance = (playerStatus.strength || 0) * 0.05; // 每点力量5%暴击率
-                if (Math.random() < critChance) {
-                    baseDmg *= 2; // 暴击伤害翻倍
-                    setCritCount(prev => prev + 1); // 累积暴击次数
-                    setDmgOverlay({ val: 'CRITICAL!', target: 'ENEMY', color: 'text-yellow-500' });
-                }
-            }
-
             // Batch 2: 暴击次数缩放 (SCALE_BY_CRIT) - YasuoR
             if (card.effect === 'SCALE_BY_CRIT') {
-                baseDmg = baseDmg * Math.max(1, critCount); // 伤害 = 基础值 × 暴击次数
+                baseDmg = baseDmg * Math.max(1, critCount || 0); // 伤害 = 基础值 × 暴击次数
             }
 
             // Batch 2: 回溯加成 (RETRO_BONUS) - EkkoQ
@@ -325,10 +340,13 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
             let total = 0;
             let isFirstHit = true; // 用于劫被动
 
-            // FIX: 提前合并状态用于计算 (解决 Vulnerable 异步问题)
-            const currentEnemyStatus = { ...enemyStatus, ...effectUpdates.enemyStatus };
+            const currentEnemyStatus = mergedEnemyStatus;
             const cardsPlayedIncludingCurrent = cardsPlayedBefore + 1;
             const priorCardsThisTurn = Math.max(0, cardsPlayedIncludingCurrent - 1);
+            const totalCritChancePercent = Math.max(0, mergedPlayerStatus.critChance || 0);
+            const critChanceDecimal = Math.min(1, totalCritChancePercent / 100);
+            const critDamageMultiplier = mergedPlayerStatus.critDamageMultiplier || 2;
+            const shouldForceCrit = !!effectUpdates.critIfVuln && (currentEnemyStatus.vulnerable > 0);
 
             // 易伤加成应用于基础伤害 (方案A) - 使用合并后的状态
             if (currentEnemyStatus.vulnerable > 0) {
@@ -345,7 +363,7 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
             }
 
             // FIX: 下一次攻击翻倍 (NEXT_ATTACK_DOUBLE)
-            if (playerStatus.nextAttackDouble) {
+            if (mergedPlayerStatus.nextAttackDouble) {
                 baseDmg *= 2;
                 setPlayerStatus(prev => ({ ...prev, nextAttackDouble: false }));
             }
@@ -368,79 +386,87 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
 
             const processMultiHit = () => {
                 for (let i = 0; i < hits; i++) {
-                let finalDmg = baseDmg; // 每次击打使用已计算易伤的基础伤害
-                if (heroData.relicId === "YasuoPassive" && Math.random() < 0.1) finalDmg = Math.floor(finalDmg * 2);
-                if (heroData.relics.includes("InfinityEdge")) finalDmg = Math.floor(finalDmg * 1.5);
+                    let finalDmg = baseDmg; // 每次击打使用已计算易伤的基础伤害
+                    if (heroData.relicId === "YasuoPassive" && Math.random() < 0.1) finalDmg = Math.floor(finalDmg * 2);
+                    if (heroData.relics.includes("InfinityEdge")) finalDmg = Math.floor(finalDmg * 1.5);
 
-                // 劫被动：首张攻击牌额外50%伤害（只在第一次命中时触发）
-                if (heroData.relicId === "ZedPassive" && zedFirstAttack && isFirstHit) {
-                    const bonusDmg = Math.floor(finalDmg * 0.5);
-                    finalDmg += bonusDmg;
-                    setZedFirstAttack(false); // 标记已使用
-                }
-                isFirstHit = false;
-                let dmgToHp = finalDmg;
-                if (enemyBlock > 0) {
-                    // 敌人格挡时播放格挡音效
-                    playSfx('BLOCK_SHIELD');
-                    if (enemyBlock >= finalDmg) { setEnemyBlock(b => b - finalDmg); dmgToHp = 0; }
-                    else { dmgToHp = finalDmg - enemyBlock; setEnemyBlock(0); }
-                } else if (dmgToHp > 0) {
-                    // 敌人受击时播放受击音效
-                    setTimeout(() => playSfx('HIT_TAKEN'), 250);
-                }
-
-                // 薇恩被动：连续命中计数
-                if (heroData.relicId === "VaynePassive" && dmgToHp > 0) {
-                    const newHitCount = vayneHitCount + 1;
-                    if (newHitCount >= 3) {
-                        dmgToHp += 10; // 额外10点伤害
-                        setVayneHitCount(0); // 重置计数
-                    } else {
-                        setVayneHitCount(newHitCount);
+                    // 劫被动：首张攻击牌额外50%伤害（只在第一次命中时触发）
+                    if (heroData.relicId === "ZedPassive" && zedFirstAttack && isFirstHit) {
+                        const bonusDmg = Math.floor(finalDmg * 0.5);
+                        finalDmg += bonusDmg;
+                        setZedFirstAttack(false); // 标记已使用
                     }
-                }
 
-                setEnemyHp(h => Math.max(0, h - dmgToHp)); total += dmgToHp;
-
-                // Batch 2: 记录造成伤害 (用于 RETRO_BONUS)
-                if (dmgToHp > 0) setDealtDamageThisTurn(true);
-
-                // Batch 2: 累积死亡印记伤害
-                if (enemyStatus.deathMark > 0) {
-                    setDeathMarkDamage(prev => prev + dmgToHp);
-                }
-
-                // 标记触发：额外伤害并消耗层数
-                if (dmgToHp > 0 && (currentEnemyStatus.mark || 0) > 0 && (currentEnemyStatus.markDamage || 0) > 0) {
-                    const triggerDmg = currentEnemyStatus.markDamage;
-                    setEnemyHp(h => Math.max(0, h - triggerDmg));
-                    total += triggerDmg;
-                    const updatedMark = Math.max(0, (currentEnemyStatus.mark || 0) - 1);
-                    currentEnemyStatus.mark = updatedMark;
-                    if (updatedMark === 0) {
-                        currentEnemyStatus.markDamage = 0;
+                    const didCrit = shouldForceCrit || (critChanceDecimal > 0 && Math.random() < critChanceDecimal);
+                    if (didCrit) {
+                        finalDmg = Math.floor(finalDmg * critDamageMultiplier);
+                        setCritCount(prev => prev + 1);
+                        setDmgOverlay({ val: 'CRIT!', target: 'ENEMY', color: 'text-yellow-400' });
                     }
-                    setEnemyStatus(prev => ({
-                        ...prev,
-                        mark: updatedMark,
-                        markDamage: currentEnemyStatus.markDamage
-                    }));
+
+                    isFirstHit = false;
+                    let dmgToHp = finalDmg;
+                    if (enemyBlock > 0) {
+                        // 敌人格挡时播放格挡音效
+                        playSfx('BLOCK_SHIELD');
+                        if (enemyBlock >= finalDmg) { setEnemyBlock(b => b - finalDmg); dmgToHp = 0; }
+                        else { dmgToHp = finalDmg - enemyBlock; setEnemyBlock(0); }
+                    } else if (dmgToHp > 0) {
+                        // 敌人受击时播放受击音效
+                        setTimeout(() => playSfx('HIT_TAKEN'), 250);
+                    }
+
+                    // 薇恩被动：连续命中计数
+                    if (heroData.relicId === "VaynePassive" && dmgToHp > 0) {
+                        const newHitCount = vayneHitCount + 1;
+                        if (newHitCount >= 3) {
+                            dmgToHp += 10; // 额外10点伤害
+                            setVayneHitCount(0); // 重置计数
+                        } else {
+                            setVayneHitCount(newHitCount);
+                        }
+                    }
+
+                    setEnemyHp(h => Math.max(0, h - dmgToHp)); total += dmgToHp;
+
+                    // Batch 2: 记录造成伤害 (用于 RETRO_BONUS)
+                    if (dmgToHp > 0) setDealtDamageThisTurn(true);
+
+                    // Batch 2: 累积死亡印记伤害
+                    if ((currentEnemyStatus.deathMark || 0) > 0) {
+                        setDeathMarkDamage(prev => prev + dmgToHp);
+                    }
+
+                    // 标记触发：额外伤害并消耗层数
+                    if (dmgToHp > 0 && (currentEnemyStatus.mark || 0) > 0 && (currentEnemyStatus.markDamage || 0) > 0) {
+                        const triggerDmg = currentEnemyStatus.markDamage;
+                        setEnemyHp(h => Math.max(0, h - triggerDmg));
+                        total += triggerDmg;
+                        const updatedMark = Math.max(0, (currentEnemyStatus.mark || 0) - 1);
+                        currentEnemyStatus.mark = updatedMark;
+                        if (updatedMark === 0) {
+                            currentEnemyStatus.markDamage = 0;
+                        }
+                        setEnemyStatus(prev => ({
+                            ...prev,
+                            mark: updatedMark,
+                            markDamage: currentEnemyStatus.markDamage
+                        }));
+                        setTimeout(() => {
+                            setDmgOverlay({ val: `标记 ${triggerDmg}`, target: 'ENEMY', color: 'text-orange-400' });
+                            setTimeout(() => setDmgOverlay(null), 250);
+                        }, i * 300 + 150);
+                    }
+
+                    if (heroData.relics.includes("VampiricScepter")) setPlayerHp(h => Math.min(heroData.maxHp, h + 1));
+                    if (heroData.relicId === "DariusPassive") setEnemyStatus(s => ({ ...s, weak: s.weak + 1 }));
+
+                    // FIX: Multi-hit display - Stagger damage numbers
+                    const hitDmg = dmgToHp; // Capture current hit damage
                     setTimeout(() => {
-                        setDmgOverlay({ val: `标记 ${triggerDmg}`, target: 'ENEMY', color: 'text-orange-400' });
+                        setDmgOverlay({ val: hitDmg, target: 'ENEMY' });
                         setTimeout(() => setDmgOverlay(null), 250);
-                    }, i * 300 + 150);
-                }
-
-                if (heroData.relics.includes("VampiricScepter")) setPlayerHp(h => Math.min(heroData.maxHp, h + 1));
-                if (heroData.relicId === "DariusPassive") setEnemyStatus(s => ({ ...s, weak: s.weak + 1 }));
-
-                // FIX: Multi-hit display - Stagger damage numbers
-                const hitDmg = dmgToHp; // Capture current hit damage
-                setTimeout(() => {
-                    setDmgOverlay({ val: hitDmg, target: 'ENEMY' });
-                    setTimeout(() => setDmgOverlay(null), 250);
-                }, i * 300);
+                    }, i * 300);
                 }
             };
 
