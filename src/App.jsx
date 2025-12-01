@@ -9,8 +9,8 @@ import BattleScene from './components/BattleScene';
 import LoginView from './components/LoginView'; // 登录界面
 import ToastContainer from './components/shared/Toast'; // 导入 ToastContainer
 import CollectionSystem from './components/CollectionSystem';
-import DeckView from './components/DeckView';
 import GMPanel from './components/GMPanel';
+import InventoryPanel from './components/InventoryPanel';
 import { unlockAudio } from './utils/audioContext'; // 音频解锁工具
 import { getHexNeighbors } from './utils/hexagonGrid'; // 六边形邻居帮助函数
 import { authService } from './services/authService';
@@ -583,7 +583,7 @@ export default function LegendsOfTheSpire() {
     const [usedEnemies, setUsedEnemies] = useState([]);
     const [showCodex, setShowCodex] = useState(false);
     const [showCollection, setShowCollection] = useState(false);
-    const [showDeck, setShowDeck] = useState(false);
+    const [showInventory, setShowInventory] = useState(false);
     const [toasts, setToasts] = useState([]);
     const [lockedChoices, setLockedChoices] = useState(new Set()); // 三选一：已锁定的选项
 
@@ -1385,12 +1385,6 @@ export default function LegendsOfTheSpire() {
                                     })}
                                 </div>
                             </div>
-                            <button
-                                onClick={() => setShowDeck(true)}
-                                className="px-4 py-1.5 rounded-full border border-[#C8AA6E]/40 text-[#C8AA6E] text-xs uppercase tracking-[0.4em] bg-black/40 hover:bg-[#C8AA6E]/10 transition"
-                            >
-                                查看牌组
-                            </button>
                         </div>
                         {view === 'COMBAT' && (
                             <div className="absolute left-1/2 -translate-x-1/2 pointer-events-auto">
@@ -1406,6 +1400,12 @@ export default function LegendsOfTheSpire() {
                 </>
             )}
             <div className="absolute bottom-6 right-6 z-[200] pointer-events-auto flex flex-col items-end gap-2">
+                <button
+                    onClick={() => setShowInventory(true)}
+                    className="px-4 py-2 rounded-full bg-slate-800/80 hover:bg-slate-700 text-[#C8AA6E] text-xs uppercase tracking-[0.4em] border border-[#C8AA6E]/60 shadow-lg"
+                >
+                    背包
+                </button>
                 <button
                     onClick={() => setShowGMPanel(true)}
                     className="px-4 py-2 rounded-full bg-emerald-600/80 hover:bg-emerald-500 text-white text-xs uppercase tracking-[0.4em] border border-emerald-300 shadow-lg"
@@ -1431,9 +1431,19 @@ export default function LegendsOfTheSpire() {
                 />
             )}
             {renderView()}
+            {showInventory && (
+                <InventoryPanel
+                    onClose={() => setShowInventory(false)}
+                    deck={masterDeck}
+                    relics={relics}
+                    champion={champion}
+                    gmConfig={gmConfig}
+                    currentHp={currentHp}
+                    maxHp={maxHp}
+                />
+            )}
             {showCodex && <CodexView onClose={() => setShowCodex(false)} />}
             {showCollection && <CollectionSystem onClose={() => setShowCollection(false)} />}
-            {showDeck && <DeckView deck={masterDeck} gmConfig={gmConfig} onClose={() => setShowDeck(false)} />}
             <ToastContainer toasts={toasts} />
         </div>
     );
