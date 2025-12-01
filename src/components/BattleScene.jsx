@@ -51,6 +51,7 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
         critDamageMultiplier: 2
     });
     const [enemyStatus, setEnemyStatus] = useState({ strength: 0, weak: 0, vulnerable: 0, mark: 0, markDamage: 0 });
+    const heroBaseCritChance = heroData?.id === 'Yasuo' ? 10 : 0;
 
     // 被动技能状态追踪
     const [rivenAttackCount, setRivenAttackCount] = useState(0); // 瑞文：攻击计数
@@ -343,7 +344,8 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
             const currentEnemyStatus = mergedEnemyStatus;
             const cardsPlayedIncludingCurrent = cardsPlayedBefore + 1;
             const priorCardsThisTurn = Math.max(0, cardsPlayedIncludingCurrent - 1);
-            const totalCritChancePercent = Math.max(0, mergedPlayerStatus.critChance || 0);
+            const strengthCritBonus = ((mergedPlayerStatus.strength || 0) * 5);
+            const totalCritChancePercent = Math.max(0, heroBaseCritChance + (mergedPlayerStatus.critChance || 0) + strengthCritBonus);
             const critChanceDecimal = Math.min(1, totalCritChancePercent / 100);
             const critDamageMultiplier = mergedPlayerStatus.critDamageMultiplier || 2;
             const shouldForceCrit = !!effectUpdates.critIfVuln && (currentEnemyStatus.vulnerable > 0);
@@ -768,7 +770,9 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
     const IntentIcon = () => { const type = nextEnemyAction.type; const isAttack = type === 'ATTACK' || nextEnemyAction.actionType === 'Attack'; if (isAttack) return <Sword size={20} className="text-red-500" />; if (type === 'BUFF') return <Shield size={20} className="text-blue-400" />; if (type === 'DEBUFF') return <Skull size={20} className="text-purple-400" />; return <AlertTriangle size={20} className="text-gray-400" />; };
 
     const { drawPile: currentDrawPile = [], discardPile: currentDiscardPile = [], hand = [] } = deckRef.current || {};
-    const debugCritChance = ((playerStatus.critChance || 0)).toFixed(1);
+    const debugStrengthBonus = ((playerStatus.strength || 0) * 5);
+    const debugCritSource = heroBaseCritChance + (playerStatus.critChance || 0) + debugStrengthBonus;
+    const debugCritChance = debugCritSource.toFixed(1);
 
     if (!heroData || !enemyConfig) {
         return <div className="w-full h-full flex items-center justify-center text-white">Loading...</div>;
@@ -792,6 +796,7 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
             <div className="absolute top-4 left-4 z-50 bg-black/70 border border-yellow-500/60 px-4 py-2 rounded shadow-lg text-xs text-yellow-200 pointer-events-none">
                 <div className="font-semibold tracking-wider">Crit Debug</div>
                 <div>Chance: {debugCritChance}%</div>
+                <div>Base: {heroBaseCritChance}% | Str: {debugStrengthBonus}% | Buff: {(playerStatus.critChance || 0).toFixed(1)}%</div>
                 <div>This turn crits: {critCount}</div>
             </div>
             {dmgOverlay && (
