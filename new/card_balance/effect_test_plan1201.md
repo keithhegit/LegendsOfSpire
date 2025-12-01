@@ -39,46 +39,30 @@
 
 ### ✨ R 技能覆盖现状（cards.js + BattleScene）
 
-#### 🧪 快速测试指引（QA / 开发）
+#### 🧪 快速测试指引（GM 控制台）
 
-1. **清空存档 / 重新开局**  
-   - 关闭游戏页签后，在浏览器控制台执行 `localStorage.removeItem('lots_save_v75')`；若使用登录账号，请同时清空 `lots_save_v75_${email}`。这样可确保新建冒险时会读取最新的初始牌组。
+1. **打开 GM 控制台**  
+   - 在任意界面点击右下角的 “GM 控制台” 按钮。启用 GM 开关后，选择目标英雄、填写 HUD 备注。
 
-2. **在初始牌堆中硬塞 R 技能**  
-   - 打开 `src/data/champions.js`，将目标英雄的 `initialCards` 修改为 `['Strike', ..., '<HeroR>', '<HeroR>']`（建议写 2 份以提高抽到几率）。
-   - 例如验证瑞文 R：`initialCards: ['RivenQ','RivenW','RivenE','RivenR','RivenR','Strike','Defend']`。
-   - 保存后 `npm run dev` → 重新选择英雄即可在 DeckView 中看到 R 技能已绑定在起始牌堆。
+2. **一键注入 R 技能**  
+   - 在 “额外注入卡牌 / 起手强制卡牌” 文本框中挑选卡牌，或直接点击下方的 R 技能快捷按钮（自动写入合法 ID，不再改文件）。
 
-3. **强制起手即抽到 R（可选，加速 QA）**  
-   - 在 `src/components/BattleScene.jsx` 的 `useEffect(() => { ... })` 初始化处，将  
-     `const initialDrawPile = shuffle([...initialDeck]);`  
-     替换为：  
-     ```js
-     const initialDrawPile = shuffle([...initialDeck]);
-     const gmForceTop = ['RivenR']; // 按需替换
-     gmForceTop.slice().reverse().forEach(id => {
-       const idx = initialDrawPile.indexOf(id);
-       if (idx >= 0) {
-         initialDrawPile.splice(idx, 1);
-         initialDrawPile.unshift(id);
-       }
-     });
-     ```
-   - 保存后刷新战斗，R 技能会 100% 出现在首回合手牌中，验证完记得把该段代码还原。
+3. **清空存档并重新开局**  
+   - 面板内点击 “清空 GM 存档” 即可同时移除 `lots_save_v75` 与登录态存档。系统会回退到选人界面，DeckView 会显示绿色 GM Banner，确认卡牌已注入。
 
-4. **跳过铺场 → 直接战斗**  
-   - 进入地图后点击顶部的 🧪 Act 按钮（在 Map 视图里），即可瞬间跳到 Act 1/2/3 的任意节点，用以测试高难敌人或 Boss。
+4. **实战验证**  
+   - 进入第一场战斗，起手手牌会出现 `起手强制卡牌` 列表。英雄面板 HUD 会显示绿色 “GM” 徽章（含备注与起手卡列表），便于截图与复现。
 
-> 以上流程能让 QA 在 2 分钟内获得任意英雄的 R 技能卡牌，避免依赖商店/奖励池随机。验证完成后请恢复 `initialCards` 与 `BattleScene.jsx` 以免影响正常流程。
+5. **测试完收尾**  
+   - 在 GM 面板中关闭开关或点击 “恢复默认配置”，即可回到普通流程；无需再改 JS 文件或刷新控制台。
 
-#### 🌿 `R_skill` 分支专用测试流程
+#### 🌿 GM 控制台分支测试流程
 
-1. **切换分支**：`git checkout R_skill && npm install && npm run dev`，该分支默认启用 GM 注入。
-2. **配置测试目标**：编辑 `src/config/rSkillTestConfig.js`，设置 `heroId`、`extraCards`、`forceTopCards`、`note`，并保持 `enabled: true`。
-3. **清空旧存档**：浏览器控制台执行 `localStorage.removeItem('lots_save_v75')`（若有账号还需清除带邮箱后缀的 key）。
-4. **重新选择英雄**：进入选人界面后锁定同配置的英雄，在 DeckView 中即可看到额外注入的 R 技能。
-5. **进入战斗验证**：起手手牌会出现 `forceTopCards` 指定的卡，英雄面板也会显示绿色 “GM” 徽章（含备注、起手卡列表），确认特效与飘字无误。
-6. **测试结束**：将 `enabled` 改回 `false` 或切换回 `card_effect`/`main` 分支，恢复正常体验。
+1. `git checkout R_skill && npm run dev` → 启动最新 GM 分支。
+2. 打开 GM 控制台，选择目标英雄与 R 技能（支持多张 R 同时注入）。
+3. 点击 “清空 GM 存档” → 重新选人，DeckView 中可见绿色 GM 提示。
+4. 进入战斗，确认起手卡、飘字、音效、HUD 备注与文档一致。
+5. 完成回归后关闭 GM 开关或 “恢复默认配置”，再切回 `card_effect`/`main` 即可。
 
 | 英雄 | R 技能 / Effect | 状态（参考 Batch 计划） |
 | :--- | :--- | :--- |
