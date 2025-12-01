@@ -56,6 +56,8 @@ const SFX = {
 const STARTING_DECK_BASIC = ["Strike", "Strike", "Strike", "Strike", "Defend", "Defend", "Defend", "Defend"];
 const SAVE_KEY = 'lots_save_v75';
 const UNLOCK_KEY = 'lots_unlocks_v75';
+const CARD_DELETE_COST = { COMMON: 50, UNCOMMON: 100, RARE: 200 };
+const MAX_EXTRA_RELICS = 6;
 const GM_STORAGE_KEY = 'lots_gm_config_v1';
 const DEFAULT_GM_CONFIG = {
     enabled: false,
@@ -581,10 +583,10 @@ export default function LegendsOfTheSpire() {
     const [baseStr, setBaseStr] = useState(0);
     const [activeNode, setActiveNode] = useState(null);
     const [usedEnemies, setUsedEnemies] = useState([]);
+    const [pendingRelic, setPendingRelic] = useState(null);
     const [showCodex, setShowCodex] = useState(false);
     const [showCollection, setShowCollection] = useState(false);
     const [showInventory, setShowInventory] = useState(false);
-    const [heroSnapshot, setHeroSnapshot] = useState(null);
     const [toasts, setToasts] = useState([]);
     const [lockedChoices, setLockedChoices] = useState(new Set()); // 三选一：已锁定的选项
 
@@ -626,6 +628,7 @@ export default function LegendsOfTheSpire() {
     };
     const [gmConfig, setGmConfig] = useState(loadStoredGMConfig);
     const [showGMPanel, setShowGMPanel] = useState(false);
+    const [activeInventoryTab, setActiveInventoryTab] = useState('CARDS');
 
     useEffect(() => {
         try {
@@ -634,6 +637,11 @@ export default function LegendsOfTheSpire() {
             console.warn('[GM] Failed to persist config', error);
         }
     }, [gmConfig]);
+
+    const openInventory = (tab = 'CARDS') => {
+        setActiveInventoryTab(tab);
+        setShowInventory(true);
+    };
 
     const updateGmConfig = (updater) => {
         setGmConfig(prev => {
@@ -788,7 +796,6 @@ export default function LegendsOfTheSpire() {
         setHasSave(false);
         setMapData({ grid: [], nodes: [], nodeMap: new Map() });
         setChampion(null);
-        setHeroSnapshot(null);
     };
 
     const handleRestartMap = () => {
@@ -828,7 +835,6 @@ export default function LegendsOfTheSpire() {
         // 播放英雄语音
         playChampionVoice(championPayload.id);
         setChampion(championPayload);
-        setHeroSnapshot(null);
         setMaxHp(championPayload.maxHp);
         setCurrentHp(championPayload.maxHp);
         setMasterDeck([...STARTING_DECK_BASIC, ...championPayload.initialCards]);
@@ -999,6 +1005,77 @@ export default function LegendsOfTheSpire() {
         }, 3000);
     };
 
+    const queueRelicPickup = (relicId, onResolved) => {
+        if (!relicId) return false;
+        const extraCount = champion ? relics.filter(rid => rid !== champion.relicId).length : relics.length;
+        if (extraCount >= MAX_EXTRA_RELICS) {
+            setPendingRelic({ id: relicId, onResolved });
+            openInventory('RELICS');
+            return false;
+        }
+        setRelics(prev => [...prev, relicId]);
+        onResolved?.(true);
+        return true;
+    };
+
+    const handleRelicReplace = (relicIdToRemove) => {
+        if (!pendingRelic) return;
+        let removed = false;
+        setRelics(prev => {
+            const filtered = prev.filter(id => {
+                if (!removed && relicIdToRemove && id === relicIdToRemove && id !== champion?.relicId) {
+                    removed = true;
+                    return false;
+                }
+                return true;
+            });
+            return [...filtered, pendingRelic.id];
+        });
+        pendingRelic.onResolved?.(true);
+        setPendingRelic(null);
+    };
+
+    const handleRejectPendingRelic = () => {
+        if (!pendingRelic) return;
+        pendingRelic.onResolved?.(false);
+        setPendingRelic(null);
+    };
+
+    const handleRemoveCard = (cardId) => {
+        const card = CARD_DATABASE[cardId];
+        if (!card) {
+            showToast('卡牌不存在');
+            return;
+        }
+        if (card.hero !== 'Neutral' || card.rarity === 'BASIC') {
+            showToast('只能删除中立技能牌');
+            return;
+        }
+        const cost = CARD_DELETE_COST[card.rarity];
+        if (!cost) {
+            showToast('该卡牌无法删除');
+            return;
+        }
+        if (gold < cost) {
+            showToast('金币不足', 'gold');
+            return;
+        }
+        if (!masterDeck.includes(cardId)) {
+            showToast('当前牌组没有此卡牌');
+            return;
+        }
+        setMasterDeck(prev => {
+            const next = [...prev];
+            const idx = next.indexOf(cardId);
+            if (idx !== -1) {
+                next.splice(idx, 1);
+            }
+            return next;
+        });
+        setGold(prev => prev - cost);
+        showToast(`已删除 ${card.name} (-${cost}G)`, 'gold');
+    };
+
     const handleGMResetSave = () => {
         localStorage.removeItem(SAVE_KEY);
         if (currentUser) {
@@ -1050,8 +1127,32 @@ export default function LegendsOfTheSpire() {
         setView('REWARD');
     };
     const handleBuyCard = (card) => { setGold(prev => prev - card.price); setMasterDeck(prev => [...prev, card.id]); };
-    const handleRelicReward = (relic) => { setRelics(prev => [...prev, relic.id]); if (relic.onPickup) { const ns = relic.onPickup({ maxHp, currentHp }); setMaxHp(ns.maxHp); setCurrentHp(ns.currentHp); } completeNode(); };
-    const handleBuyRelic = (relic) => { setGold(prev => prev - relic.price); handleRelicReward(relic); };
+    const handleRelicReward = (relic) => {
+        const resolver = (didAcquire) => {
+            if (didAcquire && relic.onPickup) {
+                const ns = relic.onPickup({ maxHp, currentHp });
+                setMaxHp(ns.maxHp);
+                setCurrentHp(ns.currentHp);
+            }
+            completeNode();
+        };
+        queueRelicPickup(relic.id, resolver);
+    };
+    const handleBuyRelic = (relic) => {
+        if (gold < relic.price) {
+            showToast('金币不足', 'gold');
+            return;
+        }
+        setGold(prev => prev - relic.price);
+        const resolver = (didAcquire) => {
+            if (didAcquire && relic.onPickup) {
+                const ns = relic.onPickup({ maxHp, currentHp });
+                setMaxHp(ns.maxHp);
+                setCurrentHp(ns.currentHp);
+            }
+        };
+        queueRelicPickup(relic.id, resolver);
+    };
     const handleEventReward = (reward) => {
         if (reward.type === 'BUFF' && reward.stat === 'strength') setBaseStr(prev => prev + reward.value);
         if (reward.type === 'RELIC_RANDOM') { const pool = Object.values(RELIC_DATABASE).filter(r => r.rarity !== 'PASSIVE' && !relics.includes(r.id)); if (pool.length > 0) handleRelicReward(shuffle(pool)[0]); }
@@ -1081,12 +1182,12 @@ export default function LegendsOfTheSpire() {
     };
 
     const handleBuyMana = () => {
-        // 增加最大法力值 (这里需要 GameState 支持，或者由 Relic 实现，简化起见，我们添加一个特殊的被动遗物)
-        // 由于没有直接的 maxMana 状态（写死在 BattleScene），我们需要通过遗物来修改
-        // 或者在 App 中添加 maxMana 状态传给 BattleScene
-        // 这里简单实现：添加一个隐藏遗物 "ManaGem"
-        setRelics(prev => [...prev, "ManaGem"]);
+        if (gold < 200) {
+            showToast('金币不足', 'gold');
+            return;
+        }
         setGold(prev => prev - 200);
+        queueRelicPickup("ManaGem");
     };
 
     const handleSkipReward = () => { setGold(gold + 50); completeNode(); };
@@ -1101,7 +1202,6 @@ export default function LegendsOfTheSpire() {
         setRelics([]);
         setBaseStr(0);
         setChampion(null);
-        setHeroSnapshot(null);
         setUsedEnemies([]);
     };
     const getCurrentBgm = () => (view === 'COMBAT' ? BGM_BATTLE_URL : BGM_MAP_URL);
@@ -1231,9 +1331,9 @@ export default function LegendsOfTheSpire() {
                                 图鉴 (Collection)
                             </div>
                         </button>
-                        {/* 背包系统 (Coming Soon) */}
+                        {/* 背包系统 */}
                         <button
-                            onClick={() => setShowInventory(true)}
+                            onClick={() => openInventory('CARDS')}
                             className="w-16 h-16 bg-slate-900/90 border border-[#C8AA6E] rounded-lg flex items-center justify-center hover:scale-110 transition-transform group relative shadow-lg shadow-black/50"
                         >
                             <img
@@ -1260,6 +1360,21 @@ export default function LegendsOfTheSpire() {
                                 成就 (Coming Soon)
                             </div>
                         </button>
+                        {/* GM 控制台 */}
+                        <button
+                            onClick={() => setShowGMPanel(true)}
+                            className="w-16 h-16 bg-emerald-600/90 border border-emerald-300 rounded-lg flex items-center justify-center hover:scale-110 transition-transform group relative shadow-lg shadow-black/50"
+                        >
+                            <span className="text-white font-bold tracking-[0.4em] text-xs">GM</span>
+                            <div className="absolute right-full mr-3 bg-slate-900 text-emerald-200 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap border border-emerald-300/40 pointer-events-none">
+                                GM 控制台
+                            </div>
+                        </button>
+                        {gmConfig.enabled && (
+                            <div className="text-[10px] text-emerald-200 bg-emerald-900/60 border border-emerald-600/50 rounded px-2 py-1">
+                                GM: {gmConfig.note || 'R 技能测试'}
+                            </div>
+                        )}
                     </div>
                     <GridMapView_v3 mapData={mapData} onNodeSelect={handleNodeSelect} currentFloor={currentFloor} act={currentAct} activeNode={activeNode} lockedChoices={lockedChoices} />
                 </div>
@@ -1267,7 +1382,7 @@ export default function LegendsOfTheSpire() {
             case 'SHOP': return <ShopView gold={gold} deck={masterDeck} relics={relics} onLeave={() => completeNode()} onBuyCard={handleBuyCard} onBuyRelic={handleBuyRelic} onUpgradeCard={handleUpgradeCard} onBuyMana={handleBuyMana} championName={champion.name} />;
             case 'EVENT': return <EventView onLeave={() => completeNode()} onReward={handleEventReward} />;
             case 'CHEST': return <ChestView onLeave={() => completeNode()} onRelicReward={handleRelicReward} relics={relics} act={currentAct} />;
-            case 'COMBAT': return champion ? <BattleScene heroData={{ ...champion, maxHp, currentHp, relics, baseStr }} enemyId={activeNode?.enemyId} initialDeck={masterDeck} onWin={handleBattleWin} onLose={() => { localStorage.removeItem(SAVE_KEY); setView('GAMEOVER'); }} floorIndex={currentFloor} act={currentAct} onStatusSnapshot={setHeroSnapshot} /> : <div>Loading...</div>;
+            case 'COMBAT': return champion ? <BattleScene heroData={{ ...champion, maxHp, currentHp, relics, baseStr }} enemyId={activeNode?.enemyId} initialDeck={masterDeck} onWin={handleBattleWin} onLose={() => { localStorage.removeItem(SAVE_KEY); setView('GAMEOVER'); }} floorIndex={currentFloor} act={currentAct} /> : <div>Loading...</div>;
             case 'REWARD': return <RewardView goldReward={50} onCardSelect={handleCardReward} onSkip={handleSkipReward} championName={champion.name} />;
             case 'REST': return <RestView onRest={handleRest} />;
             case 'VICTORY_ALL': return <div className="h-screen w-full bg-[#0AC8B9]/20 flex flex-col items-center justify-center text-white"><h1 className="text-6xl font-bold text-[#0AC8B9]">传奇永不熄灭！</h1><button onClick={() => setView('MENU')} className="mt-8 px-8 py-3 bg-[#0AC8B9] text-black font-bold rounded">回到菜单</button></div>;
@@ -1306,7 +1421,6 @@ export default function LegendsOfTheSpire() {
         setMapData({ grid: [], nodes: [], nodeMap: new Map() });
         setActiveNode(null);
         setChampion(null);
-        setHeroSnapshot(null);
         setView('CHAMPION_SELECT');
     };
 
@@ -1415,25 +1529,6 @@ export default function LegendsOfTheSpire() {
                     </div>
                 </>
             )}
-            <div className="absolute bottom-6 right-6 z-[200] pointer-events-auto flex flex-col items-end gap-2">
-                <button
-                    onClick={() => setShowInventory(true)}
-                    className="px-4 py-2 rounded-full bg-slate-800/80 hover:bg-slate-700 text-[#C8AA6E] text-xs uppercase tracking-[0.4em] border border-[#C8AA6E]/60 shadow-lg"
-                >
-                    背包
-                </button>
-                <button
-                    onClick={() => setShowGMPanel(true)}
-                    className="px-4 py-2 rounded-full bg-emerald-600/80 hover:bg-emerald-500 text-white text-xs uppercase tracking-[0.4em] border border-emerald-300 shadow-lg"
-                >
-                    GM 控制台
-                </button>
-                {gmConfig.enabled && (
-                    <div className="text-[10px] text-emerald-200 bg-emerald-900/40 border border-emerald-700 px-3 py-1 rounded shadow">
-                        GM: {gmConfig.note || 'R 技能测试模式'}
-                    </div>
-                )}
-            </div>
             {showGMPanel && (
                 <GMPanel
                     gmConfig={gmConfig}
@@ -1456,7 +1551,13 @@ export default function LegendsOfTheSpire() {
                     gmConfig={gmConfig}
                     currentHp={currentHp}
                     maxHp={maxHp}
-                    heroSnapshot={heroSnapshot}
+                    gold={gold}
+                    onRemoveCard={handleRemoveCard}
+                    initialTab={activeInventoryTab}
+                    onTabChange={setActiveInventoryTab}
+                    pendingRelic={pendingRelic}
+                    onRelicReplace={handleRelicReplace}
+                    onCancelPendingRelic={handleRejectPendingRelic}
                 />
             )}
             {showCodex && <CodexView onClose={() => setShowCodex(false)} />}
