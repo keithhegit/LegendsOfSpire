@@ -35,6 +35,13 @@ export const RELIC_DATABASE = {
   "InfinityEdge": { id: "InfinityEdge", name: "无尽之刃", price: 700, rarity: "RARE", description: "所有攻击牌伤害+50%。", img: `${ITEM_URL}/3031.png` },
   "Redemption": { id: "Redemption", name: "救赎", price: 650, rarity: "RARE", description: "每回合开始时，治疗你和敌人 5 点生命。", img: `${ITEM_URL}/3107.png`, onTurnStart: (pState, eState) => ({ pState: { ...pState, hp: Math.min(pState.maxHp, pState.hp + 5) }, eState: { ...eState, hp: eState.hp + 5 } }) },
   "BrambleVest": { id: "BrambleVest", name: "荆棘背心", price: 200, rarity: "UNCOMMON", description: "每次被攻击时，对攻击者造成 3 点伤害。", img: `${ITEM_URL}/3076.png` },
-  "GuardianAngel": { id: "GuardianAngel", name: "守护天使", price: 750, rarity: "RARE", description: "死亡时，恢复 40 点生命值。每场战斗限一次。", img: `${ITEM_URL}/3026.png`, charges: 1 }
+  "GuardianAngel": { id: "GuardianAngel", name: "守护天使", price: 750, rarity: "RARE", description: "死亡时，恢复 40 点生命值。每场战斗限一次。", img: `${ITEM_URL}/3026.png`, charges: 1 },
+
+  // 章节专属遗物
+  "Cull": { id: "Cull", name: "萃取", price: 400, rarity: "RARE", description: "Act 1 限定：击杀 10 个敌人后获得 300 金币。", img: `${ITEM_URL}/1083.png`, actLock: 1 },
+  "DarkSeal": { id: "DarkSeal", name: "黑暗封印", price: 300, rarity: "RARE", description: "Act 1 限定：每次战斗胜利 +2 点最大生命值。", img: `${ITEM_URL}/1082.png`, actLock: 1 },
+  "QSS": { id: "QSS", name: "水银饰带", price: 500, rarity: "RARE", description: "Act 2 限定：战斗开始时获得 1 层人工制品，抵挡下一个负面状态。", img: `${ITEM_URL}/3140.png`, actLock: 2 },
+  "Executioner": { id: "Executioner", name: "死刑宣告", price: 450, rarity: "RARE", description: "Act 2 限定：攻击施加重伤，目标无法回复生命。", img: `${ITEM_URL}/3123.png`, actLock: 2 },
+  "Nashor": { id: "Nashor", name: "纳什之牙", price: 800, rarity: "RARE", description: "Act 3 限定：每回合打出的第 3 张攻击牌伤害翻倍。", img: `${ITEM_URL}/3115.png`, actLock: 3 }
 };
 
