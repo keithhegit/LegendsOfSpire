@@ -2,7 +2,7 @@ import React from 'react';
 import { X, Layers } from 'lucide-react';
 import { CARD_DATABASE } from '../data/cards';
 
-const DeckView = ({ deck, onClose, gmConfig }) => {
+const DeckView = ({ deck, onClose }) => {
     // 统计卡牌数量
     const deckCounts = deck.reduce((acc, cardId) => {
         acc[cardId] = (acc[cardId] || 0) + 1;
@@ -31,13 +31,6 @@ const DeckView = ({ deck, onClose, gmConfig }) => {
                     </button>
                 </div>
                 
-                {gmConfig?.enabled && (
-                    <div className="px-4 py-3 border-b border-emerald-500/30 bg-emerald-900/20 text-emerald-100 text-xs tracking-widest">
-                        GM 模式：注入 {gmConfig.extraCards.length ? gmConfig.extraCards.join(', ') : '无'}
-                        <span className="mx-2">|</span>
-                        起手 {gmConfig.forceTopCards.length ? gmConfig.forceTopCards.join(', ') : '无'}
-                    </div>
-                )}
                 <div className="flex-1 overflow-y-auto p-4 sm:p-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 content-start">
                     {Object.entries(deckCounts).map(([cardId, count]) => {
                         const card = CARD_DATABASE[cardId];

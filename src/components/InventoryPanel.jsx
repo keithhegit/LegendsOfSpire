@@ -18,24 +18,11 @@ const getHeroStats = (champion, deckSize, relicCount) => [
     { label: '遗物槽位', value: `${relicCount}/${MAX_RELIC_SLOTS}` }
 ];
 
-const GMBanner = ({ gmConfig }) => {
-    if (!gmConfig?.enabled) return null;
-    return (
-        <div className="text-[11px] text-emerald-200 bg-emerald-900/40 border border-emerald-600/50 rounded px-4 py-2 leading-relaxed space-y-0.5">
-            <div className="font-semibold tracking-[0.3em]">GM MODE</div>
-            <div>注入：{gmConfig.extraCards?.length ? gmConfig.extraCards.join(', ') : '无'}</div>
-            <div>起手：{gmConfig.forceTopCards?.length ? gmConfig.forceTopCards.join(', ') : '无'}</div>
-            {gmConfig.note && <div>备注：{gmConfig.note}</div>}
-        </div>
-    );
-};
-
 const InventoryPanel = ({
     onClose,
     deck = [],
     relics = [],
     champion,
-    gmConfig,
     gold = 0,
     onRemoveCard,
     initialTab = 'CARDS',
@@ -81,7 +68,6 @@ const InventoryPanel = ({
         return matchSearch && matchRarity && matchHero;
     });
 
-    const gmBanner = <GMBanner gmConfig={gmConfig} />;
     const passiveRelic = champion ? RELIC_DATABASE[champion.relicId] : null;
     const extraRelics = useMemo(
         () => (champion ? relics.filter(id => id !== champion.relicId) : relics),
@@ -183,7 +169,6 @@ const InventoryPanel = ({
                     <Coins size={14} /> {gold} G
                 </div>
             </div>
-            {gmBanner}
             <div className="text-xs text-slate-400 tracking-widest">共 {deck.length} 张卡牌</div>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 {filteredDeck.map(renderCardTile)}
@@ -232,11 +217,6 @@ const InventoryPanel = ({
                         <div className="text-xs text-slate-500">暂无数据</div>
                     )}
                 </div>
-                {gmBanner && (
-                    <div className="bg-emerald-900/20 border border-emerald-600/40 rounded-xl p-4">
-                        {gmBanner}
-                    </div>
-                )}
             </div>
             {pendingRelicData && (
                 <div className="bg-amber-500/10 border border-amber-400/50 rounded-xl p-4 space-y-3">
