@@ -1384,6 +1384,12 @@ export default function LegendsOfTheSpire() {
                                     })}
                                 </div>
                             </div>
+                            <button
+                                onClick={() => setShowDeck(true)}
+                                className="px-4 py-1.5 rounded-full border border-[#C8AA6E]/40 text-[#C8AA6E] text-xs uppercase tracking-[0.4em] bg-black/40 hover:bg-[#C8AA6E]/10 transition"
+                            >
+                                查看牌组
+                            </button>
                         </div>
                         {view === 'COMBAT' && (
                             <div className="absolute left-1/2 -translate-x-1/2 pointer-events-auto">
