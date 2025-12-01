@@ -389,7 +389,6 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
             const processMultiHit = () => {
                 for (let i = 0; i < hits; i++) {
                     let finalDmg = baseDmg; // 每次击打使用已计算易伤的基础伤害
-                    if (heroData.relicId === "YasuoPassive" && Math.random() < 0.1) finalDmg = Math.floor(finalDmg * 2);
                     if (heroData.relics.includes("InfinityEdge")) finalDmg = Math.floor(finalDmg * 1.5);
 
                     // 劫被动：首张攻击牌额外50%伤害（只在第一次命中时触发）
@@ -770,9 +769,13 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
     const IntentIcon = () => { const type = nextEnemyAction.type; const isAttack = type === 'ATTACK' || nextEnemyAction.actionType === 'Attack'; if (isAttack) return <Sword size={20} className="text-red-500" />; if (type === 'BUFF') return <Shield size={20} className="text-blue-400" />; if (type === 'DEBUFF') return <Skull size={20} className="text-purple-400" />; return <AlertTriangle size={20} className="text-gray-400" />; };
 
     const { drawPile: currentDrawPile = [], discardPile: currentDiscardPile = [], hand = [] } = deckRef.current || {};
-    const debugStrengthBonus = ((playerStatus.strength || 0) * 5);
-    const debugCritSource = heroBaseCritChance + (playerStatus.critChance || 0) + debugStrengthBonus;
-    const debugCritChance = debugCritSource.toFixed(1);
+    const strengthCritBonus = ((playerStatus.strength || 0) * 5);
+    const buffCritChance = (playerStatus.critChance || 0);
+    const totalCritChanceValue = Math.max(0, heroBaseCritChance + strengthCritBonus + buffCritChance);
+    const displayCritChance = `${totalCritChanceValue.toFixed(0)}%`;
+    const displayBaseChance = `${heroBaseCritChance.toFixed(0)}%`;
+    const displayStrChance = `${strengthCritBonus.toFixed(0)}%`;
+    const displayBuffChance = `${buffCritChance.toFixed(0)}%`;
 
     if (!heroData || !enemyConfig) {
         return <div className="w-full h-full flex items-center justify-center text-white">Loading...</div>;
@@ -784,7 +787,20 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
             <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
                 <div className={`absolute left-10 bottom-[42%] w-64 h-[500px] transition-all duration-200 ${heroAnim === 'attack' ? 'translate-x-32' : ''} ${heroAnim === 'hit' ? 'translate-x-[-10px] brightness-50 bg-red-500/30' : ''}`}>
                     <img src={heroData.img} className="w-full h-full object-cover object-top rounded-xl shadow-[0_0_30px_rgba(0,0,0,0.8)] border-2 border-[#C8AA6E]" />
-                    <div className="absolute -bottom-24 w-full bg-black/80 border border-[#C8AA6E] p-2 rounded flex flex-col gap-1 shadow-lg z-40"><div className="flex justify-between text-xs text-[#C8AA6E] font-bold"><span>HP {playerHp}/{heroData.maxHp}</span>{playerBlock > 0 && <span className="text-blue-400 flex items-center gap-1"><Shield size={12} />{playerBlock}</span>}</div><div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden"><div className="h-full bg-green-600 transition-all duration-300" style={{ width: `${(playerHp / heroData.maxHp) * 100}%` }}></div></div>{renderStatus(playerStatus)}</div>
+                    <div className="absolute -bottom-24 w-full bg-black/80 border border-[#C8AA6E] p-2 rounded flex flex-col gap-1 shadow-lg z-40">
+                        <div className="flex justify-between text-xs text-[#C8AA6E] font-bold">
+                            <span>HP {playerHp}/{heroData.maxHp}</span>
+                            {playerBlock > 0 && <span className="text-blue-400 flex items-center gap-1"><Shield size={12} />{playerBlock}</span>}
+                        </div>
+                        <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                            <div className="h-full bg-green-600 transition-all duration-300" style={{ width: `${(playerHp / heroData.maxHp) * 100}%` }}></div>
+                        </div>
+                        {renderStatus(playerStatus)}
+                        <div className="mt-2 w-full bg-[#0a1324] border border-[#1f2a3f] rounded px-2 py-1 text-[11px] text-[#C8AA6E] font-semibold">
+                            <div>Crt Chance: {displayCritChance} | Crt Count: {critCount}</div>
+                            <div className="text-[10px] font-normal text-gray-300">Base: {displayBaseChance} | Str: {displayStrChance} | Buff: {displayBuffChance}</div>
+                        </div>
+                    </div>
                 </div>
                 <div className="text-6xl font-black text-[#C8AA6E]/20 italic">VS</div>
                 <div className={`absolute right-10 bottom-[42%] w-64 h-[500px] transition-all duration-200 ${enemyAnim === 'attack' ? '-translate-x-32' : ''} ${enemyAnim === 'hit' ? 'translate-x-[10px] brightness-50 bg-red-500/30' : ''}`}>
@@ -792,12 +808,6 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
                     <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-black/80 border border-red-600 px-3 py-1 rounded flex items-center gap-2 animate-bounce"><IntentIcon /><span className="text-white font-bold text-lg">{displayValue}{nextEnemyAction.count > 1 ? `x${nextEnemyAction.count}` : ''}</span></div>
                     <div className="absolute -bottom-24 w-full bg-black/80 border border-red-800 p-2 rounded flex flex-col gap-1 shadow-lg z-40"><div className="flex justify-between text-xs text-red-500 font-bold"><span>{enemyConfig.name}</span><span>{enemyHp}/{enemyConfig.maxHp}</span></div><div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden"><div className="h-full bg-red-600 transition-all duration-300" style={{ width: `${(enemyHp / enemyConfig.maxHp) * 100}%` }}></div></div>{enemyBlock > 0 && <div className="text-blue-400 text-xs font-bold flex items-center gap-1"><Shield size={10} /> 格挡 {enemyBlock}</div>}{renderStatus(enemyStatus)}</div>
                 </div>
-            </div>
-            <div className="absolute top-4 left-4 z-50 bg-black/70 border border-yellow-500/60 px-4 py-2 rounded shadow-lg text-xs text-yellow-200 pointer-events-none">
-                <div className="font-semibold tracking-wider">Crit Debug</div>
-                <div>Chance: {debugCritChance}%</div>
-                <div>Base: {heroBaseCritChance}% | Str: {debugStrengthBonus}% | Buff: {(playerStatus.critChance || 0).toFixed(1)}%</div>
-                <div>This turn crits: {critCount}</div>
             </div>
             {dmgOverlay && (
                 <div className={`absolute top-1/2 ${dmgOverlay.target === 'ENEMY' ? 'right-1/4' : 'left-1/4'} -translate-y-1/2 z-50 flex flex-col items-center`}>
