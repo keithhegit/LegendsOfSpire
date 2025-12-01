@@ -70,6 +70,7 @@
 
 #### 🌿 GM 控制台分支测试流程
 
+#### 🌿 GM 控制台分支测试流程
 1. `git checkout R_skill && npm run dev` → 启动最新 GM 分支。
 2. 打开 GM 控制台，选择目标英雄与 R 技能（支持多张 R 同时注入）。
 3. 点击 “清空 GM 存档” → 重新选人，DeckView 中可见绿色 GM 提示。
