@@ -130,7 +130,7 @@ export const CARD_DATABASE = {
   LeeR: { id: 'LeeR', name: '猛龙摆尾', type: 'ATTACK', cost: 3, value: 20, rarity: 'RARE', hero: 'LeeSin', target: 'single', effect: 'REMOVE_BUFF', effectValue: 1, description: '对目标造成20伤并移除目标的一个增益。', img: `${SPELL_URL}/LeeR.png`, price: 150 },
 
   // Riven
-  RivenR: { id: 'RivenR', name: '放逐之锋', type: 'ATTACK', cost: 3, value: 16, rarity: 'RARE', hero: 'Riven', target: 'single', effect: 'STRENGTH', effectValue: 4, effect2: 'LOW_HP_BONUS', effectValue2: 16, description: '激活放逐之锋，立即获得4点力量，并对残血目标额外造成16点伤害。', img: `${SPELL_URL}/RivenFengShuiEngine.png`, price: 150 },
+  RivenR: { id: 'RivenR', name: '放逐之锋', type: 'ATTACK', cost: 3, value: 16, rarity: 'RARE', hero: 'Riven', target: 'single', effect: 'TEMP_STR', effectValue: 4, effect2: 'LOW_HP_BONUS', effectValue2: 16, lowHpThreshold: 0.3, description: '激活放逐之锋，获得4点临时力量，并对低于30%生命的目标额外造成16点伤害。', img: `${SPELL_URL}/RivenFengShuiEngine.png`, price: 150 },
 
   // Twisted Fate
   TwistedFateR: { id: 'TwistedFateR', name: '命运', type: 'SKILL', cost: 3, value: 0, rarity: 'RARE', hero: 'TwistedFate', target: 'self', effect: 'DRAW', effectValue: 2, effect2: 'NEXT_ATTACK_BONUS', effectValue2: 6, description: '揭示战场抽2张牌，并让下一次攻击额外造成6点伤害。', img: `${SPELL_URL}/Destiny.png`, price: 150 },
@@ -154,7 +154,7 @@ export const CARD_DATABASE = {
   TeemoQ: { id: 'TeemoQ', name: '致盲吹箭', type: 'ATTACK', cost: 1, value: 6, rarity: 'COMMON', hero: 'Teemo', target: 'single', effect: 'WEAK', effectValue: 2, description: '造成6伤并使目标虚弱2（致盲效果）。', img: `${SPELL_URL}/TeemoQ.png`, price: 50 },
   TeemoW: { id: 'TeemoW', name: '疾速行军', type: 'SKILL', cost: 1, value: 5, rarity: 'UNCOMMON', hero: 'Teemo', target: 'self', effect: 'DRAW', effectValue: 1, description: '抽1张牌并获得5护甲。', img: `${SPELL_URL}/TeemoW.png`, price: 80 },
   TeemoE: { id: 'TeemoE', name: '毒性射击', type: 'ATTACK', cost: 1, value: 0, rarity: 'UNCOMMON', hero: 'Teemo', target: 'single', effect: 'POISON', effectValue: 3, description: '对目标施加3层毒（目标单体持续伤害）。', img: `${SPELL_URL}/TeemoE.png`, price: 100 },
-  TeemoR: { id: 'TeemoR', name: '剧毒陷阱', type: 'SKILL', cost: 3, value: 0, rarity: 'RARE', hero: 'Teemo', target: 'single', effect: 'POISON', effectValue: 6, effect2: 'WEAK', effectValue2: 2, description: '埋下剧毒蘑菇，对目标施加6层中毒并附加2层虚弱。', img: `${SPELL_URL}/BantamTrap.png`, price: 150 },
+  TeemoR: { id: 'TeemoR', name: '剧毒陷阱', type: 'SKILL', cost: 3, value: 0, rarity: 'RARE', hero: 'Teemo', target: 'single', effect: 'TRAP_TRIGGER', effectValue: 6, trapWeak: 2, description: '埋下剧毒蘑菇，下次敌人行动时触发，对其附加6层中毒与2层虚弱。', img: `${SPELL_URL}/BantamTrap.png`, price: 150 },
 
   // Thresh
   ThreshQ: { id: 'ThreshQ', name: '死亡判决', type: 'ATTACK', cost: 1, value: 8, rarity: 'COMMON', hero: 'Thresh', target: 'single', effect: 'PULL', effectValue: 1, description: '造成8伤并拉近目标（使其下一次攻击伤害+2）。', img: `${SPELL_URL}/ThreshQ.png`, price: 50 },

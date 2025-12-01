@@ -36,6 +36,7 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
     const [renderTrigger, setRenderTrigger] = useState(0);
     const forceUpdate = () => setRenderTrigger(prev => prev + 1);
     const [dmgOverlay, setDmgOverlay] = useState(null);
+    const [enemyTrap, setEnemyTrap] = useState(null);
     const [heroAnim, setHeroAnim] = useState("");
     const [enemyAnim, setEnemyAnim] = useState("");
     const [playerStatus, setPlayerStatus] = useState({
@@ -48,9 +49,11 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
         nextTurnMana: 0,
         nextDrawBonus: 0,
         critChance: 0,
-        critDamageMultiplier: 2
+        critDamageMultiplier: 2,
+        tempStrength: 0,
+        globalAttackBonus: 0
     });
-    const [enemyStatus, setEnemyStatus] = useState({ strength: 0, weak: 0, vulnerable: 0, mark: 0, markDamage: 0 });
+    const [enemyStatus, setEnemyStatus] = useState({ strength: 0, weak: 0, vulnerable: 0, mark: 0, markDamage: 0, trap: 0 });
     const heroBaseCritChance = heroData?.id === 'Yasuo' ? 10 : 0;
     const heroStrengthCritMultiplier = 1; // 所有英雄每点力量统一+1%暴击
 
@@ -125,6 +128,8 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
             reflectDamage: 0,
             buffNextSkill: 0,
             nextAttackCostReduce: 0,
+            tempStrength: 0,
+            globalAttackBonus: 0,
             critDamageMultiplier: prev.critDamageMultiplier || 2
         }));
         if (heroData.relicId === "ViktorPassive" && Math.random() < 0.5) {
@@ -245,6 +250,13 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
                 ...effectUpdates.enemyStatus
             }));
         }
+        if (effectUpdates.placeTrap) {
+            setEnemyTrap(effectUpdates.placeTrap);
+            setEnemyStatus(prev => ({
+                ...prev,
+                trap: (prev.trap || 0) + 1
+            }));
+        }
 
         // 盲僧被动：技能牌后设置buff
         if (card.type === 'SKILL' && heroData.relicId === "LeeSinPassive") {
@@ -282,7 +294,9 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
                 playSfx('ATTACK_HIT');
             }, 200);
             // FIX Bug #1: MULTI_HIT伤害计算 - 易伤应该加成基础伤害，然后再乘以次数
-            let baseDmg = card.value + (mergedPlayerStatus.strength || 0);
+            const tempStrengthBonus = mergedPlayerStatus.tempStrength || 0;
+            const globalAttackBonus = mergedPlayerStatus.globalAttackBonus || 0;
+            let baseDmg = card.value + (mergedPlayerStatus.strength || 0) + tempStrengthBonus + globalAttackBonus;
             if (mergedPlayerStatus.weak > 0) baseDmg = Math.floor(baseDmg * 0.75);
 
             // FIX Bug #8: 首次攻击加倍 (耀光)
@@ -321,8 +335,11 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
             }
 
             // FIX: 低血加成 (LOW_HP_BONUS) - JinxR
-            if (effectUpdates.lowHpBonus && enemyHp < enemyConfig.maxHp * 0.5) {
-                baseDmg += effectUpdates.lowHpBonus;
+            if (effectUpdates.lowHpBonus) {
+                const lowHpThreshold = effectUpdates.lowHpThreshold ?? 0.5;
+                if (enemyHp < enemyConfig.maxHp * lowHpThreshold) {
+                    baseDmg += effectUpdates.lowHpBonus;
+                }
             }
 
             // Batch 2: 暴击次数缩放 (SCALE_BY_CRIT) - YasuoR
@@ -653,6 +670,18 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
     const enemyAction = () => {
         if (enemyHp <= 0) return;
 
+        if (enemyTrap) {
+            setEnemyTrap(null);
+            setEnemyStatus(prev => ({
+                ...prev,
+                weak: (prev.weak || 0) + (enemyTrap.weak || 0),
+                poison: (prev.poison || 0) + (enemyTrap.poison || 0),
+                trap: Math.max((prev.trap || 1) - 1, 0)
+            }));
+            setDmgOverlay({ val: 'TRAP!', target: 'ENEMY', color: 'text-green-400' });
+            playSfx('HIT_TAKEN');
+        }
+
         // FIX: 眩晕逻辑 (STUN)
         if (enemyStatus.stunned > 0) {
             setEnemyStatus(s => ({ ...s, stunned: s.stunned - 1 }));
@@ -741,6 +770,8 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
     const renderStatus = (status) => (
         <div className="flex gap-1 mt-1 flex-wrap">
             {status.strength > 0 && <div className="flex items-center text-[10px] text-red-400 bg-red-900/40 px-1 rounded border border-red-900 shadow-sm"><Sword size={10} className="mr-1" /> {status.strength}</div>}
+            {status.tempStrength > 0 && <div className="flex items-center text-[10px] text-red-300 bg-red-900/30 px-1 rounded border border-red-700 shadow-sm"><Sword size={10} className="mr-1" /> 临时 +{status.tempStrength}</div>}
+            {status.globalAttackBonus > 0 && <div className="flex items-center text-[10px] text-orange-200 bg-orange-900/30 px-1 rounded border border-orange-700 shadow-sm"><Sword size={10} className="mr-1" /> 全攻 +{status.globalAttackBonus}</div>}
             {status.dexterity > 0 && <div className="flex items-center text-[10px] text-green-400 bg-green-900/40 px-1 rounded border border-green-900 shadow-sm"><Shield size={10} className="mr-1" /> 灵巧 {status.dexterity}</div>}
             {status.weak > 0 && <div className="flex items-center text-[10px] text-yellow-400 bg-yellow-900/40 px-1 rounded border border-yellow-900 shadow-sm"><Activity size={10} className="mr-1" /> 虚弱 {status.weak}</div>}
             {status.vulnerable > 0 && <div className="flex items-center text-[10px] text-purple-400 bg-purple-900/40 px-1 rounded border border-purple-900 shadow-sm"><Zap size={10} className="mr-1" /> 易伤 {status.vulnerable}</div>}
@@ -749,6 +780,7 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
             {status.burn > 0 && <div className="flex items-center text-[10px] text-orange-500 bg-orange-950/40 px-1 rounded border border-orange-800 shadow-sm"><Flame size={10} className="mr-1" /> 灼烧 {status.burn}</div>}
             {status.voidDot > 0 && <div className="flex items-center text-[10px] text-purple-300 bg-purple-950/40 px-1 rounded border border-purple-800 shadow-sm"><Ghost size={10} className="mr-1" /> 虚空 {status.voidDot}</div>}
             {status.mark > 0 && <div className="flex items-center text-[10px] text-orange-400 bg-orange-900/40 px-1 rounded border border-orange-900 shadow-sm"><Crosshair size={10} className="mr-1" /> 标记 {status.mark}</div>}
+            {status.trap > 0 && <div className="flex items-center text-[10px] text-green-200 bg-green-900/40 px-1 rounded border border-green-700 shadow-sm"><Layers size={10} className="mr-1" /> 陷阱 {status.trap}</div>}
             {(status.immuneOnce || status.avoidNextDamage) && <div className="flex items-center text-[10px] text-yellow-200 bg-yellow-900/40 px-1 rounded border border-yellow-700 shadow-sm"><Lock size={10} className="mr-1" /> 免疫</div>}
             {status.stunned > 0 && <div className="flex items-center text-[10px] text-blue-400 bg-blue-900/40 px-1 rounded border border-blue-900 shadow-sm"><AlertTriangle size={10} className="mr-1" /> 眩晕 {status.stunned}</div>}
             {status.reflect > 0 && <div className="flex items-center text-[10px] text-orange-300 bg-orange-950/40 px-1 rounded border border-orange-800 shadow-sm"><RefreshCw size={10} className="mr-1" /> 反伤 {status.reflect}</div>}
@@ -756,6 +788,7 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
             {status.healReduce > 0 && <div className="flex items-center text-[10px] text-red-300 bg-red-950/40 px-1 rounded border border-red-900 shadow-sm"><Skull size={10} className="mr-1" /> 重伤 {status.healReduce}%</div>}
             {status.lifesteal > 0 && <div className="flex items-center text-[10px] text-pink-400 bg-pink-900/40 px-1 rounded border border-pink-800 shadow-sm"><Heart size={10} className="mr-1" /> 吸血</div>}
             {status.regenMana > 0 && <div className="flex items-center text-[10px] text-blue-400 bg-blue-900/40 px-1 rounded border border-blue-800 shadow-sm"><Zap size={10} className="mr-1" /> 回蓝 {status.regenMana}</div>}
+            {status.nextAttackBonus > 0 && <div className="flex items-center text-[10px] text-amber-200 bg-amber-900/30 px-1 rounded border border-amber-700 shadow-sm"><Sword size={10} className="mr-1" /> 下一击 +{status.nextAttackBonus}</div>}
             {status.nextAttackDouble && <div className="flex items-center text-[10px] text-red-400 bg-red-900/40 px-1 rounded border border-red-800 shadow-sm"><Sword size={10} className="mr-1" /> 双倍伤害</div>}
 
             {/* Next Turn Effects */}

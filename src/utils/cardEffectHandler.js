@@ -21,12 +21,12 @@ export function applyCardEffects(card, context) {
 
     // Primary effect
     if (card.effect) {
-        applyEffect(card.effect, card.effectValue, context, updates);
+        applyEffect(card.effect, card.effectValue, context, updates, card);
     }
 
     // Secondary effect (for multi-effect cards like 卡牌R)
     if (card.effect2) {
-        applyEffect(card.effect2, card.effectValue2 || 0, context, updates);
+        applyEffect(card.effect2, card.effectValue2 || 0, context, updates, card);
     }
 
     return updates;
@@ -35,7 +35,7 @@ export function applyCardEffects(card, context) {
 /**
  * Apply a single effect to the updates object
  */
-function applyEffect(effectType, value, context, updates) {
+function applyEffect(effectType, value, context, updates, card = {}) {
     const { playerStatus, enemyStatus, playerHp, maxHp } = context;
 
     switch (effectType) {
@@ -199,6 +199,7 @@ function applyEffect(effectType, value, context, updates) {
         case 'LOW_HP_BONUS':
             // 低血额外伤害 - Calculated in BattleScene based on enemy HP
             updates.lowHpBonus = value;
+            updates.lowHpThreshold = typeof card.lowHpThreshold === 'number' ? card.lowHpThreshold : 0.5;
             break;
 
         case 'BONUS_IF_LOW_HP':
@@ -934,7 +935,10 @@ function applyEffect(effectType, value, context, updates) {
 
         case 'TRAP_TRIGGER':
             // 陷阱触发 - Place trap
-            updates.placeTrap = value;
+            updates.placeTrap = {
+                poison: value,
+                weak: card.trapWeak || 0
+            };
             break;
 
         case 'BAIT_TRIGGER':

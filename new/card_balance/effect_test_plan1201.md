@@ -51,11 +51,11 @@
 | 塞拉斯 | `SylasR` / `COPY_ENEMY_ACTION` | ⛔ 未接管 `nextEnemyAction`，Batch2 Phase2.5 待实现。 |
 | 厄加特 | `UrgotR` / `LOW_HP_EXECUTE` | ✅ 敌人 HP ≤ 30% 时立即触发处决，护甲与 HP 同步清空。 |
 | 维克托 | `ViktorR` / `DRAW_ON_USE` | ⛔ 未触发额外抽牌，Batch2 Phase2.3 需补。 |
-| 瑞文 | `RivenR` / `STRENGTH + LOW_HP_BONUS` | ⚠️ 卡牌已写入 `cards.js`，但 BattleScene 仍缺“激活放逐之锋后获得力量与残血加伤”的逻辑；排入 Batch2 Phase2.1。 |
-| 卡牌大师 | `TwistedFateR` / `DRAW + NEXT_ATTACK_BONUS` | ⚠️ 新卡提供抽牌与下一击增伤，BattleScene 需读取 `effectUpdates.nextAttackBonus`；归入 Batch2 Phase2.1。 |
+| 瑞文 | `RivenR` / `TEMP_STR + LOW_HP_BONUS` | ✅ 临时 +4 力量即时写入 `tempStrength`，并在敌人 HP <30% 时追加 16 点真实伤害；HUD 便于观察阈值。 |
+| 卡牌大师 | `TwistedFateR` / `DRAW + NEXT_ATTACK_BONUS` | ✅ 抽 2 卡 + `nextAttackBonus:6` 已接入，状态栏显示“下一击 +6”，下一张攻击自动消费。 |
 | 李青 | `LeeR` / `REMOVE_BUFF` | ⛔ 仅 effect 占位，敌人增益移除逻辑未写；归档 Batch2 Phase2.3。 |
-| 薇恩 | `VayneR` / `STRENGTH + NEXT_ATTACK_DOUBLE` | ⚠️ R 技能已补齐，需在 BattleScene 中叠加力量并复用 `nextAttackDouble` 逻辑；同样排进 Phase2.1。 |
-| 提莫 | `TeemoR` / `POISON + WEAK` | ⚠️ 卡片现已存在，但未实现“蘑菇爆炸追加毒+虚弱”；视同批次与毒系机制一起实现。 |
+| 薇恩 | `VayneR` / `STRENGTH + NEXT_ATTACK_DOUBLE` | ✅ 获得 4 力量并写入 `nextAttackDouble`，状态徽章提示直至下一张攻击触发双倍。 |
+| 提莫 | `TeemoR` / `TRAP_TRIGGER` | ✅ 埋下蘑菇陷阱，敌人下次行动前触发“TRAP!”并附加 6 层中毒 + 2 层虚弱，状态栏显示“陷阱”。 |
 | 锤石 | `ThreshR` / `WEAK_VULN_AND_PERMAHP` | ⛔ 仅记录状态，未处理“击杀加最大生命”；排入 Batch3 Phase3.3。 |
 | 内瑟斯 | `NasusR` / `TEMP_STR` | ⛔ `tempStrength` 没有结算入口；Batch3 Phase3.3 实现。 |
 | 艾瑞莉娅 | `IreliaR` / `ALL_ATTACKS_BONUS` | ⛔ 未对本回合其它攻击追加伤害；计划在 Batch2 Phase2.5。 |
@@ -68,7 +68,7 @@
 | :--- | :--- | :--- | :--- | :--- |
 | **R0 - 已上线** | 维持现状，冒烟回归 | 盖伦、拉克丝、金克丝、亚索、娑娜、厄加特、劫 | `BattleScene.jsx` 既有逻辑 | 角色专用测试卡组里确保飘字/判定与文档一致 |
 | **R1 - Phase2.3 生存向** | 打通“回血/抽牌/驱散”型 R 技能 | 艾克（`HEAL_AND_DAMAGE`）、塞拉斯（`COPY_ENEMY_ACTION` 联动 `ref enemy`）、维克托（`DRAW_ON_USE`）、李青（`REMOVE_BUFF`） | `BattleScene.jsx`：新增 `healAndDamage`/`copyEnemyAction` 分支；`enemyAction()`：消费 `reflectDamage`；`cardEffectHandler.js`：补充 `nextSkillBonus`/`drawOnUse` plumbing | ① 使用 GM 牌组触发回血+伤害同时结算；② 观察复制敌人意图的飘字；③ 维克托 R 出牌后手牌+1 |
-| **R2 - Phase2.5 强化/连击** | 让“增伤/下一击”类 R 技能可实战 | 瑞文（力量+低血加伤）、卡牌大师（抽牌+下一击加成）、薇恩（力量+`nextAttackDouble`）、艾瑞莉娅（本回合所有攻击加伤） | `BattleScene.jsx`：在攻击前读取 `effectUpdates.tempStrength / nextAttackBonus / nextAttackDouble / allAttacksBonus`；`playerStatus` 增加 `allAttacksBonus` | ① 瑞文 R 后立刻抽到攻击牌，检查力量 / 斩杀倍率；② TF R 确认抽牌 & 下次攻击+6；③ 薇恩 R 后第一张攻击翻倍；④ 艾瑞莉娅 R 后打多张攻击均加伤 |
+| **R2 - Phase2.5 强化/连击** | 让“增伤/下一击”类 R 技能可实战 | ✅ 瑞文（临时力量+30% 斩杀）、✅ 卡牌大师（抽牌+下一击加成）、✅ 薇恩（力量+`nextAttackDouble`）、⚙️ 艾瑞莉娅（本回合所有攻击加伤） | `BattleScene.jsx`：已在攻击前读取 `tempStrength / nextAttackBonus / nextAttackDouble / globalAttackBonus`；`playerStatus` 新增 `globalAttackBonus` | ① 瑞文 R 后立刻抽到攻击牌，检查临时力量与斩杀阈值；② TF R 确认抽牌 & HUD 显示下一击+6；③ 薇恩 R 后第一张攻击飘出双倍；④ 艾瑞莉娅 R 后打多张攻击均加伤 |
 | **R3 - Phase3.3 永久成长** | 引入跨战斗增幅 | 锤石（击杀 +MaxHP）、内瑟斯（`TEMP_STR` → 回合结束还原） | `BattleScene.jsx` 记录 `battleResult.gainedMaxHp`/`gainedTempStr`; `App.jsx` 在胜利面板中落地永久成长 | ① 击杀后查看战斗结算是否显示 +MaxHP / +Str；② 重新进入下一场战斗状态是否继承 |
 | **R4 - Phase2.4/毒系** | 完成 DOT / 多段型 R 技能 | 提莫（毒 + 虚弱陷阱）、德莱厄斯（Bleed Execute）、卡特琳娜（多段判定）、未来多段型 | `cardEffectHandler.js` 中 `bleedExecute`/`poison`/`multiStrike` 统一返回；`BattleScene.jsx` 的 multi-hit loop 分段消费状态 | ① 提莫 R 安置后敌人尝试攻击即触发毒 + 虚弱飘字；② 德莱厄斯 R 在高流血层立刻处决；③ 卡特 R 飘字与多段动画同步 |
 
@@ -78,11 +78,11 @@
 
 | 英雄 | 目标机制 | 当前缺口 | 计划落点 | 备注 |
 | :--- | :--- | :--- | :--- | :--- |
-| 瑞文 `RivenR` | 激活后立即 +力量、敌人低血额外伤害 | `BattleScene.jsx` 仅写入状态，未在攻击流程读取 `tempStrength / lowHpBonus` | Phase2.2 内补齐状态消费，并在 HUD 中追加残血阈值提示 | 需与 Phase2.2 暴击公式兼容，避免重复翻倍 |
-| 卡牌大师 `TwistedFateR` | 抽牌 + 下一击加成 | 仅有卡面定义；`nextAttackBonus` 未衔接 R 技能入口 | 在 playCard -> SKILL/ATTACK 分支复用 `playerStatus.nextAttackBonus` 流程 | 验证需用 GM 卡组保证立即抽到攻击牌 |
-| 薇恩 `VayneR` | 力量 + 下一张攻击翻倍 | R 技能已入库但未写前端：`strength` 添加成功，`nextAttackDouble` 未触发 | 调用现有 `nextAttackDouble` 重置逻辑，并补充 HUD 反馈 | 与薇恩被动（连续三击）叠加，需测试冲突 |
-| 艾瑞莉娅 `IreliaR` | 本回合所有攻击+伤害 | `allAttacksBonus` 未落地 | 在攻击牌流程读取 `playerStatus.allAttacksBonus` 并在回合结束清零 | 同步在状态栏展示剩余加成 |
-| 提莫 `TeemoR` | 蘑菇陷阱：延迟触发毒+虚弱 | 仅有卡面；`TRAP_TRIGGER` 未接管战斗 loop | Phase2.2 先实现最小版本：记录陷阱并在敌人行动时触发 | 完整 DOT/陷阱系统延伸到 R4 |
+| 瑞文 `RivenR` | 激活后立即 +力量、敌人低血额外伤害 | ✅ `TEMP_STR` + 30% 阈值补全，伤害端读取 `tempStrength / lowHpThreshold` | Phase2.2 内持续监控 HUD（Crit & Threshold） |  |
+| 卡牌大师 `TwistedFateR` | 抽牌 + 下一击加成 | ✅ HUD/状态展示“下一击 +6”，逻辑接入 | QA：R 后立即攻击验证 +6 飘字 |  |
+| 薇恩 `VayneR` | 力量 + 下一张攻击翻倍 | ✅ `nextAttackDouble` 徽章提示并在攻击后清空 | 与薇恩被动（连击真伤）共存 |  |
+| 艾瑞莉娅 `IreliaR` | 本回合所有攻击+伤害 | ⚙️ `globalAttackBonus` 已实现，可叠本回合所有攻击；待 QA | 状态区会显示“全攻 +X” |  |
+| 提莫 `TeemoR` | 蘑菇陷阱：延迟触发毒+虚弱 | ✅ `placeTrap` + 敌人行动前触发 | Phase2.2 最小版本上线，敌人状态显示“陷阱” | 完整 DOT/陷阱系统延伸到 R4 |
 
 > 每完成一项，需在表格“状态”列更新为 ✅ 并补充实测步骤，保证 Phase2.2 仍旧是唯一信息源。
 
