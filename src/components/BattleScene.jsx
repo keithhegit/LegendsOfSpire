@@ -36,7 +36,6 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
     const [renderTrigger, setRenderTrigger] = useState(0);
     const forceUpdate = () => setRenderTrigger(prev => prev + 1);
     const [dmgOverlay, setDmgOverlay] = useState(null);
-    const [critOverlay, setCritOverlay] = useState(null);
     const [heroAnim, setHeroAnim] = useState("");
     const [enemyAnim, setEnemyAnim] = useState("");
     const [playerStatus, setPlayerStatus] = useState({
@@ -402,8 +401,6 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
                     if (didCrit) {
                         finalDmg = Math.floor(finalDmg * critDamageMultiplier);
                         setCritCount(prev => prev + 1);
-                        setCritOverlay({ val: 'CRITICAL HIT!', target: 'ENEMY' });
-                        setTimeout(() => setCritOverlay(null), 500);
                         playSfx('CRIT_HIT');
                     }
 
@@ -467,8 +464,8 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
                     // FIX: Multi-hit display - Stagger damage numbers
                     const hitDmg = dmgToHp; // Capture current hit damage
                     setTimeout(() => {
-                        setDmgOverlay({ val: hitDmg, target: 'ENEMY' });
-                        setTimeout(() => setDmgOverlay(null), 250);
+                        setDmgOverlay({ val: hitDmg, target: 'ENEMY', isCrit: didCrit });
+                        setTimeout(() => setDmgOverlay(null), didCrit ? 600 : 250);
                     }, i * 300);
                 }
             };
@@ -782,12 +779,18 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
                     <div className="absolute -bottom-24 w-full bg-black/80 border border-red-800 p-2 rounded flex flex-col gap-1 shadow-lg z-40"><div className="flex justify-between text-xs text-red-500 font-bold"><span>{enemyConfig.name}</span><span>{enemyHp}/{enemyConfig.maxHp}</span></div><div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden"><div className="h-full bg-red-600 transition-all duration-300" style={{ width: `${(enemyHp / enemyConfig.maxHp) * 100}%` }}></div></div>{enemyBlock > 0 && <div className="text-blue-400 text-xs font-bold flex items-center gap-1"><Shield size={10} /> 格挡 {enemyBlock}</div>}{renderStatus(enemyStatus)}</div>
                 </div>
             </div>
-            {critOverlay && (
-                <div className={`absolute top-1/3 ${critOverlay.target === 'ENEMY' ? 'right-1/4' : 'left-1/4'} -translate-y-1/2 text-6xl font-extrabold text-red-400 drop-shadow-[0_0_20px_rgba(255,0,0,0.6)] animate-bounce z-50`}>
-                    {critOverlay.val}
+            {dmgOverlay && (
+                <div className={`absolute top-1/2 ${dmgOverlay.target === 'ENEMY' ? 'right-1/4' : 'left-1/4'} -translate-y-1/2 z-50 flex flex-col items-center`}>
+                    {dmgOverlay.isCrit && (
+                        <div className="text-4xl font-black text-red-400 drop-shadow-[0_0_25px_rgba(255,0,0,0.75)] tracking-[0.3em] uppercase animate-bounce">
+                            CRITICAL HIT
+                        </div>
+                    )}
+                    <div className={`text-8xl font-black ${dmgOverlay.isCrit ? 'text-yellow-200 drop-shadow-[0_0_25px_rgba(255,255,0,0.8)]' : 'text-white drop-shadow-[0_0_10px_red]'} animate-ping`}>
+                        {dmgOverlay.val}
+                    </div>
                 </div>
             )}
-            {dmgOverlay && (<div className={`absolute top-1/2 ${dmgOverlay.target === 'ENEMY' ? 'right-1/4' : 'left-1/4'} -translate-y-1/2 text-8xl font-black text-white drop-shadow-[0_0_10px_red] animate-ping z-50`}>{dmgOverlay.val}</div>)}
             <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black via-black/80 to-transparent z-20 flex items-end justify-center pb-6 gap-4 pointer-events-none">
                 <div className="absolute left-8 bottom-8 w-24 h-24 rounded-full bg-[#091428] border-4 border-[#C8AA6E] flex items-center justify-center shadow-[0_0_30px_#0066FF] pointer-events-auto text-center">
                     <span className="text-4xl font-bold text-white block">{playerMana}</span>
