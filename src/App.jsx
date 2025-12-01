@@ -13,7 +13,6 @@ import GMPanel from './components/GMPanel';
 import { unlockAudio } from './utils/audioContext'; // 音频解锁工具
 import { getHexNeighbors } from './utils/hexagonGrid'; // 六边形邻居帮助函数
 import { authService } from './services/authService';
-import { R_SKILL_TEST } from './config/rSkillTestConfig';
 const CDN_VERSION = "13.1.1";
 const CDN_URL = `https://ddragon.leagueoflegends.com/cdn/${CDN_VERSION}`;
 const LOADING_URL = "https://ddragon.leagueoflegends.com/cdn/img/champion/loading";
