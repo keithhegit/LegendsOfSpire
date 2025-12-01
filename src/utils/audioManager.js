@@ -18,6 +18,7 @@ const SFX_URLS = {
   ATTACK_HIT: `${SFX_NEW_URL}/attack_hit.mp3`, // 攻击命中音效
   BLOCK_SHIELD: `${SFX_NEW_URL}/block_shield.mp3`, // 格挡护盾音效
   HIT_TAKEN: `${SFX_NEW_URL}/hit_taken.mp3`, // 受击音效
+  CRIT_HIT: `${SFX_NEW_URL}/heavy_punch2.mp3`, // 暴击专属音效
 };
 
 export const playSfx = (type) => {
@@ -28,6 +29,8 @@ export const playSfx = (type) => {
   // 根据音效类型调整音量
   if (type === 'ATTACK_SWING' || type === 'ATTACK_HIT') {
     audio.volume = 0.5; // 攻击音效稍大
+  } else if (type === 'CRIT_HIT') {
+    audio.volume = 0.75; // 暴击音效拉开差异
   } else if (type === 'BLOCK_SHIELD') {
     audio.volume = 0.4; // 格挡音效
   } else if (type === 'HIT_TAKEN') {
