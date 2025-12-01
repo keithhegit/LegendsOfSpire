@@ -52,6 +52,7 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
     });
     const [enemyStatus, setEnemyStatus] = useState({ strength: 0, weak: 0, vulnerable: 0, mark: 0, markDamage: 0 });
     const heroBaseCritChance = heroData?.id === 'Yasuo' ? 10 : 0;
+    const heroStrengthCritMultiplier = heroData?.id === 'Yasuo' ? 1 : 5;
 
     // 被动技能状态追踪
     const [rivenAttackCount, setRivenAttackCount] = useState(0); // 瑞文：攻击计数
@@ -344,7 +345,7 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
             const currentEnemyStatus = mergedEnemyStatus;
             const cardsPlayedIncludingCurrent = cardsPlayedBefore + 1;
             const priorCardsThisTurn = Math.max(0, cardsPlayedIncludingCurrent - 1);
-            const strengthCritBonus = ((mergedPlayerStatus.strength || 0) * 5);
+            const strengthCritBonus = ((mergedPlayerStatus.strength || 0) * heroStrengthCritMultiplier);
             const totalCritChancePercent = Math.max(0, heroBaseCritChance + (mergedPlayerStatus.critChance || 0) + strengthCritBonus);
             const critChanceDecimal = Math.min(1, totalCritChancePercent / 100);
             const critDamageMultiplier = mergedPlayerStatus.critDamageMultiplier || 2;
@@ -769,7 +770,7 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
     const IntentIcon = () => { const type = nextEnemyAction.type; const isAttack = type === 'ATTACK' || nextEnemyAction.actionType === 'Attack'; if (isAttack) return <Sword size={20} className="text-red-500" />; if (type === 'BUFF') return <Shield size={20} className="text-blue-400" />; if (type === 'DEBUFF') return <Skull size={20} className="text-purple-400" />; return <AlertTriangle size={20} className="text-gray-400" />; };
 
     const { drawPile: currentDrawPile = [], discardPile: currentDiscardPile = [], hand = [] } = deckRef.current || {};
-    const strengthCritBonus = ((playerStatus.strength || 0) * 5);
+    const strengthCritBonus = ((playerStatus.strength || 0) * heroStrengthCritMultiplier);
     const buffCritChance = (playerStatus.critChance || 0);
     const totalCritChanceValue = Math.max(0, heroBaseCritChance + strengthCritBonus + buffCritChance);
     const displayCritChance = `${totalCritChanceValue.toFixed(0)}%`;
