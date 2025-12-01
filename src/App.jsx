@@ -1,3 +1,7 @@
+const isRelicAvailableInAct = (relicId, act = 1) => {
+    const requiredAct = RELIC_ACT_GATES[relicId] ?? 1;
+    return act >= requiredAct;
+};
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Sword, Shield, Zap, Skull, Heart, RefreshCw, AlertTriangle, Flame, XCircle, Activity, Map as MapIcon, Gift, Anchor, Coins, ShoppingBag, ChevronRight, Star, Play, Pause, Volume2, VolumeX, Landmark, Lock, RotateCcw, Save, ArrowRight, Layers, UserSquare, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -58,6 +62,13 @@ const SAVE_KEY = 'lots_save_v75';
 const UNLOCK_KEY = 'lots_unlocks_v75';
 const CARD_DELETE_COST = { COMMON: 50, UNCOMMON: 100, RARE: 200 };
 const MAX_EXTRA_RELICS = 6;
+const RELIC_ACT_GATES = {
+    Cull: 1,
+    DarkSeal: 1,
+    QSS: 2,
+    Executioner: 2,
+    Nashor: 3
+};
 const GM_STORAGE_KEY = 'lots_gm_config_v1';
 const DEFAULT_GM_CONFIG = {
     enabled: false,
@@ -413,9 +424,11 @@ const MapView = ({ mapData, onNodeSelect, act }) => {
     )
 };
 
-const ShopView = ({ onLeave, onBuyCard, onBuyRelic, gold, deck, relics, championName }) => {
+const ShopView = ({ onLeave, onBuyCard, onBuyRelic, gold, deck, relics, championName, act }) => {
     const cardStock = useMemo(() => shuffle(Object.values(CARD_DATABASE).filter(c => c.rarity !== 'BASIC' && (c.hero === 'Neutral' || c.hero === championName))).slice(0, 5), [championName]);
-    const relicStock = useMemo(() => Object.values(RELIC_DATABASE).filter(r => r.rarity !== 'PASSIVE' && !relics.includes(r.id)).slice(0, 3), [relics]);
+    const relicStock = useMemo(() => Object.values(RELIC_DATABASE)
+        .filter(r => r.rarity !== 'PASSIVE' && !relics.includes(r.id) && isRelicAvailableInAct(r.id, act))
+        .slice(0, 3), [relics, act]);
     const [purchasedItems, setPurchasedItems] = useState([]);
     const handleBuy = (item, type) => { if (gold >= item.price && !purchasedItems.includes(item.id)) { setPurchasedItems([...purchasedItems, item.id]); if (type === 'CARD') onBuyCard(item); if (type === 'RELIC') onBuyRelic(item); } };
     return (
@@ -469,14 +482,7 @@ const ShopView = ({ onLeave, onBuyCard, onBuyRelic, gold, deck, relics, champion
 
 const ChestView = ({ onLeave, onRelicReward, relics, act }) => {
     // 根据当前章节过滤遗物：ACT1只能获得通用遗物，ACT2可以获得ACT1+ACT2，ACT3可以获得所有
-    const availableRelics = Object.values(RELIC_DATABASE).filter(r => {
-        if (r.rarity === 'PASSIVE' || r.rarity === 'BASIC' || relics.includes(r.id)) return false;
-        // 章节专属遗物检查
-        if (r.id === 'Cull' || r.id === 'DarkSeal') return act === 1; // ACT1专属
-        if (r.id === 'QSS' || r.id === 'Executioner') return act >= 2; // ACT2专属
-        if (r.id === 'Nashor') return act >= 3; // ACT3专属
-        return true; // 通用遗物所有章节都可以获得
-    });
+    const availableRelics = Object.values(RELIC_DATABASE).filter(r => r.rarity !== 'PASSIVE' && !relics.includes(r.id) && isRelicAvailableInAct(r.id, act));
     const rewards = useMemo(() => shuffle(availableRelics).slice(0, 3), [relics, act]);
     const [rewardChosen, setRewardChosen] = useState(false);
     const handleChoose = (relic) => { if (rewardChosen) return; setRewardChosen(true); onRelicReward(relic); };
@@ -1007,23 +1013,30 @@ export default function LegendsOfTheSpire() {
 
     const queueRelicPickup = (relicId, onResolved) => {
         if (!relicId) return false;
+        if (pendingRelic) {
+            showToast('装备栏待处理，请先选择保留或放弃上一件装备');
+            openInventory('RELICS');
+            return false;
+        }
         const extraCount = champion ? relics.filter(rid => rid !== champion.relicId).length : relics.length;
         if (extraCount >= MAX_EXTRA_RELICS) {
             setPendingRelic({ id: relicId, onResolved });
+            showToast('装备栏已满，请在背包中选择替换或放弃新装备');
             openInventory('RELICS');
             return false;
         }
         setRelics(prev => [...prev, relicId]);
+        showToast(`获得装备：${RELIC_DATABASE[relicId]?.name || relicId}`, 'relic');
         onResolved?.(true);
         return true;
     };
 
     const handleRelicReplace = (relicIdToRemove) => {
         if (!pendingRelic) return;
-        let removed = false;
+        let removed = !relicIdToRemove;
         setRelics(prev => {
             const filtered = prev.filter(id => {
-                if (!removed && relicIdToRemove && id === relicIdToRemove && id !== champion?.relicId) {
+                if (!removed && id === relicIdToRemove && id !== champion?.relicId) {
                     removed = true;
                     return false;
                 }
@@ -1031,12 +1044,14 @@ export default function LegendsOfTheSpire() {
             });
             return [...filtered, pendingRelic.id];
         });
+        showToast(`装备替换：已装备 ${RELIC_DATABASE[pendingRelic.id]?.name || pendingRelic.id}`, 'relic');
         pendingRelic.onResolved?.(true);
         setPendingRelic(null);
     };
 
     const handleRejectPendingRelic = () => {
         if (!pendingRelic) return;
+        showToast(`放弃装备：${RELIC_DATABASE[pendingRelic.id]?.name || pendingRelic.id}`);
         pendingRelic.onResolved?.(false);
         setPendingRelic(null);
     };
@@ -1155,7 +1170,14 @@ export default function LegendsOfTheSpire() {
     };
     const handleEventReward = (reward) => {
         if (reward.type === 'BUFF' && reward.stat === 'strength') setBaseStr(prev => prev + reward.value);
-        if (reward.type === 'RELIC_RANDOM') { const pool = Object.values(RELIC_DATABASE).filter(r => r.rarity !== 'PASSIVE' && !relics.includes(r.id)); if (pool.length > 0) handleRelicReward(shuffle(pool)[0]); }
+        if (reward.type === 'RELIC_RANDOM') {
+            const pool = Object.values(RELIC_DATABASE).filter(r => r.rarity !== 'PASSIVE' && !relics.includes(r.id) && isRelicAvailableInAct(r.id, currentAct));
+            if (pool.length > 0) {
+                handleRelicReward(shuffle(pool)[0]);
+            } else {
+                showToast('当前章节没有可用装备', 'default');
+            }
+        }
         if (reward.type === 'UPGRADE_RANDOM') {
             // 随机升级一张卡
             const upgradableIndices = masterDeck.map((id, idx) => !id.endsWith('+') ? idx : -1).filter(i => i !== -1);
@@ -1379,7 +1401,7 @@ export default function LegendsOfTheSpire() {
                     <GridMapView_v3 mapData={mapData} onNodeSelect={handleNodeSelect} currentFloor={currentFloor} act={currentAct} activeNode={activeNode} lockedChoices={lockedChoices} />
                 </div>
             );
-            case 'SHOP': return <ShopView gold={gold} deck={masterDeck} relics={relics} onLeave={() => completeNode()} onBuyCard={handleBuyCard} onBuyRelic={handleBuyRelic} onUpgradeCard={handleUpgradeCard} onBuyMana={handleBuyMana} championName={champion.name} />;
+            case 'SHOP': return <ShopView gold={gold} deck={masterDeck} relics={relics} onLeave={() => completeNode()} onBuyCard={handleBuyCard} onBuyRelic={handleBuyRelic} onUpgradeCard={handleUpgradeCard} onBuyMana={handleBuyMana} championName={champion.name} act={currentAct} />;
             case 'EVENT': return <EventView onLeave={() => completeNode()} onReward={handleEventReward} />;
             case 'CHEST': return <ChestView onLeave={() => completeNode()} onRelicReward={handleRelicReward} relics={relics} act={currentAct} />;
             case 'COMBAT': return champion ? <BattleScene heroData={{ ...champion, maxHp, currentHp, relics, baseStr }} enemyId={activeNode?.enemyId} initialDeck={masterDeck} onWin={handleBattleWin} onLose={() => { localStorage.removeItem(SAVE_KEY); setView('GAMEOVER'); }} floorIndex={currentFloor} act={currentAct} /> : <div>Loading...</div>;
