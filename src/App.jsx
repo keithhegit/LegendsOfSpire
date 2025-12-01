@@ -12,6 +12,7 @@ import CollectionSystem from './components/CollectionSystem';
 import { unlockAudio } from './utils/audioContext'; // 音频解锁工具
 import { getHexNeighbors } from './utils/hexagonGrid'; // 六边形邻居帮助函数
 import { authService } from './services/authService';
+import { R_SKILL_TEST } from './config/rSkillTestConfig';
 const CDN_VERSION = "13.1.1";
 const CDN_URL = `https://ddragon.leagueoflegends.com/cdn/${CDN_VERSION}`;
 const LOADING_URL = "https://ddragon.leagueoflegends.com/cdn/img/champion/loading";
@@ -721,14 +722,35 @@ export default function LegendsOfTheSpire() {
         setView('MAP');
     };
 
+    const applyRSkillTestOverrides = (champion) => {
+        const baseCards = [...(champion.initialCards || [])];
+        const shouldApply = R_SKILL_TEST?.enabled && (!R_SKILL_TEST.heroId || R_SKILL_TEST.heroId === champion.id);
+        if (!shouldApply) {
+            return { ...champion, initialCards: baseCards, gmOverrides: { enabled: false } };
+        }
+        const extraCards = [...(R_SKILL_TEST.extraCards || [])];
+        const forceTopCards = [...(R_SKILL_TEST.forceTopCards || [])];
+        return {
+            ...champion,
+            initialCards: [...baseCards, ...extraCards],
+            gmOverrides: {
+                enabled: true,
+                note: R_SKILL_TEST.note || 'R-Skill QA Mode',
+                extraCards,
+                forceTopCards
+            }
+        };
+    };
+
     const handleChampionSelect = (selectedChamp) => {
+        const championPayload = applyRSkillTestOverrides(selectedChamp);
         // 播放英雄语音
-        playChampionVoice(selectedChamp.id);
-        setChampion(selectedChamp);
-        setMaxHp(selectedChamp.maxHp);
-        setCurrentHp(selectedChamp.maxHp);
-        setMasterDeck([...STARTING_DECK_BASIC, ...selectedChamp.initialCards]);
-        setRelics([RELIC_DATABASE[selectedChamp.relicId].id]);
+        playChampionVoice(championPayload.id);
+        setChampion(championPayload);
+        setMaxHp(championPayload.maxHp);
+        setCurrentHp(championPayload.maxHp);
+        setMasterDeck([...STARTING_DECK_BASIC, ...championPayload.initialCards]);
+        setRelics([RELIC_DATABASE[championPayload.relicId].id]);
         setBaseStr(0);
         setGold(0);
 

@@ -57,6 +57,9 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
     const [enemyStatus, setEnemyStatus] = useState({ strength: 0, weak: 0, vulnerable: 0, mark: 0, markDamage: 0, trap: 0 });
     const heroBaseCritChance = heroData?.id === 'Yasuo' ? 10 : 0;
     const heroStrengthCritMultiplier = 1; // 所有英雄每点力量统一+1%暴击
+    const gmOverrides = heroData?.gmOverrides || { enabled: false };
+    const gmForceTopCards = gmOverrides.forceTopCards || [];
+    const gmBadgeNote = gmOverrides.note || 'R-Skill QA Mode';
 
     // 被动技能状态追踪
     const [rivenAttackCount, setRivenAttackCount] = useState(0); // 瑞文：攻击计数
@@ -84,6 +87,15 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
         if (!heroData || !initialDeck) return;
 
         const initialDrawPile = shuffle([...initialDeck]);
+        if (gmOverrides.enabled && gmForceTopCards.length > 0) {
+            gmForceTopCards.slice().reverse().forEach(cardId => {
+                const idx = initialDrawPile.indexOf(cardId);
+                if (idx !== -1) {
+                    initialDrawPile.splice(idx, 1);
+                    initialDrawPile.unshift(cardId);
+                }
+            });
+        }
         deckRef.current = { drawPile: initialDrawPile, hand: [], discardPile: [] };
         let block = 0; let str = heroData.baseStr || 0;
         (heroData.relics || []).forEach(rid => {
@@ -883,6 +895,16 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
                             <div>Crt Chance: {displayCritChance} | Crt Count: {critCount}</div>
                             <div className="text-[10px] font-normal text-gray-300">Base: {displayBaseChance} | Str: {displayStrChance} | Buff: {displayBuffChance}</div>
                         </div>
+                        {gmOverrides.enabled && (
+                            <div className="mt-2 w-full bg-emerald-900/30 border border-emerald-600/70 rounded px-2 py-1 text-[10px] text-emerald-200">
+                                {gmBadgeNote}
+                                {gmForceTopCards.length > 0 && (
+                                    <div className="text-[9px] text-emerald-300 mt-0.5">
+                                        起手卡: {gmForceTopCards.join(', ')}
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
                 <div className="text-6xl font-black text-[#C8AA6E]/20 italic">VS</div>

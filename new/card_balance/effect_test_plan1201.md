@@ -39,25 +39,66 @@
 
 ### ✨ R 技能覆盖现状（cards.js + BattleScene）
 
+#### 🧪 快速测试指引（QA / 开发）
+
+1. **清空存档 / 重新开局**  
+   - 关闭游戏页签后，在浏览器控制台执行 `localStorage.removeItem('lots_save_v75')`；若使用登录账号，请同时清空 `lots_save_v75_${email}`。这样可确保新建冒险时会读取最新的初始牌组。
+
+2. **在初始牌堆中硬塞 R 技能**  
+   - 打开 `src/data/champions.js`，将目标英雄的 `initialCards` 修改为 `['Strike', ..., '<HeroR>', '<HeroR>']`（建议写 2 份以提高抽到几率）。
+   - 例如验证瑞文 R：`initialCards: ['RivenQ','RivenW','RivenE','RivenR','RivenR','Strike','Defend']`。
+   - 保存后 `npm run dev` → 重新选择英雄即可在 DeckView 中看到 R 技能已绑定在起始牌堆。
+
+3. **强制起手即抽到 R（可选，加速 QA）**  
+   - 在 `src/components/BattleScene.jsx` 的 `useEffect(() => { ... })` 初始化处，将  
+     `const initialDrawPile = shuffle([...initialDeck]);`  
+     替换为：  
+     ```js
+     const initialDrawPile = shuffle([...initialDeck]);
+     const gmForceTop = ['RivenR']; // 按需替换
+     gmForceTop.slice().reverse().forEach(id => {
+       const idx = initialDrawPile.indexOf(id);
+       if (idx >= 0) {
+         initialDrawPile.splice(idx, 1);
+         initialDrawPile.unshift(id);
+       }
+     });
+     ```
+   - 保存后刷新战斗，R 技能会 100% 出现在首回合手牌中，验证完记得把该段代码还原。
+
+4. **跳过铺场 → 直接战斗**  
+   - 进入地图后点击顶部的 🧪 Act 按钮（在 Map 视图里），即可瞬间跳到 Act 1/2/3 的任意节点，用以测试高难敌人或 Boss。
+
+> 以上流程能让 QA 在 2 分钟内获得任意英雄的 R 技能卡牌，避免依赖商店/奖励池随机。验证完成后请恢复 `initialCards` 与 `BattleScene.jsx` 以免影响正常流程。
+
+#### 🌿 `R_skill` 分支专用测试流程
+
+1. **切换分支**：`git checkout R_skill && npm install && npm run dev`，该分支默认启用 GM 注入。
+2. **配置测试目标**：编辑 `src/config/rSkillTestConfig.js`，设置 `heroId`、`extraCards`、`forceTopCards`、`note`，并保持 `enabled: true`。
+3. **清空旧存档**：浏览器控制台执行 `localStorage.removeItem('lots_save_v75')`（若有账号还需清除带邮箱后缀的 key）。
+4. **重新选择英雄**：进入选人界面后锁定同配置的英雄，在 DeckView 中即可看到额外注入的 R 技能。
+5. **进入战斗验证**：起手手牌会出现 `forceTopCards` 指定的卡，英雄面板也会显示绿色 “GM” 徽章（含备注、起手卡列表），确认特效与飘字无误。
+6. **测试结束**：将 `enabled` 改回 `false` 或切换回 `card_effect`/`main` 分支，恢复正常体验。
+
 | 英雄 | R 技能 / Effect | 状态（参考 Batch 计划） |
 | :--- | :--- | :--- |
 | 盖伦 | `GarenR` / `EXECUTE_SCALE` | ✅ `BattleScene.jsx` L281-L284 已按缺血加成计算（Batch1 完成，待线上复测）。 |
-| 德莱厄斯 | `DariusR` / `BLEED_EXECUTE` | ⚠️ 仅在 `cardEffectHandler.js` 写回 `bleedExecute`，前端未消费；列入 Batch2 Phase2.1。 |
+| 德莱厄斯 | `DariusR` / `BLEED_EXECUTE` | ⚠️ 仅在 `cardEffectHandler.js` 写回 `bleedExecute`，前端未消费；列入 Batch2 Phase2.4（与 DOT/陷阱统一实现）。 |
 | 拉克丝 | `LuxR` / `CONDITIONAL_DOUBLE` | ✅ 逻辑已接入（L286-L289），但需要 Batch2 Phase2.5 的专用测试卡组验证。 |
 | 金克丝 | `JinxR` / `LOW_HP_BONUS` | ✅ L291-L294 处理低血加伤，Batch2 Phase2.5 复测中。 |
 | 亚索 | `YasuoR` / `SCALE_BY_CRIT` | ✅ Phase2.2 完成暴击状态与计数回路，`YasuoQ` 叠暴击后 `YasuoR` 可按 `critCount` 倍数结算伤害。 |
 | 娑娜 | `SonaR` / `PER_CARD_BONUS` | ✅ 读取本回合已出牌数量并叠加每张 +2 伤害，等待 QA。 |
-| 艾克 | `EkkoR` / `HEAL_AND_DAMAGE` | ⛔ 尚未实现“同时伤害并回复”逻辑，列入 Batch2 Phase2.3。 |
+| 艾克 | `EkkoR` / `HEAL_AND_DAMAGE` | ✅ `HEAL_AND_DAMAGE` 分拆为 `healAmount/damageAmount`，先回 20 HP 再对敌人造成同等伤害；飘字为 “SKILL 20”。 |
 | 塞拉斯 | `SylasR` / `COPY_ENEMY_ACTION` | ⛔ 未接管 `nextEnemyAction`，Batch2 Phase2.5 待实现。 |
 | 厄加特 | `UrgotR` / `LOW_HP_EXECUTE` | ✅ 敌人 HP ≤ 30% 时立即触发处决，护甲与 HP 同步清空。 |
-| 维克托 | `ViktorR` / `DRAW_ON_USE` | ⛔ 未触发额外抽牌，Batch2 Phase2.3 需补。 |
+| 维克托 | `ViktorR` / `DRAW_ON_USE` | ⚠️ 卡面已定义，待 Phase2.3 后半段接入 `drawOnUse`（抽牌动画与堆栈处理）。 |
 | 瑞文 | `RivenR` / `TEMP_STR + LOW_HP_BONUS` | ✅ 临时 +4 力量即时写入 `tempStrength`，并在敌人 HP <30% 时追加 16 点真实伤害；HUD 便于观察阈值。 |
 | 卡牌大师 | `TwistedFateR` / `DRAW + NEXT_ATTACK_BONUS` | ✅ 抽 2 卡 + `nextAttackBonus:6` 已接入，状态栏显示“下一击 +6”，下一张攻击自动消费。 |
 | 李青 | `LeeR` / `REMOVE_BUFF` | ⛔ 仅 effect 占位，敌人增益移除逻辑未写；归档 Batch2 Phase2.3。 |
 | 薇恩 | `VayneR` / `STRENGTH + NEXT_ATTACK_DOUBLE` | ✅ 获得 4 力量并写入 `nextAttackDouble`，状态徽章提示直至下一张攻击触发双倍。 |
 | 提莫 | `TeemoR` / `TRAP_TRIGGER` | ✅ 埋下蘑菇陷阱，敌人下次行动前触发“TRAP!”并附加 6 层中毒 + 2 层虚弱，状态栏显示“陷阱”。 |
 | 锤石 | `ThreshR` / `WEAK_VULN_AND_PERMAHP` | ⛔ 仅记录状态，未处理“击杀加最大生命”；排入 Batch3 Phase3.3。 |
-| 内瑟斯 | `NasusR` / `TEMP_STR` | ⛔ `tempStrength` 没有结算入口；Batch3 Phase3.3 实现。 |
+| 内瑟斯 | `NasusR` / `TEMP_STR` | ⚠️ 依赖永久成长系统，预计 Batch3 Phase3.3 与锤石一起落地。 |
 | 艾瑞莉娅 | `IreliaR` / `ALL_ATTACKS_BONUS` | ⛔ 未对本回合其它攻击追加伤害；计划在 Batch2 Phase2.5。 |
 | 卡特琳娜 | `KatarinaR` / `MULTI_STRIKE_SEGMENTS` | ⛔ 尚未拆分多段伤害；列入 Batch2 Phase2.4（历史追踪）。 |
 | 劫 | `ZedR` / `DEATHMARK` | ✅ L388-L510 追踪印记伤害并在倒计时结束爆发（Batch2 已接入，待 QA）。 |
