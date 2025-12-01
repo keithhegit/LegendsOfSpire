@@ -584,6 +584,7 @@ export default function LegendsOfTheSpire() {
     const [showCodex, setShowCodex] = useState(false);
     const [showCollection, setShowCollection] = useState(false);
     const [showInventory, setShowInventory] = useState(false);
+    const [heroSnapshot, setHeroSnapshot] = useState(null);
     const [toasts, setToasts] = useState([]);
     const [lockedChoices, setLockedChoices] = useState(new Set()); // 三选一：已锁定的选项
 
@@ -787,6 +788,7 @@ export default function LegendsOfTheSpire() {
         setHasSave(false);
         setMapData({ grid: [], nodes: [], nodeMap: new Map() });
         setChampion(null);
+        setHeroSnapshot(null);
     };
 
     const handleRestartMap = () => {
@@ -826,6 +828,7 @@ export default function LegendsOfTheSpire() {
         // 播放英雄语音
         playChampionVoice(championPayload.id);
         setChampion(championPayload);
+        setHeroSnapshot(null);
         setMaxHp(championPayload.maxHp);
         setCurrentHp(championPayload.maxHp);
         setMasterDeck([...STARTING_DECK_BASIC, ...championPayload.initialCards]);
@@ -1089,7 +1092,18 @@ export default function LegendsOfTheSpire() {
     const handleSkipReward = () => { setGold(gold + 50); completeNode(); };
     const handleRest = () => { setCurrentHp(Math.min(maxHp, currentHp + Math.floor(maxHp * 0.3))); completeNode(); };
 
-    const restartGame = () => { setView('CHAMPION_SELECT'); setMasterDeck([]); setCurrentHp(80); setMaxHp(80); setGold(100); setRelics([]); setBaseStr(0); setChampion(null); setUsedEnemies([]); };
+    const restartGame = () => {
+        setView('CHAMPION_SELECT');
+        setMasterDeck([]);
+        setCurrentHp(80);
+        setMaxHp(80);
+        setGold(100);
+        setRelics([]);
+        setBaseStr(0);
+        setChampion(null);
+        setHeroSnapshot(null);
+        setUsedEnemies([]);
+    };
     const getCurrentBgm = () => (view === 'COMBAT' ? BGM_BATTLE_URL : BGM_MAP_URL);
     const playSfx = (type) => {
         const url = SFX[type] || SFX.ATTACK;
@@ -1219,16 +1233,17 @@ export default function LegendsOfTheSpire() {
                         </button>
                         {/* 背包系统 (Coming Soon) */}
                         <button
-                            className="w-16 h-16 bg-slate-900/80 border border-slate-600 rounded-lg flex items-center justify-center opacity-60 cursor-not-allowed group relative grayscale"
+                            onClick={() => setShowInventory(true)}
+                            className="w-16 h-16 bg-slate-900/90 border border-[#C8AA6E] rounded-lg flex items-center justify-center hover:scale-110 transition-transform group relative shadow-lg shadow-black/50"
                         >
                             <img
                                 src={BACKPACK_ICON}
-                                alt="背包占位"
-                                className="w-12 h-12 object-contain"
+                                alt="背包入口"
+                                className="w-12 h-12 object-contain drop-shadow-[0_0_8px_rgba(200,170,110,0.7)]"
                                 draggable="false"
                             />
-                            <div className="absolute right-full mr-3 bg-slate-900 text-slate-400 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap border border-slate-600/30 pointer-events-none">
-                                背包 (Coming Soon)
+                            <div className="absolute right-full mr-3 bg-slate-900 text-[#C8AA6E] text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap border border-[#C8AA6E]/30 pointer-events-none">
+                                背包 (Inventory)
                             </div>
                         </button>
                         {/* 成就系统 (Coming Soon) */}
@@ -1252,7 +1267,7 @@ export default function LegendsOfTheSpire() {
             case 'SHOP': return <ShopView gold={gold} deck={masterDeck} relics={relics} onLeave={() => completeNode()} onBuyCard={handleBuyCard} onBuyRelic={handleBuyRelic} onUpgradeCard={handleUpgradeCard} onBuyMana={handleBuyMana} championName={champion.name} />;
             case 'EVENT': return <EventView onLeave={() => completeNode()} onReward={handleEventReward} />;
             case 'CHEST': return <ChestView onLeave={() => completeNode()} onRelicReward={handleRelicReward} relics={relics} act={currentAct} />;
-            case 'COMBAT': return champion ? <BattleScene heroData={{ ...champion, maxHp, currentHp, relics, baseStr }} enemyId={activeNode?.enemyId} initialDeck={masterDeck} onWin={handleBattleWin} onLose={() => { localStorage.removeItem(SAVE_KEY); setView('GAMEOVER'); }} floorIndex={currentFloor} act={currentAct} /> : <div>Loading...</div>;
+            case 'COMBAT': return champion ? <BattleScene heroData={{ ...champion, maxHp, currentHp, relics, baseStr }} enemyId={activeNode?.enemyId} initialDeck={masterDeck} onWin={handleBattleWin} onLose={() => { localStorage.removeItem(SAVE_KEY); setView('GAMEOVER'); }} floorIndex={currentFloor} act={currentAct} onStatusSnapshot={setHeroSnapshot} /> : <div>Loading...</div>;
             case 'REWARD': return <RewardView goldReward={50} onCardSelect={handleCardReward} onSkip={handleSkipReward} championName={champion.name} />;
             case 'REST': return <RestView onRest={handleRest} />;
             case 'VICTORY_ALL': return <div className="h-screen w-full bg-[#0AC8B9]/20 flex flex-col items-center justify-center text-white"><h1 className="text-6xl font-bold text-[#0AC8B9]">传奇永不熄灭！</h1><button onClick={() => setView('MENU')} className="mt-8 px-8 py-3 bg-[#0AC8B9] text-black font-bold rounded">回到菜单</button></div>;
@@ -1291,6 +1306,7 @@ export default function LegendsOfTheSpire() {
         setMapData({ grid: [], nodes: [], nodeMap: new Map() });
         setActiveNode(null);
         setChampion(null);
+        setHeroSnapshot(null);
         setView('CHAMPION_SELECT');
     };
 
@@ -1440,6 +1456,7 @@ export default function LegendsOfTheSpire() {
                     gmConfig={gmConfig}
                     currentHp={currentHp}
                     maxHp={maxHp}
+                    heroSnapshot={heroSnapshot}
                 />
             )}
             {showCodex && <CodexView onClose={() => setShowCodex(false)} />}

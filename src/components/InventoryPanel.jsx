@@ -1,16 +1,15 @@
 import React, { useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Layers, Shield, Sword, PackageSearch, Sparkles } from 'lucide-react';
+import { X, Layers, Shield, PackageSearch } from 'lucide-react';
 import { CARD_DATABASE } from '../data/cards';
 import { RELIC_DATABASE } from '../data/relics';
 
 const tabs = [
     { id: 'cards', label: '卡牌牌组', icon: <Layers size={14} /> },
-    { id: 'relics', label: '装备 / 遗物', icon: <Shield size={14} /> },
-    { id: 'hero', label: '英雄被动', icon: <Sparkles size={14} /> }
+    { id: 'relics', label: '装备 / 英雄', icon: <Shield size={14} /> }
 ];
 
-const InventoryPanel = ({ onClose, deck = [], relics = [], champion, gmConfig, currentHp, maxHp }) => {
+const InventoryPanel = ({ onClose, deck = [], relics = [], champion, gmConfig, currentHp, maxHp, heroSnapshot }) => {
     const [activeTab, setActiveTab] = useState('cards');
 
     const deckEntries = useMemo(() => {
@@ -31,10 +30,37 @@ const InventoryPanel = ({ onClose, deck = [], relics = [], champion, gmConfig, c
             .filter(Boolean);
     }, [relics, champion]);
 
+    const baseCritChance = champion?.id === 'Yasuo' ? 10 : 0;
+    const snapshotStatus = heroSnapshot?.status || {};
+    const critChanceValue = heroSnapshot?.critChance ?? baseCritChance;
+    const critDamageValue = (heroSnapshot?.critDamage ?? 2) * 100;
+    const manaValue = heroSnapshot?.mana ?? champion?.maxMana ?? 3;
+    const blockValue = heroSnapshot?.block ?? 0;
     const heroStats = [
-        { label: 'HP', value: `${currentHp}/${maxHp}` },
-        { label: '基础力量', value: champion?.baseStr ?? 0 },
-        { label: '法力', value: champion?.maxMana ?? 3 }
+        { label: 'HP', value: `${heroSnapshot?.hp ?? currentHp}/${maxHp}` },
+        { label: '法力', value: `${manaValue}/${champion?.maxMana ?? 3}` },
+        { label: '暴击率', value: `${Math.round(critChanceValue)}%` },
+        { label: '暴击伤害', value: `${Math.round(critDamageValue)}%` },
+        { label: '力量', value: snapshotStatus.strength ?? champion?.baseStr ?? 0 },
+        { label: '临时力量', value: snapshotStatus.tempStrength ?? 0 },
+        { label: '全攻加成', value: snapshotStatus.globalAttackBonus ?? 0 },
+        { label: '敏捷 (Dex)', value: snapshotStatus.dexterity ?? 0 },
+        { label: '下一击加成', value: snapshotStatus.nextAttackBonus ?? 0 },
+        { label: '双倍攻击', value: snapshotStatus.nextAttackDouble ? 'READY' : '-' },
+        { label: '下一次技能加成', value: snapshotStatus.buffNextSkill ?? 0 },
+        { label: '护甲值', value: blockValue },
+        { label: '下回合护甲', value: snapshotStatus.nextTurnBlock ?? 0 },
+        { label: '下回合力量', value: snapshotStatus.nextTurnStrength ?? 0 },
+        { label: '下回合法力', value: snapshotStatus.nextTurnMana ?? 0 },
+        { label: '额外抽牌', value: snapshotStatus.nextDrawBonus ?? 0 },
+        { label: '易伤', value: snapshotStatus.vulnerable ?? 0 },
+        { label: '虚弱', value: snapshotStatus.weak ?? 0 },
+        { label: '中毒', value: snapshotStatus.poison ?? 0 },
+        { label: '流血', value: snapshotStatus.bleed ?? 0 },
+        { label: '标记', value: snapshotStatus.mark ?? 0 },
+        { label: '吸血', value: snapshotStatus.lifesteal ?? 0 },
+        { label: '反伤', value: snapshotStatus.reflectDamage ?? 0 },
+        { label: '回蓝', value: snapshotStatus.regenMana ?? 0 }
     ];
 
     const gmBanner = gmConfig?.enabled ? (
@@ -71,7 +97,32 @@ const InventoryPanel = ({ onClose, deck = [], relics = [], champion, gmConfig, c
     );
 
     const renderRelicsTab = () => (
-        <div className="flex-1 overflow-y-auto space-y-4">
+        <div className="flex-1 overflow-y-auto space-y-4 text-slate-200">
+            {champion ? (
+                <>
+                    <div className="flex items-center gap-3">
+                        <img src={champion.img} alt={champion.name} className="w-14 h-14 rounded-full border border-[#C8AA6E]" />
+                        <div>
+                            <div className="text-lg font-bold text-[#F0E6D2]">{champion.name}</div>
+                            <div className="text-xs text-slate-400">{champion.title}</div>
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                        {heroStats.map(stat => (
+                            <div key={stat.label} className="bg-slate-900/70 border border-slate-700 rounded-lg p-3 text-center">
+                                <div className="text-[11px] text-slate-400 uppercase tracking-[0.4em]">{stat.label}</div>
+                                <div className="text-sm text-white font-bold">{stat.value}</div>
+                            </div>
+                        ))}
+                    </div>
+                    <div>
+                        <div className="text-xs text-slate-400 tracking-[0.3em] mb-1">英雄简介</div>
+                        <p className="text-sm text-slate-200 leading-relaxed">{champion.description || '暂无描述'}</p>
+                    </div>
+                </>
+            ) : (
+                <div className="text-center text-slate-500 text-sm py-6">未选择英雄</div>
+            )}
             <div>
                 <div className="text-xs text-slate-400 uppercase tracking-[0.4em] mb-2">英雄被动</div>
                 {passiveRelic ? (
@@ -101,51 +152,12 @@ const InventoryPanel = ({ onClose, deck = [], relics = [], champion, gmConfig, c
                     )}
                 </div>
             </div>
-        </div>
-    );
-
-    const renderHeroTab = () => (
-        <div className="flex-1 overflow-y-auto space-y-4 text-slate-200">
-            {champion ? (
-                <>
-                    <div className="flex items-center gap-3">
-                        <img src={champion.img} alt={champion.name} className="w-14 h-14 rounded-full border border-[#C8AA6E]" />
-                        <div>
-                            <div className="text-lg font-bold text-[#F0E6D2]">{champion.name}</div>
-                            <div className="text-xs text-slate-400">{champion.title}</div>
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-3 gap-3">
-                        {heroStats.map(stat => (
-                            <div key={stat.label} className="bg-slate-900/70 border border-slate-700 rounded-lg p-3 text-center">
-                                <div className="text-[11px] text-slate-400 uppercase tracking-[0.4em]">{stat.label}</div>
-                                <div className="text-sm text-white font-bold">{stat.value}</div>
-                            </div>
-                        ))}
-                    </div>
-                    <div>
-                        <div className="text-xs text-slate-400 tracking-[0.3em] mb-1">英雄简介</div>
-                        <p className="text-sm text-slate-200 leading-relaxed">{champion.description || '暂无描述'}</p>
-                    </div>
-                    {gmBanner}
-                </>
-            ) : (
-                <div className="text-center text-slate-500 text-sm py-6">未选择英雄</div>
-            )}
+            {gmBanner}
         </div>
     );
 
     const renderTab = () => {
-        switch (activeTab) {
-            case 'cards':
-                return renderCardsTab();
-            case 'relics':
-                return renderRelicsTab();
-            case 'hero':
-                return renderHeroTab();
-            default:
-                return null;
-        }
+        return activeTab === 'cards' ? renderCardsTab() : renderRelicsTab();
     };
 
     return (

@@ -12,7 +12,7 @@ import Card from './shared/Card';
 
 const DEX_BLOCK_PER_STACK = 5;
 
-const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex, act }) => {
+const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex, act, onStatusSnapshot }) => {
     const getScaledEnemy = (enemyId, floor, currentAct) => {
         const baseEnemy = ENEMY_POOL[enemyId];
         if (!baseEnemy) {
@@ -871,6 +871,19 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
     const displayBaseChance = `${heroBaseCritChance.toFixed(0)}%`;
     const displayStrChance = `${strengthCritBonus.toFixed(0)}%`;
     const displayBuffChance = `${buffCritChance.toFixed(0)}%`;
+
+    useEffect(() => {
+        if (onStatusSnapshot) {
+            onStatusSnapshot({
+                hp: playerHp,
+                mana: playerMana,
+                block: playerBlock,
+                status: playerStatus,
+                critChance: totalCritChanceValue,
+                critDamage: playerStatus.critDamageMultiplier || 2
+            });
+        }
+    }, [playerHp, playerMana, playerBlock, playerStatus, totalCritChanceValue, onStatusSnapshot]);
 
     if (!heroData || !enemyConfig) {
         return <div className="w-full h-full flex items-center justify-center text-white">Loading...</div>;
