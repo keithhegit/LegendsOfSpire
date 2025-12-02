@@ -14,6 +14,7 @@ import LoginView from './components/LoginView'; // 登录界面
 import ToastContainer from './components/shared/Toast'; // 导入 ToastContainer
 import CollectionSystem from './components/CollectionSystem';
 import InventoryPanel from './components/InventoryPanel';
+import AchievementPanel from './components/AchievementPanel';
 import { unlockAudio } from './utils/audioContext'; // 音频解锁工具
 import { getHexNeighbors } from './utils/hexagonGrid'; // 六边形邻居帮助函数
 import { authService } from './services/authService';
@@ -566,6 +567,7 @@ export default function LegendsOfTheSpire() {
     const [showCodex, setShowCodex] = useState(false);
     const [showCollection, setShowCollection] = useState(false);
     const [showInventory, setShowInventory] = useState(false);
+    const [showAchievementPanel, setShowAchievementPanel] = useState(false);
     const [toasts, setToasts] = useState([]);
     const [lockedChoices, setLockedChoices] = useState(new Set()); // 三选一：已锁定的选项
 
@@ -1275,18 +1277,19 @@ export default function LegendsOfTheSpire() {
                                 背包 (Inventory)
                             </div>
                         </button>
-                        {/* 成就系统 (Coming Soon) */}
+                        {/* 成就系统 */}
                         <button
-                            className="w-16 h-16 bg-slate-900/80 border border-slate-600 rounded-lg flex items-center justify-center opacity-60 cursor-not-allowed group relative grayscale"
+                            onClick={() => setShowAchievementPanel(true)}
+                            className="w-16 h-16 bg-slate-900/90 border border-cyan-400 rounded-lg flex items-center justify-center hover:scale-110 transition-transform group relative shadow-lg shadow-black/50"
                         >
                             <img
                                 src={ACHIEVEMENT_ICON}
-                                alt="成就占位"
-                                className="w-12 h-12 object-contain"
+                                alt="成就入口"
+                                className="w-12 h-12 object-contain drop-shadow-[0_0_8px_rgba(34,211,238,0.7)]"
                                 draggable="false"
                             />
-                            <div className="absolute right-full mr-3 bg-slate-900 text-slate-400 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap border border-slate-600/30 pointer-events-none">
-                                成就 (Coming Soon)
+                            <div className="absolute right-full mr-3 bg-slate-900 text-cyan-300 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap border border-cyan-400/30 pointer-events-none">
+                                成就 (Achievements)
                             </div>
                         </button>
                     </div>
@@ -1463,6 +1466,7 @@ export default function LegendsOfTheSpire() {
             )}
             {showCodex && <CodexView onClose={() => setShowCodex(false)} />}
             {showCollection && <CollectionSystem onClose={() => setShowCollection(false)} />}
+            {showAchievementPanel && <AchievementPanel onClose={() => setShowAchievementPanel(false)} />}
             <ToastContainer toasts={toasts} />
         </div>
     );
