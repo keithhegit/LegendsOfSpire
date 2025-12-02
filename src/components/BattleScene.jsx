@@ -37,6 +37,7 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
     const forceUpdate = () => setRenderTrigger(prev => prev + 1);
     const [dmgOverlay, setDmgOverlay] = useState(null);
     const [enemyTrap, setEnemyTrap] = useState(null);
+    const [enemyBaitDamage, setEnemyBaitDamage] = useState(0);
     const [heroAnim, setHeroAnim] = useState("");
     const [enemyAnim, setEnemyAnim] = useState("");
     const [playerStatus, setPlayerStatus] = useState({
@@ -297,6 +298,11 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
             actualCost = Math.max(0, card.cost - 1);
             setLeeSinSkillBuff(false); // 消耗buff
         }
+        if (card.type === 'ATTACK' && (playerStatus.nextCostReduce || 0) > 0) {
+            const reduction = playerStatus.nextCostReduce;
+            actualCost = Math.max(0, actualCost - reduction);
+            setPlayerStatus(prev => ({ ...prev, nextCostReduce: 0 }));
+        }
 
         if (playerMana < actualCost) return;
         setPlayerMana(p => p - actualCost);
@@ -333,7 +339,7 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
 
         if (effectUpdates.drawCount > 0) drawCards(effectUpdates.drawCount);
         if (effectUpdates.playerHp !== undefined && effectUpdates.playerHp !== null) setPlayerHp(effectUpdates.playerHp);
-        if (effectUpdates.manaChange) setPlayerMana(m => Math.min(initialMana, m + effectUpdates.manaChange));
+        if (effectUpdates.manaChange) setPlayerMana(m => Math.max(0, m + effectUpdates.manaChange));
         if (effectUpdates.healAmount) {
             setPlayerHp(h => Math.min(heroData.maxHp, h + effectUpdates.healAmount));
         }
@@ -364,12 +370,18 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
         if (effectUpdates.removeEnemyBuffs) {
             removeEnemyBuffs(effectUpdates.removeEnemyBuffs);
         }
+        if (effectUpdates.blockGain) {
+            setPlayerBlock(b => b + effectUpdates.blockGain);
+        }
         if (effectUpdates.placeTrap) {
             setEnemyTrap(effectUpdates.placeTrap);
             setEnemyStatus(prev => ({
                 ...prev,
                 trap: (prev.trap || 0) + 1
             }));
+        }
+        if (effectUpdates.placeBait) {
+            setEnemyBaitDamage(effectUpdates.placeBait);
         }
 
         if (effectUpdates.copyEnemySkill) {
@@ -488,6 +500,9 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
             const critChanceDecimal = Math.min(1, totalCritChancePercent / 100);
             const critDamageMultiplier = mergedPlayerStatus.critDamageMultiplier || 2;
             const shouldForceCrit = !!effectUpdates.critIfVuln && (currentEnemyStatus.vulnerable > 0);
+            if (effectUpdates.comboBonus && dealtDamageThisTurn) {
+                baseDmg += effectUpdates.comboBonus;
+            }
 
             // 易伤加成应用于基础伤害 (方案A) - 使用合并后的状态
             if (currentEnemyStatus.vulnerable > 0) {
@@ -527,6 +542,8 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
             const shouldExecute = effectUpdates.executeThreshold && (enemyHp <= enemyConfig.maxHp * (effectUpdates.executeThreshold / 100));
 
             const lifelinkValue = effectUpdates.lifelinkAmount || 0;
+            const lifestealFlat = mergedPlayerStatus.lifesteal || 0;
+            let blockBuffer = enemyBlock;
 
             const processMultiHit = () => {
                 for (let i = 0; i < hits; i++) {
@@ -558,11 +575,19 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
 
                     isFirstHit = false;
                     let dmgToHp = finalDmg;
-                    if (enemyBlock > 0) {
+                    if (blockBuffer > 0) {
                         // 敌人格挡时播放格挡音效
                         playSfx('BLOCK_SHIELD');
-                        if (enemyBlock >= finalDmg) { setEnemyBlock(b => b - finalDmg); dmgToHp = 0; }
-                        else { dmgToHp = finalDmg - enemyBlock; setEnemyBlock(0); }
+                        if (blockBuffer >= finalDmg) {
+                            blockBuffer = blockBuffer - finalDmg;
+                            setEnemyBlock(blockBuffer);
+                            dmgToHp = 0;
+                        } else {
+                            const leftover = finalDmg - blockBuffer;
+                            blockBuffer = 0;
+                            setEnemyBlock(0);
+                            dmgToHp = leftover;
+                        }
                     } else if (dmgToHp > 0) {
                         // 敌人受击时播放受击音效
                         setTimeout(() => playSfx('HIT_TAKEN'), 250);
@@ -582,6 +607,9 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
                     setEnemyHp(h => Math.max(0, h - dmgToHp)); total += dmgToHp;
                     if (lifelinkValue > 0 && dmgToHp > 0) {
                         setPlayerHp(h => Math.min(heroData.maxHp, h + dmgToHp));
+                    }
+                    if (lifestealFlat > 0 && dmgToHp > 0) {
+                        setPlayerHp(h => Math.min(heroData.maxHp, h + lifestealFlat));
                     }
                     if (dmgToHp > 0 && drawOnHitCharges > 0) {
                         drawCards(drawOnHitCharges);
@@ -817,6 +845,10 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
             setDmgOverlay({ val: 'TRAP!', target: 'ENEMY', color: 'text-green-400' });
             playSfx('HIT_TAKEN');
         }
+        if (enemyBaitDamage > 0) {
+            applyDirectDamage(enemyBaitDamage, 'BAIT');
+            setEnemyBaitDamage(0);
+        }
 
         // FIX: 眩晕逻辑 (STUN)
         if (enemyStatus.stunned > 0) {
@@ -845,7 +877,8 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
             }, 200);
 
             // FIX Bug #6: 中娅沙漏 - 检查免伤
-            if (playerStatus.avoidNextDamage || playerStatus.immuneOnce) {
+        const wasImmune = playerStatus.immuneOnce;
+        if (playerStatus.avoidNextDamage || wasImmune) {
                 setPlayerStatus(prev => ({
                     ...prev,
                     avoidNextDamage: false,
@@ -857,7 +890,9 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
                 setTimeout(() => setDmgOverlay(null), 800);
 
                 setGameState('PLAYER_TURN');
+            if (!wasImmune) {
                 setPlayerBlock(0);
+            }
                 drawCards(5);
                 setPlayerMana(initialMana);
                 // FIX Bug #5, #9: 下回合开始时应用效果 (免疫时也要触发)

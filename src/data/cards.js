@@ -95,7 +95,7 @@ export const CARD_DATABASE = {
   YasuoQ: { id: 'YasuoQ', name: '斩钢闪', type: 'ATTACK', cost: 1, value: 7, rarity: 'COMMON', hero: 'Yasuo', target: 'single', effect: 'CRIT_CHANCE', effectValue: 10, description: '对单体造成7点伤害；暴击率受力量影响。', img: `${SPELL_URL}/YasuoQ1Wrapper.png`, price: 50 },
   YasuoW: { id: 'YasuoW', name: '风之墙', type: 'SKILL', cost: 1, block: 4, rarity: 'UNCOMMON', hero: 'Yasuo', target: 'self', effect: 'IMMUNE_ONCE', effectValue: 1, description: '获得4护甲并免疫一次伤害（本回合）。', img: `${SPELL_URL}/YasuoW.png`, price: 80 },
   YasuoE: { id: 'YasuoE', name: '疾风步', type: 'ATTACK', cost: 0, value: 4, rarity: 'UNCOMMON', hero: 'Yasuo', target: 'single', effect: 'DOUBLE_IF_ATTACKED', effectValue: 0, description: '造成4点伤害；若本回合已打出攻击则伤害翻倍。', img: `${SPELL_URL}/YasuoE.png`, price: 60 },
-  YasuoR: { id: 'YasuoR', name: '狂风绝息斩', type: 'ATTACK', cost: 3, value: 6, rarity: 'RARE', hero: 'Yasuo', target: 'single', effect: 'SCALE_BY_CRIT', effectValue: 6, description: '对目标造成 6×（本回合暴击次数） 伤害。', img: `${SPELL_URL}/YasuoR.png`, price: 150 },
+  YasuoR: { id: 'YasuoR', name: '狂风绝息斩', type: 'ATTACK', cost: 3, value: 10, rarity: 'RARE', hero: 'Yasuo', target: 'single', effect: 'TRIPLE_HIT', effectValue: 10, effect2: 'CRIT_CHANCE', effectValue2: 10, description: '连续3次造成10点伤害（总30伤），并在本回合临时获得10%暴击率。', img: `${SPELL_URL}/YasuoR.png`, price: 150 },
 
   // Sona
   SonaQ: { id: 'SonaQ', name: '英勇赞美诗', type: 'ATTACK', cost: 1, value: 8, rarity: 'COMMON', hero: 'Sona', target: 'single', effect: 'SELF_BLOCK', effectValue: 3, description: '对单体造成8点伤害，同时自身获得3点护甲。', img: `${SPELL_URL}/SonaQ.png`, price: 50 },
@@ -2463,7 +2463,7 @@ export const CARD_DATABASE = {
     value: 0,
     rarity: 'RARE',
     effect: 'LOSE_HP_GAIN_MANA',
-    effectValue: 1,
+    effectValue: 4,
     description: '失去4点生命，获得1点法力。',
     price: 70
   },

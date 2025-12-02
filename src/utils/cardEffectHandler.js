@@ -257,8 +257,8 @@ function applyEffect(effectType, value, context, updates, card = {}) {
         // ==================== BATCH 1: Block & Defense ====================
 
         case 'SELF_BLOCK':
-            // 自我格挡 - Gain block (handled via card.block in BattleScene)
-            // This is mainly a marker, actual block is in card.block property
+            // 自我格挡 - Gain block (Sona Q)
+            updates.blockGain = (updates.blockGain || 0) + value;
             break;
 
         case 'AVOID_NEXT_DAMAGE':
@@ -376,11 +376,8 @@ function applyEffect(effectType, value, context, updates, card = {}) {
         // ==================== BATCH 2: Lifesteal & Healing ====================
 
         case 'LIFESTEAL':
-            // 生命偷取 - Heal for damage dealt
-            updates.playerStatus = {
-                ...(updates.playerStatus || playerStatus),
-                lifesteal: ((updates.playerStatus?.lifesteal || playerStatus.lifesteal) || 0) + value
-            };
+            // 生命偷取 - Immediate heal
+            updates.healAmount = value;
             break;
 
         case 'LIFELINK':
@@ -429,6 +426,7 @@ function applyEffect(effectType, value, context, updates, card = {}) {
                 ...(updates.playerStatus || playerStatus),
                 immuneOnce: true
             };
+            updates.blockGain = (updates.blockGain || 0) + 4;
             break;
 
         case 'DOUBLE_IF_ATTACKED':
@@ -476,7 +474,7 @@ function applyEffect(effectType, value, context, updates, card = {}) {
 
         case 'DRAW_MANA':
             // 抽牌+法力 - Draw and gain mana (Sona E)
-            updates.drawCount += 1;
+            updates.drawCount += 2;
             updates.manaChange = (updates.manaChange || 0) + value;
             break;
 
@@ -868,10 +866,7 @@ function applyEffect(effectType, value, context, updates, card = {}) {
 
         case 'COMBO_BONUS':
             // 连招加成 - Katarina E combo
-            updates.playerStatus = {
-                ...(updates.playerStatus || playerStatus),
-                comboCounter: ((updates.playerStatus?.comboCounter || playerStatus.comboCounter) || 0) + 1
-            };
+            updates.comboBonus = value;
             break;
 
         case 'MULTI_STRIKE_SEGMENTS':
