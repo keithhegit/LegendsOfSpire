@@ -1,13 +1,14 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { TrendingUp, Heart, Coins, PackageCheck } from 'lucide-react';
+import { TrendingUp, Heart, Coins, PackageCheck, Award } from 'lucide-react';
 
 const Toast = ({ message, type = 'default', onClose }) => {
     const icons = {
         strength: <TrendingUp className="w-5 h-5" />,
         maxHp: <Heart className="w-5 h-5" />,
         gold: <Coins className="w-5 h-5" />,
-        relic: <PackageCheck className="w-5 h-5" />
+        relic: <PackageCheck className="w-5 h-5" />,
+        achievement: <Award className="w-5 h-5" />
     };
 
     const styles = {
@@ -15,6 +16,7 @@ const Toast = ({ message, type = 'default', onClose }) => {
         maxHp: 'bg-gradient-to-r from-green-900/90 to-emerald-900/90 border-green-500 text-green-100',
         gold: 'bg-gradient-to-r from-yellow-900/90 to-amber-900/90 border-yellow-500 text-yellow-100',
         relic: 'bg-gradient-to-r from-purple-900/90 to-indigo-900/90 border-purple-500 text-purple-100',
+        achievement: 'bg-gradient-to-r from-cyan-900/90 to-blue-900/90 border-cyan-400 text-cyan-50',
         default: 'bg-gradient-to-r from-slate-800/90 to-slate-700/90 border-slate-500 text-slate-100'
     };
 

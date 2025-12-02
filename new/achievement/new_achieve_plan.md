@@ -94,6 +94,14 @@ export const ACHIEVEMENTS = [
 | **S3 - UI/UX** | 主菜单成就页、HUD 提示、跑结算弹窗、音效/动画。 | Figma 走查 + Cypress 冒烟 |
 | **S4 - 扩充 40 项清单** | 批量录入初稿中 40 项及 Eternal One；撰写 QA checklist。 | 表格 + 自动化脚本 |
 
+### 4.1 Sprint S1 实装范围（进行中）
+
+- **ACH_001 – Shrug It Off**：战斗胜利且玩家 HP ≤ 10。
+- **ACH_005 – Adrenaline**：战斗内任意时刻法力值峰值 ≥ 4。
+- **ACH_017 – Perfect**：Boss 战期间未受到任何伤害并获胜。
+
+> 以上三条用于打通 Tracker → HUD → Save 通路，其余成就将在 S4 通过配置驱动批量导入。
+
 ---
 
 ## 5. 技术注意事项

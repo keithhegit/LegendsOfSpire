@@ -2,7 +2,7 @@ const isRelicAvailableInAct = (relicId, act = 1) => {
     const requiredAct = RELIC_ACT_GATES[relicId] ?? 1;
     return act >= requiredAct;
 };
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { Sword, Shield, Zap, Skull, Heart, RefreshCw, AlertTriangle, Flame, XCircle, Activity, Map as MapIcon, Gift, Anchor, Coins, ShoppingBag, ChevronRight, Star, Play, Pause, Volume2, VolumeX, Landmark, Lock, RotateCcw, Save, ArrowRight, Layers, UserSquare, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { generateGridMap } from './data/gridMapLayout_v4'; // v4生成器（带死胡同检测）
@@ -17,6 +17,7 @@ import InventoryPanel from './components/InventoryPanel';
 import { unlockAudio } from './utils/audioContext'; // 音频解锁工具
 import { getHexNeighbors } from './utils/hexagonGrid'; // 六边形邻居帮助函数
 import { authService } from './services/authService';
+import { achievementTracker } from './utils/achievementTracker';
 const CDN_VERSION = "13.1.1";
 const CDN_URL = `https://ddragon.leagueoflegends.com/cdn/${CDN_VERSION}`;
 const LOADING_URL = "https://ddragon.leagueoflegends.com/cdn/img/champion/loading";
@@ -692,6 +693,7 @@ export default function LegendsOfTheSpire() {
         if (s) {
             const data = JSON.parse(s);
             applySaveData(data);
+            achievementTracker.startRun({ type: 'resume', heroId: data?.champion?.id });
         }
     };
 
@@ -704,6 +706,7 @@ export default function LegendsOfTheSpire() {
         setHasSave(false);
         setBgmStarted(true); // 立即启动BGM
         setView('CHAMPION_SELECT');
+        achievementTracker.startRun({ type: 'new_game' });
     };
 
     const handleLoginSuccess = async (user) => {
@@ -748,6 +751,7 @@ export default function LegendsOfTheSpire() {
         setRelics([RELIC_DATABASE[championPayload.relicId].id]);
         setBaseStr(0);
         setGold(0);
+        achievementTracker.startRun({ type: 'run', heroId: championPayload.id });
 
         // 使用v4地图生成器（带死胡同检测和三选一机制）
         const newMapData = generateGridMap(1, []); // act=1, usedEnemies=[]
@@ -904,13 +908,23 @@ export default function LegendsOfTheSpire() {
     };
 
     // Toast通知系统
-    const showToast = (message, type = 'default') => {
+    const showToast = useCallback((message, type = 'default') => {
         const id = Date.now();
         setToasts(prev => [...prev, { id, message, type }]);
         setTimeout(() => {
             setToasts(prev => prev.filter(t => t.id !== id));
         }, 3000);
-    };
+    }, []);
+
+    useEffect(() => {
+        achievementTracker.init({
+            onUnlock: (achievement) => {
+                if (achievement) {
+                    showToast(`成就解锁：${achievement.name}`, 'achievement');
+                }
+            }
+        });
+    }, [showToast]);
 
     const queueRelicPickup = (relicId, onResolved) => {
         if (!relicId) return false;
@@ -1282,7 +1296,7 @@ export default function LegendsOfTheSpire() {
             case 'SHOP': return <ShopView gold={gold} deck={masterDeck} relics={relics} onLeave={() => completeNode()} onBuyCard={handleBuyCard} onBuyRelic={handleBuyRelic} onUpgradeCard={handleUpgradeCard} onBuyMana={handleBuyMana} championName={champion.name} act={currentAct} />;
             case 'EVENT': return <EventView onLeave={() => completeNode()} onReward={handleEventReward} />;
             case 'CHEST': return <ChestView onLeave={() => completeNode()} onRelicReward={handleRelicReward} relics={relics} act={currentAct} />;
-            case 'COMBAT': return champion ? <BattleScene heroData={{ ...champion, maxHp, currentHp, relics, baseStr }} enemyId={activeNode?.enemyId} initialDeck={masterDeck} onWin={handleBattleWin} onLose={() => { localStorage.removeItem(SAVE_KEY); setView('GAMEOVER'); }} floorIndex={currentFloor} act={currentAct} /> : <div>Loading...</div>;
+            case 'COMBAT': return champion ? <BattleScene heroData={{ ...champion, maxHp, currentHp, relics, baseStr }} enemyId={activeNode?.enemyId} initialDeck={masterDeck} onWin={handleBattleWin} onLose={() => { localStorage.removeItem(SAVE_KEY); setView('GAMEOVER'); }} floorIndex={currentFloor} act={currentAct} isBossFight={activeNode?.type === 'BOSS'} /> : <div>Loading...</div>;
             case 'REWARD': return <RewardView goldReward={50} onCardSelect={handleCardReward} onSkip={handleSkipReward} championName={champion.name} />;
             case 'REST': return <RestView onRest={handleRest} />;
             case 'VICTORY_ALL': return <div className="h-screen w-full bg-[#0AC8B9]/20 flex flex-col items-center justify-center text-white"><h1 className="text-6xl font-bold text-[#0AC8B9]">传奇永不熄灭！</h1><button onClick={() => setView('MENU')} className="mt-8 px-8 py-3 bg-[#0AC8B9] text-black font-bold rounded">回到菜单</button></div>;

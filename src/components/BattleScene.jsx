@@ -8,11 +8,12 @@ import { scaleEnemyStats, shuffle } from '../utils/gameLogic';
 import { ACT_BACKGROUNDS } from '../data/constants';
 import { playSfx, playChampionVoice } from '../utils/audioManager';
 import { applyCardEffects, calculateBlockValue } from '../utils/cardEffectHandler';
+import { achievementTracker } from '../utils/achievementTracker';
 import Card from './shared/Card';
 
 const DEX_BLOCK_PER_STACK = 5;
 
-const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex, act }) => {
+const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex, act, isBossFight = false }) => {
     const getScaledEnemy = (enemyId, floor, currentAct) => {
         const baseEnemy = ENEMY_POOL[enemyId];
         if (!baseEnemy) {
@@ -100,6 +101,17 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
     const [dealtDamageLastTurn, setDealtDamageLastTurn] = useState(false);
     // Batch 2: 死亡印记
     const [deathMarkDamage, setDeathMarkDamage] = useState(0);
+
+    useEffect(() => {
+        achievementTracker.startBattle({ isBoss: isBossFight });
+        return () => {
+            achievementTracker.cancelBattle();
+        };
+    }, [isBossFight]);
+
+    useEffect(() => {
+        achievementTracker.recordMana(playerMana);
+    }, [playerMana]);
 
     useEffect(() => {
         // 战斗开始时播放英雄语音
@@ -743,6 +755,7 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
                 updatePlayerHp(prev => prev + 2, { showHeal: true, label: 'HP', clamp: false });
             }
 
+            achievementTracker.recordBattleEnd({ playerHp });
             playSfx('WIN');
             setTimeout(() => onWin(battleResult), 1000);
         }
@@ -750,9 +763,10 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
 
     useEffect(() => {
         if (playerHp <= 0) {
+            achievementTracker.cancelBattle();
             setTimeout(onLose, 1000);
         }
-    }, [playerHp]);
+    }, [playerHp, onLose]);
 
     const endTurn = () => {
         const { hand, discardPile } = deckRef.current;
@@ -960,7 +974,11 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
                 }
                 total += finalDmg;
             }
+            const damageTaken = Math.max(0, playerHp - currHp);
             setPlayerBlock(remBlock); setPlayerHp(currHp); setDmgOverlay({ val: total, target: 'PLAYER' }); setTimeout(() => setDmgOverlay(null), 800);
+            if (damageTaken > 0) {
+                achievementTracker.recordPlayerDamage(damageTaken);
+            }
         }
         if (act.type === 'BUFF') {
             // 敌人获得格挡时播放格挡音效
