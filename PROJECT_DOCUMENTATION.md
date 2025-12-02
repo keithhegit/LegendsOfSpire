@@ -529,7 +529,7 @@ v0.1.0 (Alpha) → v0.5.0 (Beta) → v0.7.5 → v0.8.0 → v0.9.1 (开发中)
 - 🛡️ **EkkoW 时光护盾**：卡牌数据补充 `block:10`，施放瞬间就能获得护甲，同时保留原有 `REFLECT_IF_HIT` 反伤状态，组合 `EkkoEW` 时更稳。
 - 💰 **Neutral_019 荣誉奖章**：`WIN_GOLD_BONUS` 写入 `playerStatus.winGoldBonus` 并在 `handleBattleWin` 结算额外 +10 金币，Toast 显示收益，支持多次叠加。
 - 📄 **文档同步**：`new/card_balance/effect_test_plan1201.md` 更新 Batch 2/3 结果表，`PROJECT_DOCUMENTATION.md` 记录本轮修复。
-- 💚 **HP 飘字提示**：所有回血 / 生命偷取事件现在都会在战斗 HUD 弹出绿色 “HEAL/LIFE +X” 提示，方便确认具体加血值。
+- 💚 **HP 飘字提示 + 音效**：所有回血 / 生命偷取事件现在都会在战斗 HUD 弹出绿色 “HEAL/LIFE +X” 提示并播放治疗音效，方便确认具体加血值。
 - 🔎 **GM 卡牌库搜索**：GM 控制台新增卡牌库面板，可按 ID/名称/英雄模糊搜索任意卡牌并一键注入或设为起手，调试范围覆盖全卡库。
 
 ---

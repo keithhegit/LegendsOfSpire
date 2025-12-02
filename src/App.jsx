@@ -54,7 +54,8 @@ const SFX = {
     ATTACK_SWING: `${SFX_NEW_URL}/attack_swing.mp3`,
     ATTACK_HIT: `${SFX_NEW_URL}/attack_hit.mp3`,
     BLOCK_SHIELD: `${SFX_NEW_URL}/block_shield.mp3`,
-    HIT_TAKEN: `${SFX_NEW_URL}/hit_taken.mp3`
+    HIT_TAKEN: `${SFX_NEW_URL}/hit_taken.mp3`,
+    HEAL: `${SFX_NEW_URL}/heal-rpg.wav`
 };
 
 const STARTING_DECK_BASIC = ["Strike", "Strike", "Strike", "Strike", "Defend", "Defend", "Defend", "Defend"];
