@@ -40,6 +40,14 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
     const [enemyBaitDamage, setEnemyBaitDamage] = useState(0);
     const [heroAnim, setHeroAnim] = useState("");
     const [enemyAnim, setEnemyAnim] = useState("");
+    const spawnOverlay = (overlay, duration = 800) => {
+        setDmgOverlay(overlay);
+        setTimeout(() => setDmgOverlay(null), duration);
+    };
+    const showPlayerHealOverlay = (value, label = 'HEAL') => {
+        if (!value) return;
+        spawnOverlay({ val: `${label} +${value}`, target: 'PLAYER', color: 'text-emerald-300' }, 900);
+    };
     const [playerStatus, setPlayerStatus] = useState({
         strength: heroData.baseStr || 0,
         weak: 0,
@@ -340,10 +348,18 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
         }
 
         if (effectUpdates.drawCount > 0) drawCards(effectUpdates.drawCount);
-        if (effectUpdates.playerHp !== undefined && effectUpdates.playerHp !== null) setPlayerHp(effectUpdates.playerHp);
+        if (effectUpdates.playerHp !== undefined && effectUpdates.playerHp !== null) {
+            const healFromSet = Math.max(0, effectUpdates.playerHp - playerHp);
+            setPlayerHp(effectUpdates.playerHp);
+            if (healFromSet > 0) {
+                showPlayerHealOverlay(healFromSet, 'HEAL');
+            }
+        }
         if (effectUpdates.manaChange) setPlayerMana(m => Math.max(0, m + effectUpdates.manaChange));
         if (effectUpdates.healAmount) {
-            setPlayerHp(h => Math.min(heroData.maxHp, h + effectUpdates.healAmount));
+            const healValue = effectUpdates.healAmount;
+            setPlayerHp(h => Math.min(heroData.maxHp, h + healValue));
+            showPlayerHealOverlay(healValue, 'HEAL');
         }
         if (effectUpdates.damageAmount) {
             const directDamage = effectUpdates.damageAmount + (card.type === 'SKILL' ? skillBonusPool : 0);
@@ -617,9 +633,11 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
                     setEnemyHp(h => Math.max(0, h - dmgToHp)); total += dmgToHp;
                     if (lifelinkValue > 0 && dmgToHp > 0) {
                         setPlayerHp(h => Math.min(heroData.maxHp, h + dmgToHp));
+                        showPlayerHealOverlay(dmgToHp, 'LIFE');
                     }
                     if (lifestealFlat > 0 && dmgToHp > 0) {
                         setPlayerHp(h => Math.min(heroData.maxHp, h + lifestealFlat));
+                        showPlayerHealOverlay(lifestealFlat, 'LIFE');
                     }
                     if (dmgToHp > 0 && drawOnHitCharges > 0) {
                         drawCards(drawOnHitCharges);
@@ -655,7 +673,10 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
                         }, i * 300 + 150);
                     }
 
-                    if (heroData.relics.includes("VampiricScepter")) setPlayerHp(h => Math.min(heroData.maxHp, h + 1));
+                    if (heroData.relics.includes("VampiricScepter")) {
+                        setPlayerHp(h => Math.min(heroData.maxHp, h + 1));
+                        showPlayerHealOverlay(1, 'LIFE');
+                    }
                     if (heroData.relicId === "DariusPassive") setEnemyStatus(s => ({ ...s, weak: s.weak + 1 }));
 
                     // FIX: Multi-hit display - Stagger damage numbers
@@ -720,6 +741,7 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
             if (heroData.relicId === "ThreshPassive") {
                 battleResult.gainedMaxHp = 2;
                 setPlayerHp(h => h + 2); // 立即恢复2HP作为视觉反馈
+                showPlayerHealOverlay(2, 'HP');
             }
 
             playSfx('WIN');
