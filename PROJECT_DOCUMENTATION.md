@@ -4,7 +4,7 @@
 > **类型**: Roguelike 卡牌游戏  
 > **平台**: Web (桌面 + 移动端)  
 > **当前版本**: v0.9.1 (Beta)
-> **最后更新**: 2025-11-26
+> **最后更新**: 2025-12-02
 
 ---
 
@@ -521,6 +521,14 @@ v0.1.0 (Alpha) → v0.5.0 (Beta) → v0.7.5 → v0.8.0 → v0.9.1 (开发中)
 - 👤 **浮动用户面板**：徽章整体左移，避免挡到右上角功能；地图页右上角在登录状态下显示风险提示面板，告诉玩家重置后会清空当前进度。
 
 **详细日志**：与这套流程关联的文档有 `new/backend_plan/注册登陆流程开发计划：后端注入 (The Backend Injection).md` 和 `new/Fixing Map Dead-End Issue.md`。
+
+#### 2025-12-02 - R 技能 & 经济系统 QA 修复
+
+- ⚔️ **DariusR 处决阈值**：`BLEED_EXECUTE` 现在在敌人流血 ≥4 层时立即清空 HP/护甲并飘出 “BLEED EXECUTE!” HUD，方便 GM 测试。
+- 🔋 **Neutral_016 法力石碎片**：若打出时手牌（含本牌）≤3，立刻抽 1 并返还 1 法力，改由 `cardEffectHandler` + `BattleScene` 判定手牌数量。
+- 🛡️ **EkkoW 时光护盾**：卡牌数据补充 `block:10`，施放瞬间就能获得护甲，同时保留原有 `REFLECT_IF_HIT` 反伤状态，组合 `EkkoEW` 时更稳。
+- 💰 **Neutral_019 荣誉奖章**：`WIN_GOLD_BONUS` 写入 `playerStatus.winGoldBonus` 并在 `handleBattleWin` 结算额外 +10 金币，Toast 显示收益，支持多次叠加。
+- 📄 **文档同步**：`new/card_balance/effect_test_plan1201.md` 更新 Batch 2/3 结果表，`PROJECT_DOCUMENTATION.md` 记录本轮修复。
 
 ---
 

@@ -77,7 +77,7 @@
 | 英雄 | R 技能 / Effect | 状态（参考 Batch 计划） |
 | :--- | :--- | :--- |
 | 盖伦 | `GarenR` / `EXECUTE_SCALE` | ✅ `BattleScene.jsx` L281-L284 已按缺血加成计算（Batch1 完成，待线上复测）。 |
-| 德莱厄斯 | `DariusR` / `BLEED_EXECUTE` | ✅ 根据敌人流血层数即时触发处决，≥5 层直接清空 HP/护甲并飘出 “BLEED EXECUTE!”。 |
+| 德莱厄斯 | `DariusR` / `BLEED_EXECUTE` | ✅ 根据敌人流血层数即时触发处决，≥4 层直接清空 HP/护甲并飘出 “BLEED EXECUTE!”。 |
 | 拉克丝 | `LuxR` / `CONDITIONAL_DOUBLE` | ✅ 逻辑已接入（L286-L289），但需要 Batch2 Phase2.5 的专用测试卡组验证。 |
 | 金克丝 | `JinxR` / `LOW_HP_BONUS` | ✅ L291-L294 处理低血加伤，Batch2 Phase2.5 复测中。 |
 | 亚索 | `YasuoR` / `TRIPLE_HIT + CRIT_CHANCE` | ✅ 改为 3×10 连击并在本回合临时获得 10% 暴击率，逐段伤害可与暴击/力量叠加。 |
@@ -97,6 +97,13 @@
 | 卡特琳娜 | `KatarinaR` / `MULTI_STRIKE_SEGMENTS` | ✅ 拆分 5 段命中（每段 6 伤），逐段结算暴击/易伤/抽牌，配合 `drawOnHit` 时首段立即抽牌。 |
 | 劫 | `ZedR` / `DEATHMARK` | ✅ L388-L510 追踪印记伤害并在倒计时结束爆发（Batch2 已接入，待 QA）。 |
 
+#### 🆕 2025-12-02 快速修复 (dev_test)
+
+- **DariusR / BLEED_EXECUTE**：处决阈值下调为 `≥4` 层流血，HUD 维持 “BLEED EXECUTE!” 飘字方便复查。
+- **Neutral_016 法力石碎片**：手牌（含本牌）≤3 时立即抽 1 并返还 1 法力，配合 GM 牌库可无限循环。
+- **EkkoW 时光护盾**：出牌即获得 10 护甲，同时保留 6 点反伤，便于 “EkkoEW” 站桩。
+- **Neutral_019 荣誉奖章**：每次施放叠加 +10G 胜利奖励，结算面板会弹出金色 Toast，收益可堆叠。
+
 #### 🔧 R 技能分步修复计划（R-Roadmap）
 
 | 阶段 | 目标 / 输出 | 涉及英雄（效果） | 代码触点 | 验证要点 |
@@ -105,7 +112,7 @@
 | **R1 - Phase2.3 生存向** | 打通“回血/抽牌/驱散”型 R 技能 | 艾克（`HEAL_AND_DAMAGE`）、塞拉斯（`COPY_ENEMY_ACTION` 联动 `ref enemy`）、维克托（`DRAW_ON_USE`）、李青（`REMOVE_BUFF`） | `BattleScene.jsx`：`executeCopiedEnemyAction()` / `removeEnemyBuffs()` / draw-on-use plumbing；`cardEffectHandler.js`：补充 `copyEnemySkill` flag | ① GM 注入塞拉斯 R，敌人意图 12×2 攻击 → 立即劫持并造成 `HIJACK ×2`；② 李青 R 对带护盾敌人使用，护盾清零并飘 “DISPEL”；③ 维克托 R 出牌后手牌立即 +1 |
 | **R2 - Phase2.5 强化/连击** | 让“增伤/下一击”类 R 技能可实战 | ✅ 瑞文（临时力量+30% 斩杀）、✅ 卡牌大师（抽牌+下一击加成）、✅ 薇恩（力量+`nextAttackDouble`）、✅ 艾瑞莉娅（本回合所有攻击加伤） | `BattleScene.jsx`：`globalAttackBonus` 仅对 R 之前的攻击读取旧值，R 后叠加只影响后续攻击；HUD 常驻“全攻 +X” | ① 瑞文 R 后立刻抽到攻击牌，检查临时力量与斩杀阈值；② TF R 确认抽牌 & HUD 显示下一击+6；③ 薇恩 R 后第一张攻击飘出双倍；④ 艾瑞莉娅 R 后连续两张攻击伤害依次 +2/+4 |
 | **R3 - Phase3.3 永久成长（已取消）** | 早期代码已交付锤石 +MaxHP / 内瑟斯 +Str 永久成长，后续无额外开发 | （无） | （无） | 记录于 `BattleScene.jsx` 的 `battleResult.gainedMaxHp / gainedStr`；QA 仅需常规回归 |
-| **R4 - Phase2.4/毒系** | 完成 DOT / 多段型 R 技能 | 提莫（毒 + 虚弱陷阱）、德莱厄斯（Bleed Execute）、卡特琳娜（多段判定）、未来多段型 | `cardEffectHandler.js` 暴露 `bleedExecute`/`multiStrikeSegments`；`BattleScene.jsx`：多段 loop 支持抽牌/暴击逐段结算、流血阈值执行 | ① 提莫 R 安置后敌人尝试攻击即触发毒 + 虚弱飘字；② 德莱厄斯 R ≥5 层流血瞬杀（HUD: BLEED EXECUTE!）；③ 卡特 R 5 段伤害逐段显示并能触发抽牌 |
+| **R4 - Phase2.4/毒系** | 完成 DOT / 多段型 R 技能 | 提莫（毒 + 虚弱陷阱）、德莱厄斯（Bleed Execute）、卡特琳娜（多段判定）、未来多段型 | `cardEffectHandler.js` 暴露 `bleedExecute`/`multiStrikeSegments`；`BattleScene.jsx`：多段 loop 支持抽牌/暴击逐段结算、流血阈值执行 | ① 提莫 R 安置后敌人尝试攻击即触发毒 + 虚弱飘字；② 德莱厄斯 R ≥4 层流血瞬杀（HUD: BLEED EXECUTE!）；③ 卡特 R 5 段伤害逐段显示并能触发抽牌 |
 
 > 所有阶段完成后，20 位英雄的 R 技能将具备独立测试用例、诊断入口与 UI 反馈。若用户在实战遇到问题，按上述阶段定位即可。
 
@@ -137,7 +144,7 @@
 | **DRAW_MANA** | `SonaE` | 迅捷奏鸣曲 | 无 | 打出卡牌 | 抽牌并获得临时法力（法力值增加）。 | ✅ 出牌立即抽 2 张并获得 `effectValue` 点临时法力。 |
 | **PER_CARD_BONUS** | `SonaR` | 终乐章 | 本回合多出牌 | 打出卡牌 | 伤害随本回合已打出卡牌数量增加。 | √ 读取当前牌序，之前每出一张牌会额外+2 伤害。 |
 | **RETRO_BONUS** | `EkkoQ` | 时间折刃 | 上回合攻击过 | 打出卡牌 | 若上回合对该敌人造成过伤害，本卡伤害增加。 | √ `dealtDamageLastTurn` state 已接入；测试：上一回合造成伤害，此回合释放 Q 观察额外 +X。 |
-| **REFLECT_IF_HIT** | `EkkoW` | 时光护盾 | 无 | 打出卡牌 | 获得状态。敌人攻击时，受到反弹伤害。 | √ 激活后 HUD 显示反伤，敌人每次命中都会看到 “REFLECT” 飘字并扣血。 |
+| **REFLECT_IF_HIT** | `EkkoW` | 时光护盾 | 无 | 打出卡牌 | 获得状态。敌人攻击时，受到反弹伤害。 | ✅ 同时获得 10 护甲并记录反伤层数，敌人命中即看到 “REFLECT” 飘字并返还 6 点伤害。 |
 | **NEXT_COST_REDUCE** | `EkkoE` | 相位俯冲 | 手有攻击牌 | 打出卡牌 | 手牌中下一张攻击牌的费用 -1。 | ✅ `nextCostReduce` 状态已消费，下一张攻击牌费用立减 1（不低于 0）。 |
 | **HEAL_AND_DAMAGE** | `EkkoR` | 时空逆转 | 玩家掉血 | 打出卡牌 | 恢复生命值，同时对敌人造成伤害。 | √ 先回复20HP，再对敌人造成同等伤害（受护盾减免），飘字为 “SKILL 20”。 |
 | **LIFELINK** | `SylasW` | 吸取之斩 | 玩家掉血 | 打出卡牌 | 造成伤害的同时，恢复等量（或固定量）生命值。 | √ 打出吸取之斩后按实际命中数值回满（受易伤等加成），HUD 可见吸血生效。 |
@@ -170,10 +177,10 @@ Batch 2 所有核心技能已在战斗逻辑内实现，再次回归时只需使
 | **NEXT_DRAW_PLUS** | `Neutral_013` | 战术速记 | 无 | 打出卡牌 | 结束回合。下回合开始时手牌数增加。 | √ |
 | **SCOUT** | `Neutral_014` | 暗影笔记 | 无 | 打出卡牌 | 查看敌人下回合意图（如果是隐藏状态则显示）。 | 未生效。 |
 | **GAMBLE** | `Neutral_015` | 金币押注 | 无 | 打出卡牌 | 随机：获得金币 或 失去生命。 | 未生效。 |
-| **MANA_IF_LOW_HAND** | `Neutral_016` | 法力石碎片 | 手牌<=3 | 打出卡牌 | 获得法力并抽牌。 | 未生效。 |
+| **MANA_IF_LOW_HAND** | `Neutral_016` | 法力石碎片 | 手牌<=3 | 打出卡牌 | 获得法力并抽牌。 | ✅ 打出时若手牌（含本牌）≤3，立即抽 1 并返还 1 点法力，可与其他回蓝效果叠加。 |
 | **PERMA_DRAW_ON_KILL** | `Neutral_017` | 求知铭文 | 击杀敌人 | 打出卡牌 | 击杀后，永久获得“每回合多抽1牌”的效果。 |  |
 | **PERMA_UPGRADE_CARD** | `Neutral_018` | 匠魂之锤 | 手有可升级牌 | 打出卡牌 | 选择一张牌，该牌数值永久提升（本局游戏）。 | 未生效。 |
-| **WIN_GOLD_BONUS** | `Neutral_019` | 荣誉奖章 | 无 | 打出卡牌 | 战斗胜利结算时，金币奖励增加。 | 未生效。 |
+| **WIN_GOLD_BONUS** | `Neutral_019` | 荣誉奖章 | 无 | 打出卡牌 | 战斗胜利结算时，金币奖励增加。 | ✅ 每次施放都会叠加 `winGoldBonus`，战斗胜利后自动额外结算 +10G 并弹出金色 Toast。 |
 | **TEMP_STR_ON_KILLS** | `Neutral_020` | 猎手徽章 | 击杀敌人 | 打出卡牌 | 本场战斗击杀数达到阈值后，获得力量。 |  |
 | **PERMA_STR_FOR_HP** | `Neutral_021` | 野心契约 | 无 | 打出卡牌 | 扣除最大生命值，永久获得力量。 | 力量增加，但是未消耗血量。 |
 | **DRAW_AT_START** | `Neutral_022` | 古老碑铭 | 无 | 打出卡牌 | 获得能力：每回合开始额外抽牌。 | 未生效。 |
@@ -540,7 +547,7 @@ Batch 2 所有核心技能已在战斗逻辑内实现，再次回归时只需使
 | 效果 ID | 卡牌 | 问题分析 | 修复方案 | 优先级 |
 |---------|------|----------|----------|--------|
 | **TEMP_MANA** | Neutral_010 | 临时法力未增加 | 在 `cardEffectHandler` 返回 `manaChange`，在 `BattleScene` 应用 | 🔴 P0 |
-| **MANA_IF_LOW_HAND** | Neutral_016 | 条件判断和法力增加 | 检查手牌数，返回 `manaChange` | 🟡 P1 |
+| **MANA_IF_LOW_HAND** | Neutral_016 | ✅ 2025-12-02：BattleScene 读取手牌 ≤3 即返还法力并抽 1 | N/A | ✅ 已完成 |
 | **REGEN_MANA** | Neutral_035 | 本回合+下回合回蓝 | 立即加法力，设置 `nextTurnMana` | 🟡 P1 |
 
 #### 类别 B: 简单逻辑错误 (Simple Logic Bugs)
@@ -564,7 +571,7 @@ Batch 2 所有核心技能已在战斗逻辑内实现，再次回归时只需使
 |---------|------|----------|------|--------|
 | **GAIN_GOLD** | Neutral_011 | 金币未增加 | 在 `App.jsx` 修改金币 state | 🟢 P3 |
 | **GAMBLE** | Neutral_015 | 随机金币/扣血 | 需要随机逻辑 + 金币系统 | 🟢 P3 |
-| **WIN_GOLD_BONUS** | Neutral_019 | 胜利金币加成 | 在 `battleResult` 中添加 `goldBonus` | 🟢 P3 |
+| **WIN_GOLD_BONUS** | Neutral_019 | ✅ 2025-12-02：`playerStatus.winGoldBonus` 结算 +10G，附 Toast | N/A | ✅ 已完成 |
 
 #### 类别 E: 卡牌操作系统 (Card Manipulation - 高复杂度)
 

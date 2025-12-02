@@ -53,7 +53,8 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
         critDamageMultiplier: 2,
         buffNextSkill: 0,
         tempStrength: 0,
-        globalAttackBonus: 0
+        globalAttackBonus: 0,
+        winGoldBonus: 0
     });
     const [enemyStatus, setEnemyStatus] = useState({ strength: 0, weak: 0, vulnerable: 0, mark: 0, markDamage: 0, trap: 0 });
     const heroBaseCritChance = heroData?.id === 'Yasuo' ? 10 : 0;
@@ -268,6 +269,7 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
     const playCard = (index) => {
         if (gameState !== 'PLAYER_TURN') return;
         const { hand, discardPile } = deckRef.current;
+        const handSizeBeforePlay = hand.length;
         const cardId = hand[index];
         if (!cardId) return; // 防止无效的 cardId
 
@@ -372,6 +374,9 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
         }
         if (effectUpdates.blockGain) {
             setPlayerBlock(b => b + effectUpdates.blockGain);
+        }
+        if (effectUpdates.manaIfLowHand && handSizeBeforePlay <= 3) {
+            setPlayerMana(m => Math.max(0, m + effectUpdates.manaIfLowHand));
         }
         if (effectUpdates.placeTrap) {
             setEnemyTrap(effectUpdates.placeTrap);
@@ -695,7 +700,8 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
             let battleResult = {
                 finalHp: playerHp,
                 gainedStr: 0,
-                gainedMaxHp: 0
+                gainedMaxHp: 0,
+                winGoldBonus: playerStatus.winGoldBonus || 0
             };
 
             // 内瑟斯被动：用攻击牌击杀获得1永久力量

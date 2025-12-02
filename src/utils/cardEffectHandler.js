@@ -469,6 +469,7 @@ function applyEffect(effectType, value, context, updates, card = {}) {
 
         case 'MANA_IF_LOW_HAND':
             // 低手牌法力 - Conditional mana (needs hand size check in BattleScene)
+            updates.drawCount = (updates.drawCount || 0) + 1;
             updates.manaIfLowHand = value;
             break;
 

@@ -1138,6 +1138,11 @@ export default function LegendsOfTheSpire() {
             showToast('灌铅骰子: +15 金币', 'gold');
         }
 
+        if (result.winGoldBonus > 0) {
+            setGold(prev => prev + result.winGoldBonus);
+            showToast(`荣誉奖章: +${result.winGoldBonus} 金币`, 'gold');
+        }
+
         setCurrentHp(Math.min(maxHp + (result.gainedMaxHp || 0), result.finalHp + passiveHeal));
         setView('REWARD');
     };
