@@ -98,7 +98,7 @@ export const ACHIEVEMENTS = [
 
 - **ACH_001 – Shrug It Off**：战斗胜利且玩家 HP ≤ 10。
 - **ACH_005 – Adrenaline**：战斗内任意时刻法力值峰值 ≥ 4。
-- **ACH_017 – Perfect**：Boss 战期间未受到任何伤害并获胜。
+- **ACH_019 – The Guardian**：击败 Act1 Boss（岩石守护者）。
 
 > 以上三条用于打通 Tracker → HUD → Save 通路，其余成就将在 S4 通过配置驱动批量导入。
 

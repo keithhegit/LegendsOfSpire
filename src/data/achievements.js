@@ -18,13 +18,13 @@ export const ACHIEVEMENTS = [
         reward: { type: 'RELIC', ref: 'AdrenalineOrb' }
     },
     {
-        id: 'ACH_017',
-        name: 'Perfect',
+        id: 'ACH_019',
+        name: 'The Guardian',
         category: 'BOSS',
-        description: '在 Boss 战中不受到任何伤害并获胜',
-        difficulty: 'A',
-        trigger: 'boss_perfect',
-        reward: { type: 'MODE', ref: 'PerfectRun' }
+        description: '击败 Act1 Boss：岩石守护者',
+        difficulty: 'B',
+        trigger: 'boss_guardian',
+        reward: { type: 'CARD', ref: 'GuardianStrike' }
     }
 ];
 

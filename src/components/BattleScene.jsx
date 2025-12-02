@@ -13,7 +13,7 @@ import Card from './shared/Card';
 
 const DEX_BLOCK_PER_STACK = 5;
 
-const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex, act, isBossFight = false }) => {
+const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex, act }) => {
     const getScaledEnemy = (enemyId, floor, currentAct) => {
         const baseEnemy = ENEMY_POOL[enemyId];
         if (!baseEnemy) {
@@ -103,11 +103,11 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
     const [deathMarkDamage, setDeathMarkDamage] = useState(0);
 
     useEffect(() => {
-        achievementTracker.startBattle({ isBoss: isBossFight });
+        achievementTracker.startBattle();
         return () => {
             achievementTracker.cancelBattle();
         };
-    }, [isBossFight]);
+    }, []);
 
     useEffect(() => {
         achievementTracker.recordMana(playerMana);
@@ -755,7 +755,6 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
                 updatePlayerHp(prev => prev + 2, { showHeal: true, label: 'HP', clamp: false });
             }
 
-            achievementTracker.recordBattleEnd({ playerHp });
             playSfx('WIN');
             setTimeout(() => onWin(battleResult), 1000);
         }

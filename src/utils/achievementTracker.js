@@ -74,13 +74,13 @@ export const achievementTracker = {
             defaultState.battle.damageTaken = true;
         }
     },
-    recordBattleEnd({ playerHp = 0 } = {}) {
+    recordBattleEnd({ playerHp = 0, bossId = null } = {}) {
         if (!defaultState.battle) return;
         if (playerHp <= 10) {
             unlockAchievement('ACH_001');
         }
-        if (defaultState.battle.isBoss && !defaultState.battle.damageTaken) {
-            unlockAchievement('ACH_017');
+        if (bossId === 'Guardian') {
+            unlockAchievement('ACH_019');
         }
         defaultState.battle = null;
     },
