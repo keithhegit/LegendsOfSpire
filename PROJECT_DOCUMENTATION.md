@@ -515,6 +515,7 @@ v0.1.0 (Alpha) → v0.5.0 (Beta) → v0.7.5 → v0.8.0 → v0.9.1 (开发中)
 - ✨ **Cloudflare D1 认证**：为登录/注册引入 `functions/api/auth/{login,register}.js`、`functions/utils/crypto.js`、`src/services/authService.js`，通过 Pages Functions 操作 D1、执行 PBKDF2+SHA-256 加密、把 `user` 写入/读出 `localStorage`。
 - 💻 **前端账号联动**：`LoginView` 和 `HeroSelectView` 共享用户上下文，登录后自动恢复英雄、地图、卡组状态；地图页面增加用户面板、登出、重置进度入口。
 - 🛰️ **地图保护**：地图视图判断死胡同后弹出重启提示，Reset Progress 会清除当前地图并重新选人，防止旧进度卡死且保留老用户登录后继续 ACT 的流程。
+- ⚔️ **R 技能 Phase 2.2-2.4 集成**：`BattleScene.jsx` 新增 `executeCopiedEnemyAction()`、`removeEnemyBuffs()`、多段结算与流血处决逻辑，完成塞拉斯 R 劫持敌人行动、李青 R 驱散增益、维克托 R 出牌即抽、艾瑞莉娅 R 全攻加成、德莱厄斯 R 流血处决与卡特琳娜 R 五段分段伤害等修复，详情记录在 `new/card_balance/effect_test_plan1201.md`。
 - 🗂️ **账号存档隔离**：`SAVE_KEY_${account}` 格式的多存档机制，登录即尝试读取该账号的存档，无存档则进入选人页；新增 `RESET PROGRESS` 按钮与“死胡同”弹层，均会明确提示重置后需重新选人。
 - 🧭 **死胡同体验**：`hasAvailableNeighbors` 会同步锁定状态、弹出“重新生成地图 or 稍后”浮层，点击“重新生成”会调用新版 `generateGridMap` 并清空 `lockedChoices`，确保 Act 3 也能就地再刷一次地图。
 - 👤 **浮动用户面板**：徽章整体左移，避免挡到右上角功能；地图页右上角在登录状态下显示风险提示面板，告诉玩家重置后会清空当前进度。

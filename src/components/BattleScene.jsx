@@ -124,6 +124,71 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
         playSfx('DRAW');
     };
 
+    const removeEnemyBuffs = (stacks = 1) => {
+        if (!stacks) return;
+        const buffKeys = ['strength', 'damageReduce', 'reflect', 'reflectDamage', 'lifesteal', 'regenMana'];
+        let remaining = stacks;
+        setEnemyStatus(prev => {
+            if (!prev) return prev;
+            const next = { ...prev };
+            buffKeys.forEach(key => {
+                if (remaining === 0) return;
+                if ((next[key] || 0) > 0) {
+                    next[key] = 0;
+                    remaining -= 1;
+                }
+            });
+            return next;
+        });
+        if (remaining > 0) {
+            setEnemyBlock(prev => {
+                if (prev <= 0) return prev;
+                remaining = 0;
+                return 0;
+            });
+        }
+        setDmgOverlay({ val: 'DISPEL', target: 'ENEMY', color: 'text-emerald-300' });
+        setTimeout(() => setDmgOverlay(null), 900);
+    };
+
+    const executeCopiedEnemyAction = () => {
+        if (!nextEnemyAction) return;
+        const act = nextEnemyAction;
+        const attackLike = act.type === 'ATTACK' || act.actionType === 'Attack';
+        if (attackLike) {
+            const baseValue = act.value ?? act.dmgValue ?? 0;
+            const perHit = Math.max(0, Math.floor(baseValue * 0.5));
+            const hits = act.count || 1;
+            for (let i = 0; i < hits; i++) {
+                applyDirectDamage(perHit, 'HIJACK');
+            }
+            setDmgOverlay({ val: `HIJACK ×${hits}`, target: 'ENEMY', color: 'text-emerald-200' });
+            setTimeout(() => setDmgOverlay(null), 800);
+            return;
+        }
+        if (act.type === 'BUFF') {
+            const value = act.effectValue ?? act.value ?? 0;
+            if (act.effect === 'BLOCK') {
+                setPlayerBlock(b => b + value);
+                setDmgOverlay({ val: `BLOCK +${value}`, target: 'PLAYER', color: 'text-blue-200' });
+            } else if (act.effect === 'STRENGTH') {
+                setPlayerStatus(prev => ({ ...prev, strength: (prev.strength || 0) + value }));
+                setDmgOverlay({ val: `STR +${value}`, target: 'PLAYER', color: 'text-red-200' });
+            }
+            setTimeout(() => setDmgOverlay(null), 800);
+            return;
+        }
+        if (act.type === 'DEBUFF' && act.effect) {
+            const debuffValue = act.effectValue ?? 1;
+            setEnemyStatus(prev => ({
+                ...prev,
+                [act.effect.toLowerCase()]: Math.max(0, (prev?.[act.effect.toLowerCase()] || 0) + debuffValue)
+            }));
+            setDmgOverlay({ val: `MIRROR ${act.effect}`, target: 'ENEMY', color: 'text-purple-300' });
+            setTimeout(() => setDmgOverlay(null), 900);
+        }
+    };
+
     const applyDirectDamage = (rawDamage, label = 'DMG') => {
         if (rawDamage <= 0) return;
         setEnemyBlock(prevBlock => {
@@ -251,6 +316,7 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
             playerStatus,
             enemyStatus
         });
+        const globalAttackBonusBefore = playerStatus.globalAttackBonus || 0;
         const mergedPlayerStatus = {
             ...playerStatus,
             ...(effectUpdates.playerStatus || {})
@@ -295,12 +361,19 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
                 ...effectUpdates.enemyStatus
             }));
         }
+        if (effectUpdates.removeEnemyBuffs) {
+            removeEnemyBuffs(effectUpdates.removeEnemyBuffs);
+        }
         if (effectUpdates.placeTrap) {
             setEnemyTrap(effectUpdates.placeTrap);
             setEnemyStatus(prev => ({
                 ...prev,
                 trap: (prev.trap || 0) + 1
             }));
+        }
+
+        if (effectUpdates.copyEnemySkill) {
+            executeCopiedEnemyAction();
         }
 
         // 盲僧被动：技能牌后设置buff
@@ -340,8 +413,10 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
             }, 200);
             // FIX Bug #1: MULTI_HIT伤害计算 - 易伤应该加成基础伤害，然后再乘以次数
             const tempStrengthBonus = mergedPlayerStatus.tempStrength || 0;
-            const globalAttackBonus = mergedPlayerStatus.globalAttackBonus || 0;
-            let baseDmg = card.value + (mergedPlayerStatus.strength || 0) + tempStrengthBonus + globalAttackBonus;
+            const globalAttackBonus = globalAttackBonusBefore;
+            const multiStrikeSegments = effectUpdates.multiStrikeSegments || 0;
+            const baseCardValue = multiStrikeSegments ? Math.max(1, Math.floor(card.value / multiStrikeSegments)) : card.value;
+            let baseDmg = baseCardValue + (mergedPlayerStatus.strength || 0) + tempStrengthBonus + globalAttackBonus;
             if (mergedPlayerStatus.weak > 0) baseDmg = Math.floor(baseDmg * 0.75);
 
             // FIX Bug #8: 首次攻击加倍 (耀光)
@@ -400,9 +475,10 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
             }
 
             // FIX: 支持 MULTI_HIT from effectUpdates
-            const hits = card.isMultiHit ? card.hits : (effectUpdates.multiHitCount || 1);
+            const hits = multiStrikeSegments || (card.isMultiHit ? card.hits : (effectUpdates.multiHitCount || 1));
             let total = 0;
             let isFirstHit = true; // 用于劫被动
+            let drawOnHitCharges = effectUpdates.drawOnHit || 0;
 
             const currentEnemyStatus = mergedEnemyStatus;
             const cardsPlayedIncludingCurrent = cardsPlayedBefore + 1;
@@ -447,6 +523,7 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
                 setKatarinaAttackCount(0); // 重置计数器
             }
 
+            const shouldBleedExecute = effectUpdates.bleedExecute && (currentEnemyStatus.bleed || 0) >= effectUpdates.bleedExecute;
             const shouldExecute = effectUpdates.executeThreshold && (enemyHp <= enemyConfig.maxHp * (effectUpdates.executeThreshold / 100));
 
             const lifelinkValue = effectUpdates.lifelinkAmount || 0;
@@ -506,6 +583,10 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
                     if (lifelinkValue > 0 && dmgToHp > 0) {
                         setPlayerHp(h => Math.min(heroData.maxHp, h + dmgToHp));
                     }
+                    if (dmgToHp > 0 && drawOnHitCharges > 0) {
+                        drawCards(drawOnHitCharges);
+                        drawOnHitCharges = 0;
+                    }
 
                     // Batch 2: 记录造成伤害 (用于 RETRO_BONUS)
                     if (dmgToHp > 0) setDealtDamageThisTurn(true);
@@ -548,10 +629,10 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
                 }
             };
 
-            if (shouldExecute) {
+            if (shouldExecute || shouldBleedExecute) {
                 setEnemyBlock(0);
                 setEnemyHp(0);
-                setDmgOverlay({ val: 'EXECUTE!', target: 'ENEMY', color: 'text-amber-300' });
+                setDmgOverlay({ val: shouldBleedExecute ? 'BLEED EXECUTE!' : 'EXECUTE!', target: 'ENEMY', color: 'text-amber-300' });
                 setTimeout(() => setDmgOverlay(null), 600);
                 playSfx('HIT_TAKEN');
             } else {

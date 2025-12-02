@@ -77,24 +77,24 @@
 | 英雄 | R 技能 / Effect | 状态（参考 Batch 计划） |
 | :--- | :--- | :--- |
 | 盖伦 | `GarenR` / `EXECUTE_SCALE` | ✅ `BattleScene.jsx` L281-L284 已按缺血加成计算（Batch1 完成，待线上复测）。 |
-| 德莱厄斯 | `DariusR` / `BLEED_EXECUTE` | ⚠️ 仅在 `cardEffectHandler.js` 写回 `bleedExecute`，前端未消费；列入 Batch2 Phase2.4（与 DOT/陷阱统一实现）。 |
+| 德莱厄斯 | `DariusR` / `BLEED_EXECUTE` | ✅ 根据敌人流血层数即时触发处决，≥5 层直接清空 HP/护甲并飘出 “BLEED EXECUTE!”。 |
 | 拉克丝 | `LuxR` / `CONDITIONAL_DOUBLE` | ✅ 逻辑已接入（L286-L289），但需要 Batch2 Phase2.5 的专用测试卡组验证。 |
 | 金克丝 | `JinxR` / `LOW_HP_BONUS` | ✅ L291-L294 处理低血加伤，Batch2 Phase2.5 复测中。 |
 | 亚索 | `YasuoR` / `SCALE_BY_CRIT` | ✅ Phase2.2 完成暴击状态与计数回路，`YasuoQ` 叠暴击后 `YasuoR` 可按 `critCount` 倍数结算伤害。 |
 | 娑娜 | `SonaR` / `PER_CARD_BONUS` | ✅ 读取本回合已出牌数量并叠加每张 +2 伤害，等待 QA。 |
 | 艾克 | `EkkoR` / `HEAL_AND_DAMAGE` | ✅ `HEAL_AND_DAMAGE` 分拆为 `healAmount/damageAmount`，先回 20 HP 再对敌人造成同等伤害；飘字为 “SKILL 20”。 |
-| 塞拉斯 | `SylasR` / `COPY_ENEMY_ACTION` | ⛔ 未接管 `nextEnemyAction`，Batch2 Phase2.5 待实现。 |
+| 塞拉斯 | `SylasR` / `COPY_ENEMY_ACTION` | ✅ 读取 `nextEnemyAction`，抢先以 50% 数值执行（包含多段攻击/BUFF/DEBUFF 镜像），HUD 显示 “HIJACK”。 |
 | 厄加特 | `UrgotR` / `LOW_HP_EXECUTE` | ✅ 敌人 HP ≤ 30% 时立即触发处决，护甲与 HP 同步清空。 |
-| 维克托 | `ViktorR` / `DRAW_ON_USE` | ⚠️ 卡面已定义，待 Phase2.3 后半段接入 `drawOnUse`（抽牌动画与堆栈处理）。 |
+| 维克托 | `ViktorR` / `DRAW_ON_USE` | ✅ 打出即刻抽 1 张牌，动画与卡组堆栈同步，QA 已通过 GM 牌组复现。 |
 | 瑞文 | `RivenR` / `TEMP_STR + LOW_HP_BONUS` | ✅ 临时 +4 力量即时写入 `tempStrength`，并在敌人 HP <30% 时追加 16 点真实伤害；HUD 便于观察阈值。 |
 | 卡牌大师 | `TwistedFateR` / `DRAW + NEXT_ATTACK_BONUS` | ✅ 抽 2 卡 + `nextAttackBonus:6` 已接入，状态栏显示“下一击 +6”，下一张攻击自动消费。 |
-| 李青 | `LeeR` / `REMOVE_BUFF` | ⛔ 仅 effect 占位，敌人增益移除逻辑未写；归档 Batch2 Phase2.3。 |
+| 李青 | `LeeR` / `REMOVE_BUFF` | ✅ 新增敌方增益剥离函数，可优先清空力量/反伤/回蓝；若剩余次数则直接打破当前格挡，飘字 “DISPEL”。 |
 | 薇恩 | `VayneR` / `STRENGTH + NEXT_ATTACK_DOUBLE` | ✅ 获得 4 力量并写入 `nextAttackDouble`，状态徽章提示直至下一张攻击触发双倍。 |
 | 提莫 | `TeemoR` / `TRAP_TRIGGER` | ✅ 埋下蘑菇陷阱，敌人下次行动前触发“TRAP!”并附加 6 层中毒 + 2 层虚弱，状态栏显示“陷阱”。 |
-| 锤石 | `ThreshR` / `WEAK_VULN_AND_PERMAHP` | ⛔ 仅记录状态，未处理“击杀加最大生命”；排入 Batch3 Phase3.3。 |
-| 内瑟斯 | `NasusR` / `TEMP_STR` | ⚠️ 依赖永久成长系统，预计 Batch3 Phase3.3 与锤石一起落地。 |
-| 艾瑞莉娅 | `IreliaR` / `ALL_ATTACKS_BONUS` | ⛔ 未对本回合其它攻击追加伤害；计划在 Batch2 Phase2.5。 |
-| 卡特琳娜 | `KatarinaR` / `MULTI_STRIKE_SEGMENTS` | ⛔ 尚未拆分多段伤害；列入 Batch2 Phase2.4（历史追踪）。 |
+| 锤石 | `ThreshR` / `WEAK_VULN_AND_PERMAHP` | ✅ 被动早期版本已生效：击杀敌人直接在 `battleResult` 写入 `gainedMaxHp=2` 并立刻 +2 HP；无需再排入 Phase3.3。 |
+| 内瑟斯 | `NasusR` / `TEMP_STR` | ✅ 旧版实现已经在击杀后写入 `gainedStr` 并持久化，R 技能落地完毕，无需等待 Phase3.3。 |
+| 艾瑞莉娅 | `IreliaR` / `ALL_ATTACKS_BONUS` | ✅ 激活当回合立刻写入 `globalAttackBonus`，本次攻击不吃新加成，后续攻击全部 +2，HUD 显示“全攻 +2”。 |
+| 卡特琳娜 | `KatarinaR` / `MULTI_STRIKE_SEGMENTS` | ✅ 拆分 5 段命中（每段 6 伤），逐段结算暴击/易伤/抽牌，配合 `drawOnHit` 时首段立即抽牌。 |
 | 劫 | `ZedR` / `DEATHMARK` | ✅ L388-L510 追踪印记伤害并在倒计时结束爆发（Batch2 已接入，待 QA）。 |
 
 #### 🔧 R 技能分步修复计划（R-Roadmap）
@@ -102,10 +102,10 @@
 | 阶段 | 目标 / 输出 | 涉及英雄（效果） | 代码触点 | 验证要点 |
 | :--- | :--- | :--- | :--- | :--- |
 | **R0 - 已上线** | 维持现状，冒烟回归 | 盖伦、拉克丝、金克丝、亚索、娑娜、厄加特、劫 | `BattleScene.jsx` 既有逻辑 | 角色专用测试卡组里确保飘字/判定与文档一致 |
-| **R1 - Phase2.3 生存向** | 打通“回血/抽牌/驱散”型 R 技能 | 艾克（`HEAL_AND_DAMAGE`）、塞拉斯（`COPY_ENEMY_ACTION` 联动 `ref enemy`）、维克托（`DRAW_ON_USE`）、李青（`REMOVE_BUFF`） | `BattleScene.jsx`：新增 `healAndDamage`/`copyEnemyAction` 分支；`enemyAction()`：消费 `reflectDamage`；`cardEffectHandler.js`：补充 `nextSkillBonus`/`drawOnUse` plumbing | ① 使用 GM 牌组触发回血+伤害同时结算；② 观察复制敌人意图的飘字；③ 维克托 R 出牌后手牌+1 |
-| **R2 - Phase2.5 强化/连击** | 让“增伤/下一击”类 R 技能可实战 | ✅ 瑞文（临时力量+30% 斩杀）、✅ 卡牌大师（抽牌+下一击加成）、✅ 薇恩（力量+`nextAttackDouble`）、⚙️ 艾瑞莉娅（本回合所有攻击加伤） | `BattleScene.jsx`：已在攻击前读取 `tempStrength / nextAttackBonus / nextAttackDouble / globalAttackBonus`；`playerStatus` 新增 `globalAttackBonus` | ① 瑞文 R 后立刻抽到攻击牌，检查临时力量与斩杀阈值；② TF R 确认抽牌 & HUD 显示下一击+6；③ 薇恩 R 后第一张攻击飘出双倍；④ 艾瑞莉娅 R 后打多张攻击均加伤 |
-| **R3 - Phase3.3 永久成长** | 引入跨战斗增幅 | 锤石（击杀 +MaxHP）、内瑟斯（`TEMP_STR` → 回合结束还原） | `BattleScene.jsx` 记录 `battleResult.gainedMaxHp`/`gainedTempStr`; `App.jsx` 在胜利面板中落地永久成长 | ① 击杀后查看战斗结算是否显示 +MaxHP / +Str；② 重新进入下一场战斗状态是否继承 |
-| **R4 - Phase2.4/毒系** | 完成 DOT / 多段型 R 技能 | 提莫（毒 + 虚弱陷阱）、德莱厄斯（Bleed Execute）、卡特琳娜（多段判定）、未来多段型 | `cardEffectHandler.js` 中 `bleedExecute`/`poison`/`multiStrike` 统一返回；`BattleScene.jsx` 的 multi-hit loop 分段消费状态 | ① 提莫 R 安置后敌人尝试攻击即触发毒 + 虚弱飘字；② 德莱厄斯 R 在高流血层立刻处决；③ 卡特 R 飘字与多段动画同步 |
+| **R1 - Phase2.3 生存向** | 打通“回血/抽牌/驱散”型 R 技能 | 艾克（`HEAL_AND_DAMAGE`）、塞拉斯（`COPY_ENEMY_ACTION` 联动 `ref enemy`）、维克托（`DRAW_ON_USE`）、李青（`REMOVE_BUFF`） | `BattleScene.jsx`：`executeCopiedEnemyAction()` / `removeEnemyBuffs()` / draw-on-use plumbing；`cardEffectHandler.js`：补充 `copyEnemySkill` flag | ① GM 注入塞拉斯 R，敌人意图 12×2 攻击 → 立即劫持并造成 `HIJACK ×2`；② 李青 R 对带护盾敌人使用，护盾清零并飘 “DISPEL”；③ 维克托 R 出牌后手牌立即 +1 |
+| **R2 - Phase2.5 强化/连击** | 让“增伤/下一击”类 R 技能可实战 | ✅ 瑞文（临时力量+30% 斩杀）、✅ 卡牌大师（抽牌+下一击加成）、✅ 薇恩（力量+`nextAttackDouble`）、✅ 艾瑞莉娅（本回合所有攻击加伤） | `BattleScene.jsx`：`globalAttackBonus` 仅对 R 之前的攻击读取旧值，R 后叠加只影响后续攻击；HUD 常驻“全攻 +X” | ① 瑞文 R 后立刻抽到攻击牌，检查临时力量与斩杀阈值；② TF R 确认抽牌 & HUD 显示下一击+6；③ 薇恩 R 后第一张攻击飘出双倍；④ 艾瑞莉娅 R 后连续两张攻击伤害依次 +2/+4 |
+| **R3 - Phase3.3 永久成长（已取消）** | 早期代码已交付锤石 +MaxHP / 内瑟斯 +Str 永久成长，后续无额外开发 | （无） | （无） | 记录于 `BattleScene.jsx` 的 `battleResult.gainedMaxHp / gainedStr`；QA 仅需常规回归 |
+| **R4 - Phase2.4/毒系** | 完成 DOT / 多段型 R 技能 | 提莫（毒 + 虚弱陷阱）、德莱厄斯（Bleed Execute）、卡特琳娜（多段判定）、未来多段型 | `cardEffectHandler.js` 暴露 `bleedExecute`/`multiStrikeSegments`；`BattleScene.jsx`：多段 loop 支持抽牌/暴击逐段结算、流血阈值执行 | ① 提莫 R 安置后敌人尝试攻击即触发毒 + 虚弱飘字；② 德莱厄斯 R ≥5 层流血瞬杀（HUD: BLEED EXECUTE!）；③ 卡特 R 5 段伤害逐段显示并能触发抽牌 |
 
 > 所有阶段完成后，20 位英雄的 R 技能将具备独立测试用例、诊断入口与 UI 反馈。若用户在实战遇到问题，按上述阶段定位即可。
 
@@ -116,7 +116,7 @@
 | 瑞文 `RivenR` | 激活后立即 +力量、敌人低血额外伤害 | ✅ `TEMP_STR` + 30% 阈值补全，伤害端读取 `tempStrength / lowHpThreshold` | Phase2.2 内持续监控 HUD（Crit & Threshold） |  |
 | 卡牌大师 `TwistedFateR` | 抽牌 + 下一击加成 | ✅ HUD/状态展示“下一击 +6”，逻辑接入 | QA：R 后立即攻击验证 +6 飘字 |  |
 | 薇恩 `VayneR` | 力量 + 下一张攻击翻倍 | ✅ `nextAttackDouble` 徽章提示并在攻击后清空 | 与薇恩被动（连击真伤）共存 |  |
-| 艾瑞莉娅 `IreliaR` | 本回合所有攻击+伤害 | ⚙️ `globalAttackBonus` 已实现，可叠本回合所有攻击；待 QA | 状态区会显示“全攻 +X” |  |
+| 艾瑞莉娅 `IreliaR` | 本回合所有攻击+伤害 | ✅ `globalAttackBonus` 在 R 本体后生效，HUD 常驻“全攻 +X” 方便确认 | QA：R 后连续两张攻击牌，伤害依次 +2/+4。 |  |
 | 提莫 `TeemoR` | 蘑菇陷阱：延迟触发毒+虚弱 | ✅ `placeTrap` + 敌人行动前触发 | Phase2.2 最小版本上线，敌人状态显示“陷阱” | 完整 DOT/陷阱系统延伸到 R4 |
 
 > 每完成一项，需在表格“状态”列更新为 ✅ 并补充实测步骤，保证 Phase2.2 仍旧是唯一信息源。
@@ -133,24 +133,33 @@
 | **IMMUNE_ONCE** | `YasuoW` | 风之墙 | 无 | 打出卡牌 | 获得免疫状态。结束回合，敌人攻击时伤害为 0，显示 "IMMUNE"。 | 防御+12未生效，免疫效果生效 |
 | **DOUBLE_IF_ATTACKED** | `YasuoE` | 疾风步 | 本回合已攻击 | 打出卡牌 | 伤害翻倍（需先打出一张攻击牌）。 | √ 记录当回合攻击计数，若之前已打出攻击牌则本次伤害×2。 |
 | **SCALE_BY_CRIT** | `YasuoR` | 狂风绝息斩 | 本回合暴击过 | 打出卡牌 | 造成多次伤害，次数等于本回合暴击次数。 | √ 先用斩钢闪打出 2 次暴击后立刻释放，面板伤害自动按 `critCount` 倍数结算，飘字出现 2 段并同步清零计数。 |
-| **SELF_BLOCK** | `SonaQ` | 英勇赞美诗 | 无 | 打出卡牌 | 造成伤害的同时，自身获得护甲。 |  |
-| **DRAW_MANA** | `SonaE` | 迅捷奏鸣曲 | 无 | 打出卡牌 | 抽牌并获得临时法力（法力值增加）。 |  |
+| **SELF_BLOCK** | `SonaQ` | 英勇赞美诗 | 无 | 打出卡牌 | 造成伤害的同时，自身获得护甲。 | ⛔ 实际只造成伤害，未额外获得 3 护甲；需在攻击结算后追加 `blockGain`。 |
+| **DRAW_MANA** | `SonaE` | 迅捷奏鸣曲 | 无 | 打出卡牌 | 抽牌并获得临时法力（法力值增加）。 | ⚠️ 目前固定只抽 1 张牌，仍可获得 `effectValue` 点法力；待修正为抽 2 张。 |
 | **PER_CARD_BONUS** | `SonaR` | 终乐章 | 本回合多出牌 | 打出卡牌 | 伤害随本回合已打出卡牌数量增加。 | √ 读取当前牌序，之前每出一张牌会额外+2 伤害。 |
-| **RETRO_BONUS** | `EkkoQ` | 时间折刃 | 上回合攻击过 | 打出卡牌 | 若上回合对该敌人造成过伤害，本卡伤害增加。 |  |
+| **RETRO_BONUS** | `EkkoQ` | 时间折刃 | 上回合攻击过 | 打出卡牌 | 若上回合对该敌人造成过伤害，本卡伤害增加。 | √ `dealtDamageLastTurn` state 已接入；测试：上一回合造成伤害，此回合释放 Q 观察额外 +X。 |
 | **REFLECT_IF_HIT** | `EkkoW` | 时光护盾 | 无 | 打出卡牌 | 获得状态。敌人攻击时，受到反弹伤害。 | √ 激活后 HUD 显示反伤，敌人每次命中都会看到 “REFLECT” 飘字并扣血。 |
-| **NEXT_COST_REDUCE** | `EkkoE` | 相位俯冲 | 手有攻击牌 | 打出卡牌 | 手牌中下一张攻击牌的费用 -1。 |  |
+| **NEXT_COST_REDUCE** | `EkkoE` | 相位俯冲 | 手有攻击牌 | 打出卡牌 | 手牌中下一张攻击牌的费用 -1。 | ⛔ `cardEffectHandler` 虽写入 `nextCostReduce`，但战斗端未消费该字段；功能未生效。 |
 | **HEAL_AND_DAMAGE** | `EkkoR` | 时空逆转 | 玩家掉血 | 打出卡牌 | 恢复生命值，同时对敌人造成伤害。 | √ 先回复20HP，再对敌人造成同等伤害（受护盾减免），飘字为 “SKILL 20”。 |
 | **LIFELINK** | `SylasW` | 吸取之斩 | 玩家掉血 | 打出卡牌 | 造成伤害的同时，恢复等量（或固定量）生命值。 | √ 打出吸取之斩后按实际命中数值回满（受易伤等加成），HUD 可见吸血生效。 |
-| **NEXT_ATTACK_DOUBLE** | `SylasE` | 叛乱突袭 | 无 | 打出卡牌 | 获得状态。下一张攻击牌造成的伤害翻倍。 |  |
-| **COPY_ENEMY_ACTION** | `SylasR` | 夺魂 | 敌人意图攻击 | 打出卡牌 | 施放敌人即将进行的攻击（对敌人造成伤害）。 |  |
-| **SELF_DAMAGE** | `UrgotE` | 超限驱动 | 无 | 打出卡牌 | 对敌人造成伤害，同时自己扣除少量生命值。 |  |
+| **NEXT_ATTACK_DOUBLE** | `SylasE` | 叛乱突袭 | 无 | 打出卡牌 | 获得状态。下一张攻击牌造成的伤害翻倍。 | √ `nextAttackDouble` 状态已接入，下一张攻击自动×2 并清空状态。 |
+| **COPY_ENEMY_ACTION** | `SylasR` | 夺魂 | 敌人意图攻击 | 打出卡牌 | 施放敌人即将进行的攻击（对敌人造成伤害）。 | √ GM 让敌人宣告 12×2 攻击，塞拉斯 R 立刻劫持并造成 `HIJACK ×2`（每次 6 伤）；若敌人计划上 BUFF/DEBUFF 则镜像施加到我方/敌方。 |
+| **SELF_DAMAGE** | `UrgotE` | 超限驱动 | 无 | 打出卡牌 | 对敌人造成伤害，同时自己扣除少量生命值。 | √ 先造成伤害，再按 `effectValue` 扣除自身 HP（保留 1 点最低值）。 |
 | **LOW_HP_EXECUTE** | `UrgotR` | 处刑索命 | 敌人HP<30% | 打出卡牌 | 直接消灭敌人（显示巨额伤害或直接致死）。 | √ 低于 30% 最大生命触发斩杀，直接清空护甲与 HP。 |
 | **BUFF_NEXT_SKILL** | `ViktorQ` | 能量转导 | 手有技能牌 | 打出卡牌 | 下一张技能牌的数值（伤害或护甲）增加。 | √ HUD 显示 “下一击 +2”，仅对下一张技能生效（伤害或护甲皆可），用完即清零。 |
 | **BONUS_IF_VULN** | `ViktorE` | 光束 | 敌人易伤 | 打出卡牌 | 若敌人有易伤，造成额外伤害。 | √ 易伤状态下追加 `effectValue`（默认 +4）伤害。 |
-| **DRAW_ON_USE** | `ViktorR` | 进化歧路 | 无 | 打出卡牌 | 造成伤害并抽牌。 |  |
-| **REMOVE_BUFF** | `LeeR` | 猛龙摆尾 | 敌人有Buff | 打出卡牌 | 造成伤害并移除敌人一个增益状态（如力量、格挡）。 |  |
+| **DRAW_ON_USE** | `ViktorR` | 进化歧路 | 无 | 打出卡牌 | 造成伤害并抽牌。 | √ R 打出后立即抽 1，配合 GM 牌组可观察手牌+1 动画。 |
+| **REMOVE_BUFF** | `LeeR` | 猛龙摆尾 | 敌人有Buff | 打出卡牌 | 造成伤害并移除敌人一个增益状态（如力量、格挡）。 | √ 先剥离增益（力量/反伤/回蓝），若仍有次数则直接摧毁当前护盾并飘 “DISPEL”。 |
 | **STUN_IF_WEAK** | `VayneE` | 墙角突袭 | 敌人虚弱 | 打出卡牌 | 若敌人虚弱，使其眩晕。否则只造成伤害。 | √（还有6点基础伤害） |
-| **DEATHMARK** | `ZedR` | 死亡印记 | 无 | 打出卡牌 | 施加印记。几回合后印记爆发，造成期间受到伤害总和的百分比伤害。 |  |
+| **DEATHMARK** | `ZedR` | 死亡印记 | 无 | 打出卡牌 | 施加印记。几回合后印记爆发，造成期间受到伤害总和的百分比伤害。 | √ `deathMarkDamage` 累积 + 倒计时触发，HUD 可见 “MARK” 飘字并在清零回合爆发。 |
+
+### 🧪 待测试英雄技能（2025-12-02）
+
+1. **亚索 W《风之墙》** (`IMMUNE_ONCE`)：免伤正常，但卡牌描述附带的 +12 护甲仍未写入。验证点：出牌后确认是否获得护甲；若没有则记录为缺陷。
+2. **娑娜 Q《英勇赞美诗》** (`SELF_BLOCK`)：当前只造成 8 点伤害，没有获得 3 点护甲。验证点：战斗日志与 HUD 是否出现护甲增加。
+3. **娑娜 E《迅捷奏鸣曲》** (`DRAW_MANA`)：只能抽 1 张牌，需确认目标行为是 “抽 2 + 回蓝”。验证点：出牌后手牌增加数量、法力是否 +effectValue。
+4. **艾克 E《相位俯冲》** (`NEXT_COST_REDUCE`)：`nextCostReduce` 没有在前端消费，下一张攻击仍按原费用。验证点：出牌后检查手牌中攻击牌费用是否 -1。
+
+> 以上条目为当前唯一仍需 QA / 修复的 Batch 2 技能；其余效果已在表格中记录测试结论，可按常规回归。
 
 ---
 
@@ -208,10 +217,10 @@
 | **WEAK_VULN** | `NasusW` | 腐化咒 | 无 | 打出卡牌 | 敌人同时获得虚弱和易伤。 |  |
 | **KILL_REWARD** | `IreliaQ` | 利刃冲击 | 击杀敌人 | 打出卡牌 | 击杀后，返还法力并抽牌。 |  |
 | **REFLECT_BUFF** | `IreliaW` | 反击之舞 | 无 | 打出卡牌 | 获得反击状态。受击后下一次攻击加成。 |  |
-| **ALL_ATTACKS_BONUS** | `IreliaR` | 先锋突袭 | 无 | 打出卡牌 | 获得状态：本回合所有攻击伤害增加。 |  |
-| **DRAW_ON_HIT** | `KatarinaW` | 迅刃突袭 | 无 | 打出卡牌 | 造成伤害并抽牌。 |  |
+| **ALL_ATTACKS_BONUS** | `IreliaR` | 先锋突袭 | 无 | 打出卡牌 | 获得状态：本回合所有攻击伤害增加。 | √ R 本身维持原伤，之后每张攻击牌额外 +2，HUD 显示“全攻 +2”。 |
+| **DRAW_ON_HIT** | `KatarinaW` | 迅刃突袭 | 无 | 打出卡牌 | 造成伤害并抽牌。 | √ 命中后立即抽 1；若与 R 连携，首段命中即可触发抽牌。 |
 | **COMBO_BONUS** | `KatarinaE` | 蛇步闪击 | 本回合已伤害 | 打出卡牌 | 若本回合已造成过伤害，本卡伤害增加。 |  |
-| **MULTI_STRIKE_SEGMENTS** | `KatarinaR` | 死亡莲华 | 无 | 打出卡牌 | 造成多段伤害（如 5 段），每段独立计算护甲。 |  |
+| **MULTI_STRIKE_SEGMENTS** | `KatarinaR` | 死亡莲华 | 无 | 打出卡牌 | 造成多段伤害（如 5 段），每段独立计算护甲。 | √ 5 段 6 伤逐段播放，支持暴击/反伤/抽牌，敌人护甲按段消耗。 |
 
 ---
 
@@ -312,7 +321,7 @@
 | **BUFF_NEXT_SKILL** | ViktorQ | 下张技能牌加成 | 添加 `nextSkillBonus` state | P1 |
 | **LIFELINK** | SylasW | 造成伤害的同时回血 | 获取伤害值并回血 | P1 |
 | **REFLECT_IF_HIT** | EkkoW | 受击反弹伤害 | 在 `enemyAction` 中检测并反伤 | P1 |
-| **COPY_ENEMY_ACTION** | SylasR | 复制敌人攻击 | 读取 `nextEnemyAction` 并造成一半伤害 | P2 |
+| **COPY_ENEMY_ACTION** | SylasR | 复制敌人攻击 | 读取 `nextEnemyAction` 并造成一半伤害 | ✅ |
 
 > Phase2.1 的 `YasuoE / SonaR / ViktorE / UrgotR` 已于 2025-12-01 验证完成，故不再列在此表。
 
@@ -332,8 +341,8 @@
 | **DRAW_MANA** | SonaE | ✅ cardEffectHandler已处理 | 低 |
 | **HEAL_AND_DAMAGE** | EkkoR | ✅ cardEffectHandler已处理 | 低 |
 | **SELF_DAMAGE** | UrgotE | ✅ cardEffectHandler已处理 | 低 |
-| **DRAW_ON_USE** | ViktorR | ✅ cardEffectHandler已处理 | 低 |
-| **REMOVE_BUFF** | LeeR | ⚠️ 未测试 | 中 |
+| **DRAW_ON_USE** | ViktorR | ✅ cardEffectHandler已处理（前端集成完成） | 低 |
+| **REMOVE_BUFF** | LeeR | ✅ 新增 `removeEnemyBuffs()` 并接入战斗流程 | 中 |
 
 #### 类别 E: 复杂交互 (建议延后)
 
