@@ -538,7 +538,12 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
                 setKatarinaAttackCount(0); // 重置计数器
             }
 
-            const shouldBleedExecute = effectUpdates.bleedExecute && (currentEnemyStatus.bleed || 0) >= effectUpdates.bleedExecute;
+            const currentBleedStacks = typeof effectUpdates.bleedExecute === 'number'
+                ? currentEnemyStatus.bleed || 0
+                : 0;
+            const shouldBleedExecute =
+                effectUpdates.bleedExecute &&
+                currentBleedStacks >= effectUpdates.bleedExecute;
             const shouldExecute = effectUpdates.executeThreshold && (enemyHp <= enemyConfig.maxHp * (effectUpdates.executeThreshold / 100));
 
             const lifelinkValue = effectUpdates.lifelinkAmount || 0;

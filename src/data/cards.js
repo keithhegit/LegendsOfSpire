@@ -77,7 +77,7 @@ export const CARD_DATABASE = {
   DariusQ: { id: 'DariusQ', name: '大杀四方', type: 'ATTACK', cost: 1, value: 6, rarity: 'COMMON', hero: 'Darius', target: 'single', effect: 'BLEED', effectValue: 2, description: '造成7点伤害并施加2层流血。', img: `${SPELL_URL}/DariusCleave.png`, price: 50 },
   DariusW: { id: 'DariusW', name: '致残打击', type: 'ATTACK', cost: 1, value: 5, rarity: 'UNCOMMON', hero: 'Darius', target: 'single', effect: 'VULNERABLE', effectValue: 1, description: '造成5点伤害并给予目标1层易伤；本回合你的下一次攻击+3伤害。', img: `${SPELL_URL}/DariusNoxianTacticsONH.png`, price: 80 },
   DariusE: { id: 'DariusE', name: '无情铁手', type: 'SKILL', cost: 2, value: 0, rarity: 'UNCOMMON', hero: 'Darius', target: 'single', effect: 'BLEED_VULN', effectValue: 3, description: '对目标施加3层流血并1层虚弱。', img: `${SPELL_URL}/DariusAxeGrabCone.png`, price: 100 },
-  DariusR: { id: 'DariusR', name: '诺克萨斯断头台', type: 'ATTACK', cost: 3, value: 18, rarity: 'RARE', hero: 'Darius', target: 'single', effect: 'BLEED_EXECUTE', effectValue: 2, description: '对目标造成 20 + (流血层数×2) 伤害；若击杀则此卡本局费用变为0。', img: `${SPELL_URL}/DariusExecute.png`, price: 150 },
+  DariusR: { id: 'DariusR', name: '诺克萨斯断头台', type: 'ATTACK', cost: 3, value: 18, rarity: 'RARE', hero: 'Darius', target: 'single', effect: 'BLEED_EXECUTE', effectValue: 5, description: '对目标造成18点伤害；若目标流血层数 ≥5，则直接处决并无视护盾。', img: `${SPELL_URL}/DariusExecute.png`, price: 150 },
 
   // Lux
   LuxQ: { id: 'LuxQ', name: '光之束缚', type: 'ATTACK', cost: 1, value: 8, rarity: 'COMMON', hero: 'Lux', target: 'single', effect: 'VULNERABLE', effectValue: 1, description: '对单体造成9点伤害并施加1层易伤。', img: `${SPELL_URL}/LuxLightBinding.png`, price: 50 },
