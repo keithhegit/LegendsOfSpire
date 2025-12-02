@@ -53,7 +53,8 @@ const SFX = {
     ATTACK_SWING: `${SFX_NEW_URL}/attack_swing.mp3`,
     ATTACK_HIT: `${SFX_NEW_URL}/attack_hit.mp3`,
     BLOCK_SHIELD: `${SFX_NEW_URL}/block_shield.mp3`,
-    HIT_TAKEN: `${SFX_NEW_URL}/hit_taken.mp3`
+    HIT_TAKEN: `${SFX_NEW_URL}/hit_taken.mp3`,
+    HEAL: `${SFX_NEW_URL}/heal-rpg.wav`
 };
 
 const STARTING_DECK_BASIC = ["Strike", "Strike", "Strike", "Strike", "Defend", "Defend", "Defend", "Defend"];
@@ -1023,6 +1024,11 @@ export default function LegendsOfTheSpire() {
             console.log('[卡牌大师] 获得额外金币: +15'); // 调试日志
             setGold(prev => prev + 15);
             showToast('灌铅骰子: +15 金币', 'gold');
+        }
+
+        if (result.winGoldBonus > 0) {
+            setGold(prev => prev + result.winGoldBonus);
+            showToast(`荣誉奖章: +${result.winGoldBonus} 金币`, 'gold');
         }
 
         setCurrentHp(Math.min(maxHp + (result.gainedMaxHp || 0), result.finalHp + passiveHeal));

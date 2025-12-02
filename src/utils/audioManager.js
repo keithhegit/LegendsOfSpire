@@ -19,6 +19,7 @@ const SFX_URLS = {
   BLOCK_SHIELD: `${SFX_NEW_URL}/block_shield.mp3`, // 格挡护盾音效
   HIT_TAKEN: `${SFX_NEW_URL}/hit_taken.mp3`, // 受击音效
   CRIT_HIT: `${SFX_NEW_URL}/heavy_punch2.mp3`, // 暴击专属音效
+  HEAL: `${SFX_NEW_URL}/heal-rpg.wav`, // 治疗HUD音效
 };
 
 export const playSfx = (type) => {
@@ -35,6 +36,8 @@ export const playSfx = (type) => {
     audio.volume = 0.4; // 格挡音效
   } else if (type === 'HIT_TAKEN') {
     audio.volume = 0.6; // 受击音效更明显
+  } else if (type === 'HEAL') {
+    audio.volume = 0.45;
   } else {
     audio.volume = 0.4; // 默认音量
   }

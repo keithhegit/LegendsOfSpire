@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { FlaskConical, X, RefreshCw, Trash2, Wand2 } from 'lucide-react';
 
@@ -18,6 +18,7 @@ const GMPanel = ({
     const [forceInput, setForceInput] = useState((gmConfig.forceTopCards || []).join('\n'));
     const [extraInvalid, setExtraInvalid] = useState([]);
     const [forceInvalid, setForceInvalid] = useState([]);
+    const [searchQuery, setSearchQuery] = useState('');
 
     useEffect(() => {
         setExtraInput((gmConfig.extraCards || []).join('\n'));
@@ -54,6 +55,19 @@ const GMPanel = ({
             return { ...prev, forceTopCards: [...list, cardId] };
         });
     };
+
+    const normalizedQuery = searchQuery.trim().toLowerCase();
+    const searchResults = useMemo(() => {
+        const cards = Object.values(cardDatabase);
+        if (!normalizedQuery) return cards;
+        return cards.filter(card => {
+            const hero = card.hero?.toLowerCase() || '';
+            const name = card.name?.toLowerCase() || '';
+            const id = card.id?.toLowerCase() || '';
+            return id.includes(normalizedQuery) || name.includes(normalizedQuery) || hero.includes(normalizedQuery);
+        });
+    }, [cardDatabase, normalizedQuery]);
+    const limitedSearch = searchResults.slice(0, 60);
 
     const renderRSkillButtons = (target) => (
         <div className="flex flex-wrap gap-2 mt-2 max-h-32 overflow-y-auto">
@@ -184,6 +198,69 @@ const GMPanel = ({
                             )}
                             {renderRSkillButtons('force')}
                         </div>
+                    </section>
+
+                    <section className="bg-slate-900/80 border border-slate-700 rounded-xl p-4 space-y-3">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h4 className="text-sm text-white tracking-widest">卡牌库调试</h4>
+                                <p className="text-xs text-slate-400">搜索或浏览任意卡牌并一键加入额外注入 / 起手列表。</p>
+                            </div>
+                            <button
+                                onClick={() => setSearchQuery('')}
+                                className="text-xs text-slate-300 hover:text-white flex items-center gap-1"
+                                aria-label="清除搜索"
+                            >
+                                清空
+                            </button>
+                        </div>
+                        <input
+                            type="text"
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            placeholder="输入卡牌 ID、名称或英雄"
+                            aria-label="卡牌检索"
+                            className="w-full rounded border border-slate-700 bg-slate-950 px-3 py-2 text-sm text-white focus:ring-emerald-400/40 focus:border-emerald-400"
+                        />
+                        <div className="max-h-64 overflow-y-auto divide-y divide-slate-800">
+                            {limitedSearch.map(card => {
+                                const isExtra = gmConfig.extraCards.includes(card.id);
+                                const isForce = gmConfig.forceTopCards.includes(card.id);
+                                return (
+                                    <div key={card.id} className="flex flex-col gap-1 py-2">
+                                        <div className="flex items-center justify-between">
+                                            <div>
+                                                <p className="text-[11px] uppercase tracking-[0.3em] text-slate-400">{card.id}</p>
+                                                <p className="text-sm text-white">{card.name}</p>
+                                                <p className="text-xs text-slate-500">{card.hero} · {card.rarity} · {card.type}</p>
+                                            </div>
+                                            <div className="flex gap-1">
+                                                <button
+                                                    aria-label={`注入 ${card.name}`}
+                                                    onClick={() => handleAddCard(card.id, 'extra')}
+                                                    className={`px-2 py-1 text-[11px] rounded border ${isExtra ? 'border-emerald-400/60 text-emerald-200' : 'border-white/30 text-white hover:border-emerald-400 hover:text-emerald-200'} transition`}
+                                                >
+                                                    注入
+                                                </button>
+                                                <button
+                                                    aria-label={`设置 ${card.name} 起手`}
+                                                    onClick={() => handleAddCard(card.id, 'force')}
+                                                    className={`px-2 py-1 text-[11px] rounded border ${isForce ? 'border-sky-400/60 text-sky-200' : 'border-white/30 text-white hover:border-sky-400 hover:text-sky-200'} transition`}
+                                                >
+                                                    起手
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                            {limitedSearch.length === 0 && (
+                                <p className="text-xs text-slate-500 italic py-2">无匹配结果，尝试其他关键词。</p>
+                            )}
+                        </div>
+                        <p className="text-xs text-slate-500">
+                            展示 {Math.min(limitedSearch.length, 60)} / {searchResults.length} 条结果 (最多 60 条)。
+                        </p>
                     </section>
 
                     <section className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -4,7 +4,7 @@
 > **类型**: Roguelike 卡牌游戏  
 > **平台**: Web (桌面 + 移动端)  
 > **当前版本**: v0.9.1 (Beta)
-> **最后更新**: 2025-11-26
+> **最后更新**: 2025-12-02
 
 ---
 
@@ -515,11 +515,22 @@ v0.1.0 (Alpha) → v0.5.0 (Beta) → v0.7.5 → v0.8.0 → v0.9.1 (开发中)
 - ✨ **Cloudflare D1 认证**：为登录/注册引入 `functions/api/auth/{login,register}.js`、`functions/utils/crypto.js`、`src/services/authService.js`，通过 Pages Functions 操作 D1、执行 PBKDF2+SHA-256 加密、把 `user` 写入/读出 `localStorage`。
 - 💻 **前端账号联动**：`LoginView` 和 `HeroSelectView` 共享用户上下文，登录后自动恢复英雄、地图、卡组状态；地图页面增加用户面板、登出、重置进度入口。
 - 🛰️ **地图保护**：地图视图判断死胡同后弹出重启提示，Reset Progress 会清除当前地图并重新选人，防止旧进度卡死且保留老用户登录后继续 ACT 的流程。
+- ⚔️ **R 技能 Phase 2.2-2.4 集成**：`BattleScene.jsx` 新增 `executeCopiedEnemyAction()`、`removeEnemyBuffs()`、多段结算与流血处决逻辑，完成塞拉斯 R 劫持敌人行动、李青 R 驱散增益、维克托 R 出牌即抽、艾瑞莉娅 R 全攻加成、德莱厄斯 R 流血处决与卡特琳娜 R 五段分段伤害等修复，详情记录在 `new/card_balance/effect_test_plan1201.md`。
 - 🗂️ **账号存档隔离**：`SAVE_KEY_${account}` 格式的多存档机制，登录即尝试读取该账号的存档，无存档则进入选人页；新增 `RESET PROGRESS` 按钮与“死胡同”弹层，均会明确提示重置后需重新选人。
 - 🧭 **死胡同体验**：`hasAvailableNeighbors` 会同步锁定状态、弹出“重新生成地图 or 稍后”浮层，点击“重新生成”会调用新版 `generateGridMap` 并清空 `lockedChoices`，确保 Act 3 也能就地再刷一次地图。
 - 👤 **浮动用户面板**：徽章整体左移，避免挡到右上角功能；地图页右上角在登录状态下显示风险提示面板，告诉玩家重置后会清空当前进度。
 
 **详细日志**：与这套流程关联的文档有 `new/backend_plan/注册登陆流程开发计划：后端注入 (The Backend Injection).md` 和 `new/Fixing Map Dead-End Issue.md`。
+
+#### 2025-12-02 - R 技能 & 经济系统 QA 修复
+
+- ⚔️ **DariusR 处决阈值**：`BLEED_EXECUTE` 现在在敌人流血 ≥4 层时立即清空 HP/护甲并飘出 “BLEED EXECUTE!” HUD，方便 GM 测试。
+- 🔋 **Neutral_016 法力石碎片**：若打出时手牌（含本牌）≤3，立刻抽 1 并返还 1 法力，改由 `cardEffectHandler` + `BattleScene` 判定手牌数量。
+- 🛡️ **EkkoW 时光护盾**：卡牌数据补充 `block:10`，施放瞬间就能获得护甲，同时保留原有 `REFLECT_IF_HIT` 反伤状态，组合 `EkkoEW` 时更稳。
+- 💰 **Neutral_019 荣誉奖章**：`WIN_GOLD_BONUS` 写入 `playerStatus.winGoldBonus` 并在 `handleBattleWin` 结算额外 +10 金币，Toast 显示收益，支持多次叠加。
+- 📄 **文档同步**：`new/card_balance/effect_test_plan1201.md` 更新 Batch 2/3 结果表，`PROJECT_DOCUMENTATION.md` 记录本轮修复。
+- 💚 **HP 飘字提示 + 音效**：所有回血 / 生命偷取事件现在都会在战斗 HUD 弹出绿色 “HEAL/LIFE +X” 提示并播放治疗音效，方便确认具体加血值。
+- 🔎 **GM 卡牌库搜索**：GM 控制台新增卡牌库面板，可按 ID/名称/英雄模糊搜索任意卡牌并一键注入或设为起手，调试范围覆盖全卡库。
 
 ---
 

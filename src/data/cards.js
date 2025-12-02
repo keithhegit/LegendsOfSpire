@@ -77,7 +77,7 @@ export const CARD_DATABASE = {
   DariusQ: { id: 'DariusQ', name: '大杀四方', type: 'ATTACK', cost: 1, value: 6, rarity: 'COMMON', hero: 'Darius', target: 'single', effect: 'BLEED', effectValue: 2, description: '造成7点伤害并施加2层流血。', img: `${SPELL_URL}/DariusCleave.png`, price: 50 },
   DariusW: { id: 'DariusW', name: '致残打击', type: 'ATTACK', cost: 1, value: 5, rarity: 'UNCOMMON', hero: 'Darius', target: 'single', effect: 'VULNERABLE', effectValue: 1, description: '造成5点伤害并给予目标1层易伤；本回合你的下一次攻击+3伤害。', img: `${SPELL_URL}/DariusNoxianTacticsONH.png`, price: 80 },
   DariusE: { id: 'DariusE', name: '无情铁手', type: 'SKILL', cost: 2, value: 0, rarity: 'UNCOMMON', hero: 'Darius', target: 'single', effect: 'BLEED_VULN', effectValue: 3, description: '对目标施加3层流血并1层虚弱。', img: `${SPELL_URL}/DariusAxeGrabCone.png`, price: 100 },
-  DariusR: { id: 'DariusR', name: '诺克萨斯断头台', type: 'ATTACK', cost: 3, value: 18, rarity: 'RARE', hero: 'Darius', target: 'single', effect: 'BLEED_EXECUTE', effectValue: 2, description: '对目标造成 20 + (流血层数×2) 伤害；若击杀则此卡本局费用变为0。', img: `${SPELL_URL}/DariusExecute.png`, price: 150 },
+  DariusR: { id: 'DariusR', name: '诺克萨斯断头台', type: 'ATTACK', cost: 3, value: 18, rarity: 'RARE', hero: 'Darius', target: 'single', effect: 'BLEED_EXECUTE', effectValue: 4, description: '对目标造成18点伤害；若目标流血层数 ≥4，则直接处决并无视护盾。', img: `${SPELL_URL}/DariusExecute.png`, price: 150 },
 
   // Lux
   LuxQ: { id: 'LuxQ', name: '光之束缚', type: 'ATTACK', cost: 1, value: 8, rarity: 'COMMON', hero: 'Lux', target: 'single', effect: 'VULNERABLE', effectValue: 1, description: '对单体造成9点伤害并施加1层易伤。', img: `${SPELL_URL}/LuxLightBinding.png`, price: 50 },
@@ -95,7 +95,7 @@ export const CARD_DATABASE = {
   YasuoQ: { id: 'YasuoQ', name: '斩钢闪', type: 'ATTACK', cost: 1, value: 7, rarity: 'COMMON', hero: 'Yasuo', target: 'single', effect: 'CRIT_CHANCE', effectValue: 10, description: '对单体造成7点伤害；暴击率受力量影响。', img: `${SPELL_URL}/YasuoQ1Wrapper.png`, price: 50 },
   YasuoW: { id: 'YasuoW', name: '风之墙', type: 'SKILL', cost: 1, block: 4, rarity: 'UNCOMMON', hero: 'Yasuo', target: 'self', effect: 'IMMUNE_ONCE', effectValue: 1, description: '获得4护甲并免疫一次伤害（本回合）。', img: `${SPELL_URL}/YasuoW.png`, price: 80 },
   YasuoE: { id: 'YasuoE', name: '疾风步', type: 'ATTACK', cost: 0, value: 4, rarity: 'UNCOMMON', hero: 'Yasuo', target: 'single', effect: 'DOUBLE_IF_ATTACKED', effectValue: 0, description: '造成4点伤害；若本回合已打出攻击则伤害翻倍。', img: `${SPELL_URL}/YasuoE.png`, price: 60 },
-  YasuoR: { id: 'YasuoR', name: '狂风绝息斩', type: 'ATTACK', cost: 3, value: 6, rarity: 'RARE', hero: 'Yasuo', target: 'single', effect: 'SCALE_BY_CRIT', effectValue: 6, description: '对目标造成 6×（本回合暴击次数） 伤害。', img: `${SPELL_URL}/YasuoR.png`, price: 150 },
+  YasuoR: { id: 'YasuoR', name: '狂风绝息斩', type: 'ATTACK', cost: 3, value: 10, rarity: 'RARE', hero: 'Yasuo', target: 'single', effect: 'TRIPLE_HIT', effectValue: 10, effect2: 'CRIT_CHANCE', effectValue2: 10, description: '连续3次造成10点伤害（总30伤），并在本回合临时获得10%暴击率。', img: `${SPELL_URL}/YasuoR.png`, price: 150 },
 
   // Sona
   SonaQ: { id: 'SonaQ', name: '英勇赞美诗', type: 'ATTACK', cost: 1, value: 8, rarity: 'COMMON', hero: 'Sona', target: 'single', effect: 'SELF_BLOCK', effectValue: 3, description: '对单体造成8点伤害，同时自身获得3点护甲。', img: `${SPELL_URL}/SonaQ.png`, price: 50 },
@@ -105,7 +105,7 @@ export const CARD_DATABASE = {
 
   // Ekko
   EkkoQ: { id: 'EkkoQ', name: '时间折刃', type: 'ATTACK', cost: 1, value: 8, rarity: 'COMMON', hero: 'Ekko', target: 'single', effect: 'RETRO_BONUS', effectValue: 6, description: '对目标造成8伤；若目标在上回合已受你伤害则额外+6伤害。', img: `${SPELL_URL}/EkkoQ.png`, price: 50 },
-  EkkoW: { id: 'EkkoW', name: '时光护盾', type: 'SKILL', cost: 1, value: 10, rarity: 'UNCOMMON', hero: 'Ekko', target: 'self', effect: 'REFLECT_IF_HIT', effectValue: 6, description: '获得10护甲；若下回合被攻击则反弹6伤害给攻击者。', img: `${SPELL_URL}/EkkoW.png`, price: 80 },
+  EkkoW: { id: 'EkkoW', name: '时光护盾', type: 'SKILL', cost: 1, value: 10, block: 10, rarity: 'UNCOMMON', hero: 'Ekko', target: 'self', effect: 'REFLECT_IF_HIT', effectValue: 6, description: '获得10护甲；若下回合被攻击则反弹6伤害给攻击者。', img: `${SPELL_URL}/EkkoW.png`, price: 80 },
   EkkoE: { id: 'EkkoE', name: '相位俯冲', type: 'ATTACK', cost: 1, value: 8, rarity: 'UNCOMMON', hero: 'Ekko', target: 'single', effect: 'NEXT_COST_REDUCE', effectValue: 1, description: '对目标造成8伤；本回合下一张攻击卡费用-1。', img: `${SPELL_URL}/EkkoE.png`, price: 100 },
   EkkoR: { id: 'EkkoR', name: '时空逆转', type: 'SKILL', cost: 3, value: 20, rarity: 'RARE', hero: 'Ekko', target: 'single', effect: 'HEAL_AND_DAMAGE', effectValue: 20, description: '恢复20生命，同时对单体造成20伤害（交换效果）。', img: `${SPELL_URL}/EkkoR.png`, price: 150 },
 
@@ -2463,7 +2463,7 @@ export const CARD_DATABASE = {
     value: 0,
     rarity: 'RARE',
     effect: 'LOSE_HP_GAIN_MANA',
-    effectValue: 1,
+    effectValue: 4,
     description: '失去4点生命，获得1点法力。',
     price: 70
   },
