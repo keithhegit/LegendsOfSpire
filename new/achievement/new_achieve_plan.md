@@ -185,6 +185,70 @@ export const ACHIEVEMENTS = [
 
 > 表格按分类展开，涵盖 40+ 项成就。前三条（ACH_001/005/019）已和 S1 路径打通，后续依照状态更新 ✅/🟡/🔄 以便 QA、策划追踪。
 
+### 4.3 当前已实装成就（48 项）
+
+> 以下内容同步自 `src/data/achievements.js`，代表目前客户端与服务端同时接入、可实时解锁的成就。所有条目均已写入 Tracker 与奖励管线，可直接用于 QA/运营验收。
+
+#### 战斗 / Boss / 机制（ACH_001–ACH_025）
+| ID | 名称 | 触发说明 | 奖励 |
+|----|------|----------|------|
+| ACH_001 | Shrug It Off | 战斗胜利且 HP ≤10 | 卡牌 ToughBandages |
+| ACH_002 | Purity | 手牌+牌库+弃牌总数 ≤3 | 遗物 PurityRing |
+| ACH_003 | Come At Me | 不出攻击牌获胜 | 模式 PureSkillMode |
+| ACH_004 | The Pact | 单场耗尽 ≥20 张牌 | 卡牌 ExhaustPact |
+| ACH_005 | Adrenaline | 单回合法力峰值 ≥4 | 遗物 AdrenalineOrb |
+| ACH_006 | Powerful | 战斗中 Buff 层数 ≥10 | 卡牌 PowerSurge |
+| ACH_007 | Jaxxed | Ironclad 力量 ≥50 | 遗物 JaxxsBarbell |
+| ACH_008 | Impervious | 战斗中格挡 ≥99 | 卡牌 ImperviousShell |
+| ACH_009 | Barricaded | 战斗中格挡 ≥999 | 模式 BarricadeChallenge |
+| ACH_010 | Catalyst | 单敌中毒 ≥99 层 | 卡牌 CatalystVial |
+| ACH_011 | Plague | 单战毒杀 ≥3 敌 | 遗物 PlagueMask |
+| ACH_012 | Ninja | 单回合飞刀 ≥10 | 卡牌 MasterNinja |
+| ACH_013 | Infinity | 单回合出牌 ≥25 | 模式 InfinityLoop |
+| ACH_014 | Focused | Defect 专注 ≥25 | 遗物 FocusCore |
+| ACH_015 | Neon | Defect 单回合充能 ≥9 | 卡牌 NeonOverload |
+| ACH_016 | You Are Nothing | Turn1 击败 Boss | 遗物 Nothingness |
+| ACH_017 | Perfect | 不掉血击败 Boss | 模式 PerfectRun |
+| ACH_018 | Big Hitter | 单次伤害 ≥50 | 卡牌 MegaStrike |
+| ACH_019 | The Guardian | 击败 Act1 Boss（岩石守护者） | 卡牌 GuardianStrike |
+| ACH_020 | Level Up! | 任意机制升级至 Lv10 | 模式 ClanMastery |
+| ACH_021 | 10K Chips | 单回合总伤害 ≥10000 | 卡牌 ChipExplosion |
+| ACH_022 | Retrograde | 任意牌型等级 Lv10 | 遗物 LevelBooster |
+| ACH_023 | Lone Survivor | 仅领袖存活取胜 | 模式 SoloLeader |
+| ACH_024 | High Roller | 单次商店购买 ≥3 件遗物 | 奖励 GoldDrop |
+| ACH_025 | Desecration | 摧毁全部防御陷阱 | 卡牌 TrapBreaker |
+
+#### Meta / 收藏 / 挑战（ACH_038–ACH_093）
+| ID | 名称 | 触发说明 | 奖励 |
+|----|------|----------|------|
+| ACH_038 | Who Needs Relics? | 单遗物通关 | 模式 ReliclessBoost |
+| ACH_039 | Speed Climber | 20 分钟内通关 | 模式 SpeedRun |
+| ACH_040 | Common Sense | 全普通卡通关 | 模式 StandardDeckRun |
+| ACH_042 | Eternal One | 解锁全部成就 | 模式 GodMode |
+| ACH_057 | Clan Master: Strength | 力量机制 Lv10 | 卡牌 StrengthSurge |
+| ACH_058 | Clan Master: Poison | 毒机制 Lv10 | 遗物 PoisonClanRing |
+| ACH_059 | Clan Master: Focus | 专注机制 Lv10 | 模式 OrbMastery |
+| ACH_060 | Clan Master: Wrath | Wrath 机制 Lv10 | 奖励 WrathCycle |
+| ACH_077 | Card Collector | 解锁 50 张独特卡牌 | 卡牌 CollectorBonus |
+| ACH_078 | Relic Hoarder | 同一跑持有 20 遗物 | 奖励 ShopRelicBonus |
+| ACH_079 | All Cards | 解锁全部卡牌 | 模式 GodDeck |
+| ACH_090 | No Relics | 无遗物通关 | 遗物 RelicFreeBoost |
+| ACH_091 | Speed Climber++ | 10 分钟内通关 | 模式 UltraSpeed |
+| ACH_092 | Gold Stake | Asc20+ 全角色胜 | 模式 GoldStake |
+| ACH_093 | Joker Master | Joker 遗物全部金效 | 模式 JokerMode |
+
+#### 跑图 / Act / 进程（ACH_100–ACH_110）
+| ID | 名称 | 触发说明 | 奖励 |
+|----|------|----------|------|
+| ACH_100 | Merchant Enthusiast | 累计拜访商店 ≥10 次 | 遗物 LuckyCoin |
+| ACH_101 | Explorer | 累计踏足 25 个节点 | 遗物 MapFragment |
+| ACH_102 | Monster Slayer | 累计击杀普通敌人 ≥100 | 卡牌 KillingBlow |
+| ACH_103 | Act II Victor | 累计通关 Act 2 | 模式 Act2Challenge |
+| ACH_104 | Act III Victor | 累计通关 Act 3 | 模式 Act3Challenge |
+| ACH_105 | Treasure Hunter | 累计开启宝箱 ≥15 | 遗物 Chestfinder |
+| ACH_109 | Eventful Run | 单次跑完成所有事件节点 | 模式 EventMode |
+| ACH_110 | Ascender | Ascension ≥15 完成通关 | 模式 AscensionGlory |
+
 ---
 
 ## 5. 技术注意事项
