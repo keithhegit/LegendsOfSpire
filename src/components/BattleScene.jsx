@@ -94,6 +94,8 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
     const [lastPlayedCard, setLastPlayedCard] = useState(null); // 追踪最后打出的牌
     const [cardsPlayedCount, setCardsPlayedCount] = useState(0); // 本回合打出的卡牌数量
     const [attacksThisTurn, setAttacksThisTurn] = useState(0); // 本回合打出的攻击牌数量
+    const [turnDamageTotal, setTurnDamageTotal] = useState(0);
+    const [noAttackPlayed, setNoAttackPlayed] = useState(true);
     // Batch 2: 暴击系统
     const [critCount, setCritCount] = useState(0);
     // Batch 2: 伤害历史追踪
@@ -104,6 +106,8 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
 
     useEffect(() => {
         achievementTracker.startBattle();
+        achievementTracker.setBattleFlag('noAttackPlayed', true);
+        achievementTracker.recordBattleStat('cardsPlayedInTurn', 0, { setValue: 0 });
         return () => {
             achievementTracker.cancelBattle();
         };
@@ -232,6 +236,9 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
             }
             setDmgOverlay({ val: `${label} ${rawDamage}`, target: 'ENEMY' });
             setTimeout(() => setDmgOverlay(null), 400);
+            achievementTracker.recordTurnDamage(rawDamage);
+            achievementTracker.recordSingleHit(rawDamage);
+            setTurnDamageTotal(prev => prev + rawDamage);
             return prevBlock - blockAbsorb;
         });
     };
@@ -246,6 +253,10 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
         setCardsPlayedCount(0); // 重置卡牌计数
         setAttacksThisTurn(0); // 重置攻击计数
         setCritCount(0); // Batch 2: 重置暴击计数
+        setTurnDamageTotal(0);
+        setNoAttackPlayed(true);
+        achievementTracker.recordBattleStat('cardsPlayedInTurn', 0, { setValue: 0 });
+        achievementTracker.setBattleFlag('noAttackPlayed', true);
         setPlayerStatus(prev => ({
             ...prev,
             critChance: 0,
@@ -344,6 +355,9 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
         // 记录最后打出的牌（用于内瑟斯/艾瑞莉娅被动）
         setLastPlayedCard(card);
         setCardsPlayedCount(prev => prev + 1);
+        const nextCardsPlayed = cardsPlayedBefore + 1;
+        achievementTracker.recordBattleStat('cardsPlayed', 1);
+        achievementTracker.recordBattleStat('cardsPlayedInTurn', nextCardsPlayed, { setValue: nextCardsPlayed });
 
         // 处理卡牌效果
         const effectUpdates = applyCardEffects(card, {
@@ -719,11 +733,19 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
                 blockGain += skillBonusPool;
                 skillBonusPool = 0;
             }
-            setPlayerBlock(b => b + blockGain);
+            setPlayerBlock(b => {
+                const nextBlock = b + blockGain;
+                achievementTracker.recordBattleStat('blockGained', blockGain);
+                return nextBlock;
+            });
         }
 
         if (card.type === 'ATTACK') {
             setAttacksThisTurn(prev => prev + 1);
+            if (noAttackPlayed) {
+                setNoAttackPlayed(false);
+                achievementTracker.setBattleFlag('noAttackPlayed', false);
+            }
         }
     };
 
@@ -833,6 +855,8 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
 
         // FIX Bug #9: 回合结束时重置首次攻击标记
         setPlayerStatus(prev => ({ ...prev, firstAttackUsed: false }));
+        achievementTracker.recordBattleStat('cardsPlayedInTurn', 0, { setValue: 0 });
+        setTurnDamageTotal(0);
 
         setTimeout(enemyAction, 1000);
     };

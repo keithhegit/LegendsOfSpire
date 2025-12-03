@@ -19,6 +19,9 @@ import { unlockAudio } from './utils/audioContext'; // 音频解锁工具
 import { getHexNeighbors } from './utils/hexagonGrid'; // 六边形邻居帮助函数
 import { authService } from './services/authService';
 import { achievementTracker } from './utils/achievementTracker';
+import AchievementUnlockBanner from './components/AchievementUnlockBanner';
+import AchievementDevPanel from './components/AchievementDevPanel';
+import { getAchievementFeatureFlag, setAchievementFeatureFlag } from './config/achievementConfig';
 const CDN_VERSION = "13.1.1";
 const CDN_URL = `https://ddragon.leagueoflegends.com/cdn/${CDN_VERSION}`;
 const LOADING_URL = "https://ddragon.leagueoflegends.com/cdn/img/champion/loading";
@@ -64,6 +67,7 @@ const SAVE_KEY = 'lots_save_v75';
 const UNLOCK_KEY = 'lots_unlocks_v75';
 const CARD_DELETE_COST = { COMMON: 50, UNCOMMON: 100, RARE: 200 };
 const MAX_EXTRA_RELICS = 6;
+const ACHIEVEMENT_MODE_KEY = 'lots_achievement_modes_v1';
 const RELIC_ACT_GATES = {
     Cull: 1,
     DarkSeal: 1,
@@ -570,6 +574,18 @@ export default function LegendsOfTheSpire() {
     const [showAchievementPanel, setShowAchievementPanel] = useState(false);
     const [toasts, setToasts] = useState([]);
     const [lockedChoices, setLockedChoices] = useState(new Set()); // 三选一：已锁定的选项
+    const [recentAchievement, setRecentAchievement] = useState(null);
+    const [achievementsEnabled, setAchievementsEnabled] = useState(getAchievementFeatureFlag());
+    const [achievementSnapshot, setAchievementSnapshot] = useState(achievementTracker.getUnlocked());
+    const [unlockedModes, setUnlockedModes] = useState(() => {
+        try {
+            const raw = localStorage.getItem(ACHIEVEMENT_MODE_KEY);
+            return raw ? JSON.parse(raw) : [];
+        } catch {
+            return [];
+        }
+    });
+    const runStartRef = useRef(null);
 
     const [unlockedChamps, setUnlockedChamps] = useState(() => {
         try {
@@ -606,6 +622,10 @@ export default function LegendsOfTheSpire() {
 
     const getSaveKey = (user) => user ? `${SAVE_KEY}_${user.email}` : SAVE_KEY;
 
+    useEffect(() => {
+        localStorage.setItem(ACHIEVEMENT_MODE_KEY, JSON.stringify(unlockedModes));
+    }, [unlockedModes]);
+
     const serializeMapData = () => {
         const serializable = {
             ...mapData,
@@ -615,6 +635,23 @@ export default function LegendsOfTheSpire() {
         };
         return serializable;
     };
+
+    useEffect(() => {
+        achievementTracker.updateUniqueCards(new Set(masterDeck).size);
+    }, [masterDeck]);
+
+    useEffect(() => {
+        achievementTracker.updateRelicsOwned(relics.length);
+    }, [relics]);
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (!runStartRef.current) return;
+            const minutes = (Date.now() - runStartRef.current) / 60000;
+            achievementTracker.updateRunDuration(minutes);
+        }, 5000);
+        return () => clearInterval(interval);
+    }, []);
 
     const applySaveData = (data) => {
         if (!data) return;
@@ -638,6 +675,11 @@ export default function LegendsOfTheSpire() {
         setActiveNode(data.activeNode);
         setUsedEnemies(data.usedEnemies);
         setView(data.view);
+        const savedAchievements = data.achievements || {};
+        if (Array.isArray(savedAchievements.unlocked)) {
+            achievementTracker.hydrateUnlocked(savedAchievements.unlocked);
+        }
+        setUnlockedModes(Array.isArray(savedAchievements.modes) ? savedAchievements.modes : []);
     };
 
     const restoreUserSave = (user) => {
@@ -683,19 +725,52 @@ export default function LegendsOfTheSpire() {
     }, [currentUser]);
 
     useEffect(() => {
+        if (!currentUser) return;
+        hydrateRemoteAchievements(currentUser);
+    }, [currentUser, hydrateRemoteAchievements]);
+
+    useEffect(() => {
         if (['MENU', 'CHAMPION_SELECT', 'GAMEOVER', 'VICTORY_ALL'].includes(view)) return;
         const serializableMapData = serializeMapData();
         const key = getSaveKey(currentUser);
-        localStorage.setItem(key, JSON.stringify({ view, mapData: serializableMapData, currentFloor, currentAct, masterDeck, champion, currentHp, maxHp, gold, relics, baseStr, activeNode, usedEnemies }));
-    }, [view, currentHp, gold, currentFloor, currentAct, champion, masterDeck, relics, baseStr, activeNode, usedEnemies, currentUser]);
+        const achievementsPayload = {
+            unlocked: achievementTracker.getUnlocked(),
+            modes: unlockedModes
+        };
+        localStorage.setItem(key, JSON.stringify({
+            view,
+            mapData: serializableMapData,
+            currentFloor,
+            currentAct,
+            masterDeck,
+            champion,
+            currentHp,
+            maxHp,
+            gold,
+            relics,
+            baseStr,
+            activeNode,
+            usedEnemies,
+            achievements: achievementsPayload
+        }));
+        persistRemoteSave();
+    }, [view, currentHp, gold, currentFloor, currentAct, champion, masterDeck, relics, baseStr, activeNode, usedEnemies, currentUser, unlockedModes, persistRemoteSave]);
 
     const handleContinue = async () => {
         await unlockAudio();
-        const s = localStorage.getItem(getSaveKey(currentUser));
-        if (s) {
-            const data = JSON.parse(s);
+        const key = getSaveKey(currentUser);
+        const stored = localStorage.getItem(key);
+        let heroId = null;
+        if (stored) {
+            const data = JSON.parse(stored);
+            heroId = data?.champion?.id;
             applySaveData(data);
-            achievementTracker.startRun({ type: 'resume', heroId: data?.champion?.id });
+            achievementTracker.startRun({ type: 'resume', heroId });
+        } else {
+            achievementTracker.startRun({ type: 'resume' });
+        }
+        if (currentUser) {
+            await hydrateRemoteAchievements(currentUser);
         }
     };
 
@@ -714,6 +789,7 @@ export default function LegendsOfTheSpire() {
     const handleLoginSuccess = async (user) => {
         setCurrentUser(user);
         const restored = restoreUserSave(user);
+        await hydrateRemoteAchievements(user);
         if (!restored) {
             await handleNewGame();
         }
@@ -754,6 +830,7 @@ export default function LegendsOfTheSpire() {
         setBaseStr(0);
         setGold(0);
         achievementTracker.startRun({ type: 'run', heroId: championPayload.id });
+        runStartRef.current = Date.now();
 
         // 使用v4地图生成器（带死胡同检测和三选一机制）
         const newMapData = generateGridMap(1, []); // act=1, usedEnemies=[]
@@ -800,6 +877,7 @@ export default function LegendsOfTheSpire() {
 
         // 检查是否到达BOSS
         if (activeNode.type === 'BOSS') {
+            achievementTracker.recordActCompletion(currentAct);
             // 章节通关逻辑
             if (currentAct < 3) {
                 const nextAct = currentAct + 1;
@@ -898,6 +976,10 @@ export default function LegendsOfTheSpire() {
 
         setActiveNode(node);
         setCurrentFloor(node.row);
+        achievementTracker.recordNodeVisit();
+        if (node.type === 'SHOP') achievementTracker.recordShopVisit();
+        if (node.type === 'EVENT') achievementTracker.recordEventVisit();
+        if (node.type === 'CHEST') achievementTracker.recordChestOpen();
 
         switch (node.type) {
             case 'BATTLE': case 'BOSS': setView('COMBAT'); break;
@@ -909,7 +991,80 @@ export default function LegendsOfTheSpire() {
         }
     };
 
+    const persistRemoteSave = useCallback(async () => {
+        if (!currentUser) return;
+        try {
+            await fetch('/api/game/save', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: currentUser.id,
+                    achievements: { unlocked: achievementTracker.getUnlocked() },
+                    modes: unlockedModes,
+                    featureFlag: achievementsEnabled
+                })
+            });
+        } catch (error) {
+            console.warn('[Achievement Sync] Failed to persist remote state', error);
+        }
+    }, [currentUser, unlockedModes, achievementsEnabled]);
+
+    const hydrateRemoteAchievements = useCallback(async (user) => {
+        if (!user) return;
+        try {
+            const response = await fetch(`/api/game/load?userId=${user.id}`);
+            if (!response.ok) return;
+            const data = await response.json();
+            if (Array.isArray(data?.achievements?.unlocked)) {
+                achievementTracker.hydrateUnlocked(data.achievements.unlocked);
+                setAchievementSnapshot(achievementTracker.getUnlocked());
+            }
+            if (Array.isArray(data?.modes)) {
+                setUnlockedModes(data.modes);
+            }
+        } catch (error) {
+            console.warn('[Achievement Sync] Failed to hydrate remote state', error);
+        }
+    }, [setUnlockedModes]);
+
     // Toast通知系统
+    const formatRewardText = useCallback((reward) => {
+        if (!reward) return '奖励：未定义';
+        switch (reward.type) {
+            case 'CARD':
+                return `卡牌 ${reward.ref}`;
+            case 'RELIC':
+                return `遗物 ${reward.ref}`;
+            case 'MODE':
+                return `模式 ${reward.ref}`;
+            case 'REWARD':
+                return reward.ref;
+            default:
+                return reward.ref;
+        }
+    }, []);
+
+    const assignAchievementReward = useCallback((achievement) => {
+        if (!achievement?.reward) return;
+        const { type, ref } = achievement.reward;
+        switch (type) {
+            case 'CARD': {
+                setMasterDeck(prev => [...prev, ref]);
+                break;
+            }
+            case 'RELIC': {
+                setRelics(prev => (prev.includes(ref) ? prev : [...prev, ref]));
+                break;
+            }
+            case 'MODE': {
+                setUnlockedModes(prev => (prev.includes(ref) ? prev : [...prev, ref]));
+                break;
+            }
+            default:
+                break;
+        }
+    }, [setMasterDeck, setRelics, setUnlockedModes]);
+
     const showToast = useCallback((message, type = 'default') => {
         const id = Date.now();
         setToasts(prev => [...prev, { id, message, type }]);
@@ -918,15 +1073,35 @@ export default function LegendsOfTheSpire() {
         }, 3000);
     }, []);
 
+    const handleAchievementUnlock = useCallback((achievement) => {
+        if (!achievement) return;
+        assignAchievementReward(achievement);
+        const rewardText = formatRewardText(achievement.reward);
+        showToast(`成就解锁：${achievement.name} · ${rewardText}`, 'achievement');
+        setRecentAchievement(achievement);
+        setAchievementSnapshot(achievementTracker.getUnlocked());
+        persistRemoteSave();
+    }, [assignAchievementReward, formatRewardText, persistRemoteSave, showToast]);
+
+    const handleAchievementToggle = useCallback(() => {
+        const next = !achievementsEnabled;
+        setAchievementFeatureFlag(next);
+        setAchievementsEnabled(next);
+        showToast(`成就系统已${next ? '启用' : '关闭'}`, 'achievement');
+        persistRemoteSave();
+    }, [achievementsEnabled, persistRemoteSave, showToast]);
+
     useEffect(() => {
         achievementTracker.init({
-            onUnlock: (achievement) => {
-                if (achievement) {
-                    showToast(`成就解锁：${achievement.name}`, 'achievement');
-                }
-            }
+            onUnlock: handleAchievementUnlock
         });
-    }, [showToast]);
+    }, [handleAchievementUnlock]);
+
+    useEffect(() => {
+        if (!recentAchievement) return;
+        const timer = setTimeout(() => setRecentAchievement(null), 3200);
+        return () => clearTimeout(timer);
+    }, [recentAchievement]);
 
     const queueRelicPickup = (relicId, onResolved) => {
         if (!relicId) return false;
@@ -1048,11 +1223,8 @@ export default function LegendsOfTheSpire() {
         }
 
         setCurrentHp(Math.min(maxHp + (result.gainedMaxHp || 0), result.finalHp + passiveHeal));
-        if (activeNode?.type === 'BOSS' && activeNode?.enemyId === 'Darius_BOSS') {
-            achievementTracker.recordBattleEnd({ playerHp: result.finalHp, bossId: 'Guardian' });
-        } else {
-            achievementTracker.recordBattleEnd({ playerHp: result.finalHp });
-        }
+        achievementTracker.recordEnemyKill({ isBoss: activeNode?.type === 'BOSS' });
+        achievementTracker.recordBattleEnd({ playerHp: result.finalHp, bossId: activeNode?.enemyId });
         setView('REWARD');
     };
     const handleBuyCard = (card) => { setGold(prev => prev - card.price); setMasterDeck(prev => [...prev, card.id]); };
@@ -1283,20 +1455,25 @@ export default function LegendsOfTheSpire() {
                             </div>
                         </button>
                         {/* 成就系统 */}
-                        <button
-                            onClick={() => setShowAchievementPanel(true)}
-                            className="w-16 h-16 bg-slate-900/90 border border-cyan-400 rounded-lg flex items-center justify-center hover:scale-110 transition-transform group relative shadow-lg shadow-black/50"
-                        >
-                            <img
-                                src={ACHIEVEMENT_ICON}
-                                alt="成就入口"
-                                className="w-12 h-12 object-contain drop-shadow-[0_0_8px_rgba(34,211,238,0.7)]"
-                                draggable="false"
-                            />
-                            <div className="absolute right-full mr-3 bg-slate-900 text-cyan-300 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap border border-cyan-400/30 pointer-events-none">
-                                成就 (Achievements)
-                            </div>
-                        </button>
+                        <div className="flex flex-col items-center gap-1">
+                            <button
+                                onClick={() => setShowAchievementPanel(true)}
+                                className="w-16 h-16 bg-slate-900/90 border border-cyan-400 rounded-lg flex items-center justify-center hover:scale-110 transition-transform group relative shadow-lg shadow-black/50"
+                            >
+                                <img
+                                    src={ACHIEVEMENT_ICON}
+                                    alt="成就入口"
+                                    className="w-12 h-12 object-contain drop-shadow-[0_0_8px_rgba(34,211,238,0.7)]"
+                                    draggable="false"
+                                />
+                                <div className="absolute right-full mr-3 bg-slate-900 text-cyan-300 text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap border border-cyan-400/30 pointer-events-none">
+                                    成就 (Achievements)
+                                </div>
+                            </button>
+                            <span className={`text-[10px] uppercase tracking-[0.4em] ${achievementsEnabled ? 'text-emerald-300' : 'text-red-400'}`}>
+                                {achievementsEnabled ? '已开启' : '已暂停'}
+                            </span>
+                        </div>
                     </div>
                     <GridMapView_v3 mapData={mapData} onNodeSelect={handleNodeSelect} currentFloor={currentFloor} act={currentAct} activeNode={activeNode} lockedChoices={lockedChoices} />
                 </div>
@@ -1471,8 +1648,17 @@ export default function LegendsOfTheSpire() {
             )}
             {showCodex && <CodexView onClose={() => setShowCodex(false)} />}
             {showCollection && <CollectionSystem onClose={() => setShowCollection(false)} />}
-            {showAchievementPanel && <AchievementPanel onClose={() => setShowAchievementPanel(false)} />}
+            {showAchievementPanel && (
+                <AchievementPanel
+                    onClose={() => setShowAchievementPanel(false)}
+                    enabled={achievementsEnabled}
+                    onToggle={handleAchievementToggle}
+                    unlockedSnapshot={achievementSnapshot}
+                />
+            )}
+            <AchievementUnlockBanner achievement={recentAchievement} />
             <ToastContainer toasts={toasts} />
+            <AchievementDevPanel />
         </div>
     );
 }

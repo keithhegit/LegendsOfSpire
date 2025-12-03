@@ -102,6 +102,89 @@ export const ACHIEVEMENTS = [
 
 > 以上三条用于打通 Tracker → HUD → Save 通路，其余成就将在 S4 通过配置驱动批量导入。
 
+### 4.2 成就清单 & 状态追踪
+
+#### 战斗壮举
+| ID | 名称 | 分类 | 触发条件 | 状态 |
+|----|------|------|----------|------|
+| ACH_001 | Shrug It Off | BATTLE | 战斗胜利且 HP ≤10 | ✅ 已实现 |
+| ACH_002 | Purity | BATTLE | 手牌+牌库+弃牌 ≤3 | 🔄 规划中 |
+| ACH_003 | Come At Me | BATTLE | 不出攻击牌赢战 | 🔄 规划中 |
+| ACH_004 | The Pact | BATTLE | 单战耗尽 ≥20 张牌 | 🔄 规划中 |
+| ACH_005 | Adrenaline | BATTLE | 战斗中法力峰值 ≥4 | ✅ 已实现 |
+| ACH_006 | Powerful | BATTLE | 战斗中 Buff ≥10 层 | 🔄 规划中 |
+| ACH_007 | Jaxxed | BATTLE | Ironclad 力量 ≥50 | 🔄 规划中 |
+| ACH_008 | Impervious | BATTLE | 战斗中格挡 ≥99 | 🔄 规划中 |
+| ACH_009 | Barricaded | BATTLE | 战斗中格挡 ≥999 | 🔄 规划中 |
+| ACH_010 | Catalyst | BATTLE | 单敌中毒 ≥99 | 🔄 规划中 |
+| ACH_011 | Plague | BATTLE | 单场毒杀 3 敌 | 🔄 规划中 |
+| ACH_012 | Ninja | BATTLE | 单回合出 10 飞刀 | 🔄 规划中 |
+| ACH_013 | Infinity | BATTLE | 单回合出牌 ≥25 | 🔄 规划中 |
+| ACH_014 | Focused | BATTLE | Defect 专注 ≥25 | 🔄 规划中 |
+| ACH_015 | Neon | BATTLE | Defect 一回合充能 ≥9 | 🔄 规划中 |
+| ACH_018 | Big Hitter | BATTLE | 单次伤害 ≥50 | 🔄 规划中 |
+| ACH_019 | Snowball Fight | BATTLE | 单敌雪 ≥15 层 | 🔄 规划中 |
+| ACH_020 | Level Up! | BATTLE | 升级任意机制 Lv10 | 🔄 规划中 |
+| ACH_021 | 10K Chips | BATTLE | 单回合伤害 ≥10000 | 🔄 规划中 |
+| ACH_022 | Retrograde | BATTLE | 任意牌型 Lv10 | 🔄 规划中 |
+| ACH_023 | Lone Survivor | BATTLE | 仅领袖存活胜利 | 🔄 规划中 |
+| ACH_025 | Desecration | BATTLE | 摧毁防御陷阱 | 🔄 规划中 |
+
+#### Boss / 机制掌握
+| ID | 名称 | 分类 | 触发条件 | 状态 |
+|----|------|------|----------|------|
+| ACH_016 | You Are Nothing | BOSS | Turn1 击败 Boss | 🔄 规划中 |
+| ACH_017 | Perfect | BOSS | 不掉血击败 Boss | 🔄 规划中 |
+| ACH_019 | The Guardian | BOSS | 击败 Act1 Boss（岩石守护者） | ✅ 已实现 |
+| ACH_020 | The Boss | BOSS | 击败 Act1 Slime Boss | 🔄 规划中 |
+| ACH_021 | The Automaton | BOSS | 击败 Act2 Bronze Automaton | 🔄 规划中 |
+| ACH_024 | The Crow | BOSS | 击败 Act3 Awakened One | 🔄 规划中 |
+| ACH_026-028 | Boss Tier 1+ | BOSS | 原 11 个及 Act4 扩展（Seraph/Miners） | 🔄 规划中 |
+| ACH_037 | The End? | BOSS | 三角色完成 Ending | 🔄 规划中 |
+| ACH_057 | Clan Master: Strength | MECH | 力量机制 Lv10 | 🔄 规划中 |
+| ACH_058 | Clan Master: Poison | MECH | 毒机制 Lv10 | 🔄 规划中 |
+| ACH_059 | Clan Master: Focus | MECH | 专注机制 Lv10 | 🔄 规划中 |
+| ACH_060 | Clan Master: Wrath | MECH | Wrath 机制 Lv10 | 🔄 规划中 |
+| ACH_061 | Pyre Survivor | ENDLESS | Pyre ≥25 层 | 🔄 规划中 |
+| ACH_062 | Angel Hunter | BOSS | 击败 Angel Boss | 🔄 规划中 |
+| ACH_063 | Machinist | MECH | 仅物品牌胜 | 🔄 规划中 |
+| ACH_064-076 | Mechanism Mastery | MECH | Block/Draw/Energy/DoT/Snow/Fire 等 Lv5-10 | 🔄 规划中 |
+
+#### 收藏与极限
+| ID | 名称 | 分类 | 触发条件 | 状态 |
+|----|------|------|----------|------|
+| ACH_077 | Card Collector | COLLECTION | 解锁 50 张卡 | 🔄 规划中 |
+| ACH_078 | Relic Hoarder | COLLECTION | 持有 20 遗物 | 🔄 规划中 |
+| ACH_079 | All Cards | COLLECTION | 解锁所有卡牌 | 🔄 规划中 |
+| ACH_080-089 | Hero/Card Completionist | COLLECTION | 英雄/卡全解锁（如 Sharra 系列） | 🔄 规划中 |
+| ACH_090 | No Relics | CHALLENGE | 无遗物通关 | 🔄 规划中 |
+| ACH_091 | Speed Climber++ | CHALLENGE | <10 分通关 | 🔄 规划中 |
+| ACH_092 | Gold Stake | CHALLENGE | Asc20+ 全角色胜 | 🔄 规划中 |
+| ACH_093 | Joker Master | CHALLENGE | Joker 遗物全金效 | 🔄 规划中 |
+| ACH_094-099 | Extremes | CHALLENGE | 无攻击/0 能量/全普通牌/1HP 全程/Endless100 | 🔄 规划中 |
+
+#### META / 运行统计
+| ID | 名称 | 分类 | 触发条件 | 状态 |
+|----|------|------|----------|------|
+| ACH_038 | Who Needs Relics? | MISC | 单遗物通关 | 🔄 规划中 |
+| ACH_039 | Speed Climber | MISC | 20 分钟内通关 | 🔄 规划中 |
+| ACH_040 | Common Sense | MISC | 无非普通牌通关 | 🔄 规划中 |
+| ACH_041 | My Lucky Day | DAILY | 赢得 Daily Climb | 🔄 规划中 |
+| ACH_042 | Eternal One | META | 解锁所有成就 | 🔄 规划中 |
+| ACH_100 | Merchant Enthusiast | META | 拜访商店 ≥10 次 | 🟨 待开发 |
+| ACH_101 | Explorer | META | 走过事件节点 ≥20 | 🟨 待开发 |
+| ACH_102 | Monster Slayer | META | 击杀普通敌人 ≥100 | 🟨 待开发 |
+| ACH_103 | Act II Victor | HERO | 通关 Act2（累计） | 🟨 待开发 |
+| ACH_104 | Act III Victor | HERO | 通关 Act3（累计） | 🟨 待开发 |
+| ACH_105 | Treasure Hunter | META | 开启宝箱 ≥15 | 🟨 待开发 |
+| ACH_106 | Big Spender | META | 单次商店消费 ≥300G | 🟨 待开发 |
+| ACH_107 | Mana Master | META | 累计回蓝 ≥100 | 🟨 待开发 |
+| ACH_108 | Relic Collector | META | 同一跑获得 ≥10 遗物 | 🟨 待开发 |
+| ACH_109 | Eventful Run | META | 单次跑走完所有事件 | 🟨 待开发 |
+| ACH_110 | Ascender | META | Ascension ≥15 通关 | 🟨 待开发 |
+
+> 表格按分类展开，涵盖 40+ 项成就。前三条（ACH_001/005/019）已和 S1 路径打通，后续依照状态更新 ✅/🟡/🔄 以便 QA、策划追踪。
+
 ---
 
 ## 5. 技术注意事项
@@ -110,6 +193,17 @@ export const ACHIEVEMENTS = [
 2. **可扩展性**：配置中的 `trigger` 支持 DSL（`{ type: 'buff', stat: 'strength', gte: 50 }`），未来新增成就无需改代码。
 3. **禁用策略**：当 `Mods` 或 `Custom Mode` 启用时，直接跳过 Tracker，HUD 提示“成就已禁用”以免混淆。
 4. **安全性**：奖励解锁写入服务器（Cloudflare D1）后再写本地，防止客户端改存档即解锁。
+5. **运营控制**：提供本地 `achievement_feature_override` 开关/按钮（运营可配置开/关）、HUD 内显示运营状态，并同步至 Cloudflare D1 (`featureFlag`) 让不同环境可快速关闭成就功能。
+
+---
+
+## 5.1 QA 检验工具
+
+| 项目 | 说明 |
+|------|------|
+| `AchievementDevPanel` 面板 | 开发环境下在右下角显示按钮，支持“15 个宝箱”“12 个事件”“25 个节点”“9 分速通”“无遗物”“重置跑”，便于重现对应成就。 |
+| 成就进度记录 | 每次 key 成就完成后附带 HUD 弹窗和 `AchievementUnlockBanner`，QA 可在运行日志/Toast 中核对奖励是否正确发放。 |
+| 远端同步验证 | 通过 Cloudflare D1 `save`/`load` 接口同步 `achievements`/`modes`，复现“跨设备恢复”场景。 |
 
 ---
 
