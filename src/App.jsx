@@ -1,7 +1,3 @@
-const isRelicAvailableInAct = (relicId, act = 1) => {
-    const requiredAct = RELIC_ACT_GATES[relicId] ?? 1;
-    return act >= requiredAct;
-};
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import { Sword, Shield, Zap, Skull, Heart, RefreshCw, AlertTriangle, Flame, XCircle, Activity, Map as MapIcon, Gift, Anchor, Coins, ShoppingBag, ChevronRight, Star, Play, Pause, Volume2, VolumeX, Landmark, Lock, RotateCcw, Save, ArrowRight, Layers, UserSquare, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -74,6 +70,11 @@ const RELIC_ACT_GATES = {
     QSS: 2,
     Executioner: 2,
     Nashor: 3
+};
+
+const isRelicAvailableInAct = (relicId, act = 1) => {
+    const requiredAct = RELIC_ACT_GATES[relicId] ?? 1;
+    return act >= requiredAct;
 };
 // ==========================================
 // 2. 游戏数据库
