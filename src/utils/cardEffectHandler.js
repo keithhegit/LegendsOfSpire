@@ -229,10 +229,10 @@ function applyEffect(effectType, value, context, updates, card = {}) {
             break;
 
         case 'STR_DEBUFF':
-            // 力量削弱 - Reduce enemy strength
+            // 虚弱契约 - Apply weak stacks instead
             updates.enemyStatus = {
                 ...(updates.enemyStatus || enemyStatus),
-                strength: Math.max(0, ((updates.enemyStatus?.strength || enemyStatus.strength) || 0) - value)
+                weak: ((updates.enemyStatus?.weak || enemyStatus.weak) || 0) + (value || 3)
             };
             break;
 
@@ -447,16 +447,17 @@ function applyEffect(effectType, value, context, updates, card = {}) {
             break;
 
         case 'REGEN_MANA':
-            // 法力回复 - Regenerate mana over time
+            // 法力回复 - 本回合 + 下回合回蓝
+            updates.manaChange = (updates.manaChange || 0) + value;
             updates.playerStatus = {
                 ...(updates.playerStatus || playerStatus),
-                manaRegen: ((updates.playerStatus?.manaRegen || playerStatus.manaRegen) || 0) + value
+                nextTurnMana: ((updates.playerStatus?.nextTurnMana || playerStatus.nextTurnMana) || 0) + value
             };
             break;
 
         case 'TEMP_MANA':
             // 临时法力 - Gain temporary mana this turn
-            updates.tempMana = value;
+            updates.manaChange = (updates.manaChange || 0) + value;
             break;
 
         case 'GAIN_MANA_NEXT_TURN':
@@ -513,10 +514,10 @@ function applyEffect(effectType, value, context, updates, card = {}) {
             break;
 
         case 'DRAW_AT_START':
-            // 战斗开始抽牌 - Draw at battle start (relic effect)
+            // 回合开始额外抽牌（古老碑铭）
             updates.playerStatus = {
                 ...(updates.playerStatus || playerStatus),
-                battleStartDraw: ((updates.playerStatus?.battleStartDraw || playerStatus.battleStartDraw) || 0) + value
+                extraDrawPerTurn: ((updates.playerStatus?.extraDrawPerTurn || playerStatus.extraDrawPerTurn) || 0) + value
             };
             break;
 
@@ -595,11 +596,8 @@ function applyEffect(effectType, value, context, updates, card = {}) {
             break;
 
         case 'TEMP_STR_ON_KILLS':
-            // 击杀临时力量 - Gain str on kills
-            updates.playerStatus = {
-                ...(updates.playerStatus || playerStatus),
-                tempStrOnKill: ((updates.playerStatus?.tempStrOnKill || playerStatus.tempStrOnKill) || 0) + value
-            };
+            // 猎手徽章 - Flag permanent strength gain on kill
+            updates.hunterBadge = true;
             break;
 
         case 'GAIN_STRENGTH_PER_HIT':
@@ -653,8 +651,8 @@ function applyEffect(effectType, value, context, updates, card = {}) {
             break;
 
         case 'PERMA_STR_FOR_HP':
-            // 生命换力量 - Lose max HP for str
-            updates.loseMaxHp = value;
+            // 生命换力量（永久力量 + 代价）
+            updates.maxHpCost = (updates.maxHpCost || 0) + value;
             updates.playerStatus = {
                 ...(updates.playerStatus || playerStatus),
                 strength: ((updates.playerStatus?.strength || playerStatus.strength) || 0) + value
@@ -698,8 +696,11 @@ function applyEffect(effectType, value, context, updates, card = {}) {
 
         case 'SELF_HP_FOR_BLOCK':
             // 生命换格挡 - Lose HP for block
-            updates.playerHp = Math.max(1, playerHp - Math.floor(value / 3));
-            updates.blockGain = value;
+            {
+                const hpCost = Math.max(0, Math.min(playerHp - 1, Math.ceil(value / 2)));
+                updates.playerHp = Math.max(1, playerHp - hpCost);
+                updates.blockGain = (updates.blockGain || 0) + value;
+            }
             break;
 
         case 'GAIN_BLOCK_WHEN_ATTACK':
@@ -938,8 +939,11 @@ function applyEffect(effectType, value, context, updates, card = {}) {
             break;
 
         case 'BAIT_TRIGGER':
-            // 诱饵触发 - Bait mechanic
-            updates.placeBait = value;
+            // 诱饵触发 - Reuse Teemo trap logic
+            updates.placeTrap = {
+                poison: value,
+                weak: card.trapWeak || 0
+            };
             break;
 
         case 'FREE_IF_WEAK':

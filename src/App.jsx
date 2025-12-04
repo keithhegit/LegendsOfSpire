@@ -1203,13 +1203,20 @@ export default function LegendsOfTheSpire() {
             showToast(`永久力量 +${result.gainedStr}`, 'strength');
         }
 
-        // 锤石被动：永久增加最大生命值
+        // 最大生命值变动：先应用奖励再扣减
+        let nextMaxHp = maxHp;
         if (result.gainedMaxHp > 0) {
             console.log('[锤石] 最大HP增长:', result.gainedMaxHp, '→', maxHp + result.gainedMaxHp); // 调试日志
-            setMaxHp(prev => prev + result.gainedMaxHp);
+            nextMaxHp += result.gainedMaxHp;
             passiveHeal += result.gainedMaxHp; // 最大HP增长也算作恢复
             showToast(`最大生命值 +${result.gainedMaxHp}`, 'maxHp');
         }
+        if (result.maxHpCost > 0) {
+            console.log('[生命代价] 最大HP扣除:', result.maxHpCost, '→', nextMaxHp - result.maxHpCost);
+            nextMaxHp = Math.max(1, nextMaxHp - result.maxHpCost);
+            showToast(`生命代价 -${result.maxHpCost}`, 'maxHp');
+        }
+        setMaxHp(nextMaxHp);
 
         // 卡牌大师被动：战斗胜利额外金币
         if (champion && champion.relicId === "TwistedFatePassive") {
@@ -1223,7 +1230,21 @@ export default function LegendsOfTheSpire() {
             showToast(`荣誉奖章: +${result.winGoldBonus} 金币`, 'gold');
         }
 
-        setCurrentHp(Math.min(maxHp + (result.gainedMaxHp || 0), result.finalHp + passiveHeal));
+        if (Array.isArray(result.permaUpgrades) && result.permaUpgrades.length > 0) {
+            setMasterDeck(prev => {
+                const next = [...prev];
+                result.permaUpgrades.forEach(baseId => {
+                    const idx = next.indexOf(baseId);
+                    if (idx !== -1) {
+                        next[idx] = `${baseId}+`;
+                    }
+                });
+                return next;
+            });
+            showToast(`永久升级 ${result.permaUpgrades.length} 张卡牌`, 'default');
+        }
+
+        setCurrentHp(Math.min(nextMaxHp, result.finalHp + passiveHeal));
         achievementTracker.recordEnemyKill({ isBoss: activeNode?.type === 'BOSS' });
         achievementTracker.recordBattleEnd({ playerHp: result.finalHp, bossId: activeNode?.enemyId });
         setView('REWARD');

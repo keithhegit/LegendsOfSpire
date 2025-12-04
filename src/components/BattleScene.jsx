@@ -12,6 +12,7 @@ import { achievementTracker } from '../utils/achievementTracker';
 import Card from './shared/Card';
 
 const DEX_BLOCK_PER_STACK = 5;
+const PERMA_UPGRADE_TYPES = new Set(['ATTACK', 'SKILL']);
 
 const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex, act }) => {
     const getScaledEnemy = (enemyId, floor, currentAct) => {
@@ -36,11 +37,16 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
     const deckRef = useRef({ drawPile: [], hand: [], discardPile: [] });
     const [renderTrigger, setRenderTrigger] = useState(0);
     const forceUpdate = () => setRenderTrigger(prev => prev + 1);
+    const battleDebtRef = useRef({ maxHpCost: 0 });
+    const permaUpgradeRef = useRef([]);
+    const hunterBadgeActiveRef = useRef(false);
     const [dmgOverlay, setDmgOverlay] = useState(null);
     const [enemyTrap, setEnemyTrap] = useState(null);
     const [enemyBaitDamage, setEnemyBaitDamage] = useState(0);
     const [heroAnim, setHeroAnim] = useState("");
     const [enemyAnim, setEnemyAnim] = useState("");
+    const [scoutInfo, setScoutInfo] = useState(null);
+    const [idleBlockState, setIdleBlockState] = useState({ value: 0, armed: false, broken: false, sourceCard: null });
     const spawnOverlay = (overlay, duration = 800) => {
         setDmgOverlay(overlay);
         setTimeout(() => setDmgOverlay(null), duration);
@@ -74,6 +80,8 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
         nextTurnStrength: 0,
         nextTurnMana: 0,
         nextDrawBonus: 0,
+        extraDrawPerTurn: 0,
+        idleBlock: 0,
         critChance: 0,
         critDamageMultiplier: 2,
         buffNextSkill: 0,
@@ -106,6 +114,10 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
 
     useEffect(() => {
         achievementTracker.startBattle();
+        battleDebtRef.current = { maxHpCost: 0 };
+        permaUpgradeRef.current = [];
+        hunterBadgeActiveRef.current = false;
+        setIdleBlockState({ value: 0, armed: false, broken: false, sourceCard: null });
         achievementTracker.setBattleFlag('noAttackPlayed', true);
         achievementTracker.recordBattleStat('cardsPlayedInTurn', 0, { setValue: 0 });
         return () => {
@@ -152,6 +164,104 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
         deckRef.current = { drawPile, hand, discardPile };
         forceUpdate();
         playSfx('DRAW');
+    };
+
+    const rewriteDeckRef = (hand, drawPile, discardPile) => {
+        deckRef.current = { drawPile, hand, discardPile };
+        forceUpdate();
+    };
+
+    const findAndUpgradeCard = () => {
+        const { hand, drawPile, discardPile } = deckRef.current;
+        const piles = [
+            { name: 'hand', cards: [...hand] },
+            { name: 'drawPile', cards: [...drawPile] },
+            { name: 'discardPile', cards: [...discardPile] }
+        ];
+        for (const pile of piles) {
+            const idx = pile.cards.findIndex(cardId => {
+                if (!cardId || cardId.endsWith('+')) return false;
+                const baseCard = CARD_DATABASE[cardId];
+                if (!baseCard) return false;
+                return PERMA_UPGRADE_TYPES.has(baseCard.type || '');
+            });
+            if (idx !== -1) {
+                const baseId = pile.cards[idx];
+                pile.cards[idx] = `${baseId}+`;
+                const nextHand = pile.name === 'hand' ? pile.cards : piles[0].cards;
+                const nextDraw = pile.name === 'drawPile' ? pile.cards : piles[1].cards;
+                const nextDiscard = pile.name === 'discardPile' ? pile.cards : piles[2].cards;
+                rewriteDeckRef(nextHand, nextDraw, nextDiscard);
+                return baseId;
+            }
+        }
+        return null;
+    };
+
+    const applyPermaUpgrade = () => {
+        const upgradedId = findAndUpgradeCard();
+        if (upgradedId) {
+            permaUpgradeRef.current.push(upgradedId);
+            setDmgOverlay({ val: '升阶成功', target: 'PLAYER', color: 'text-amber-200' });
+            setTimeout(() => setDmgOverlay(null), 900);
+        } else {
+            setDmgOverlay({ val: '无可升级目标', target: 'PLAYER', color: 'text-red-200' });
+            setTimeout(() => setDmgOverlay(null), 900);
+        }
+    };
+
+    const upgradeCardsInHand = () => {
+        const { hand, drawPile, discardPile } = deckRef.current;
+        let upgraded = false;
+        const nextHand = hand.map(cardId => {
+            if (!cardId || cardId.endsWith('+')) return cardId;
+            const baseCard = CARD_DATABASE[cardId];
+            if (!baseCard) return cardId;
+            if (!PERMA_UPGRADE_TYPES.has(baseCard.type || '')) return cardId;
+            upgraded = true;
+            return `${cardId}+`;
+        });
+        if (upgraded) {
+            rewriteDeckRef(nextHand, drawPile, discardPile);
+            setDmgOverlay({ val: '手牌强化', target: 'PLAYER', color: 'text-emerald-200' });
+            setTimeout(() => setDmgOverlay(null), 900);
+        }
+        return upgraded;
+    };
+
+    const recycleDiscardToHand = () => {
+        const { hand, drawPile, discardPile } = deckRef.current;
+        if (discardPile.length === 0) return null;
+        const recovered = discardPile.pop();
+        hand.push(recovered);
+        rewriteDeckRef(hand, drawPile, discardPile);
+        setDmgOverlay({ val: `回收 ${recovered}`, target: 'PLAYER', color: 'text-slate-200' });
+        setTimeout(() => setDmgOverlay(null), 800);
+        return recovered;
+    };
+
+    const transformRandomHandCard = () => {
+        const { hand, drawPile, discardPile } = deckRef.current;
+        if (hand.length === 0 || !initialDeck?.length) return false;
+        const targetIndex = Math.floor(Math.random() * hand.length);
+        const replacementPool = initialDeck.filter(id => id && id !== hand[targetIndex]);
+        if (replacementPool.length === 0) return false;
+        const newCardId = replacementPool[Math.floor(Math.random() * replacementPool.length)];
+        hand[targetIndex] = newCardId;
+        rewriteDeckRef(hand, drawPile, discardPile);
+        setDmgOverlay({ val: `转换 → ${newCardId}`, target: 'PLAYER', color: 'text-purple-200' });
+        setTimeout(() => setDmgOverlay(null), 900);
+        return true;
+    };
+
+    const revealEnemyIntent = () => {
+        if (!nextEnemyAction) return;
+        setScoutInfo({
+            label: nextEnemyAction.type === 'ATTACK' || nextEnemyAction.actionType === 'Attack'
+                ? `攻击 ${nextEnemyAction.value}${nextEnemyAction.count > 1 ? `×${nextEnemyAction.count}` : ''}`
+                : nextEnemyAction.type
+        });
+        setTimeout(() => setScoutInfo(null), 2000);
     };
 
     const removeEnemyBuffs = (stacks = 1) => {
@@ -248,8 +358,9 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
         setPlayerMana(initialMana + (heroData.relicId === "LuxPassive" ? 1 : 0));
         // 护甲不清零，累积到下一回合（符合 Slay the Spire 机制）
         // setPlayerBlock(0); // 已移除
-        let drawCount = 5; if (heroData.relicId === "JinxPassive") drawCount = 6;
-        drawCards(drawCount);
+        const baseDraw = heroData.relicId === "JinxPassive" ? 6 : 5;
+        const extraDraw = playerStatus?.extraDrawPerTurn || 0;
+        drawCards(baseDraw + extraDraw);
         setCardsPlayedCount(0); // 重置卡牌计数
         setAttacksThisTurn(0); // 重置攻击计数
         setCritCount(0); // Batch 2: 重置暴击计数
@@ -266,7 +377,8 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
             nextAttackCostReduce: 0,
             tempStrength: 0,
             globalAttackBonus: 0,
-            critDamageMultiplier: prev.critDamageMultiplier || 2
+            critDamageMultiplier: prev.critDamageMultiplier || 2,
+            idleBlock: 0
         }));
         if (heroData.relicId === "ViktorPassive" && Math.random() < 0.5) {
             const basicCard = shuffle(['Strike', 'Defend'])[0];
@@ -308,9 +420,11 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
     const playCard = (index) => {
         if (gameState !== 'PLAYER_TURN') return;
         const { hand, discardPile } = deckRef.current;
-        const handSizeBeforePlay = hand.length;
         const cardId = hand[index];
         if (!cardId) return; // 防止无效的 cardId
+        if (idleBlockState.armed && cardId !== idleBlockState.sourceCard) {
+            setIdleBlockState(prev => ({ ...prev, broken: true }));
+        }
 
         // 处理升级卡牌 (带 + 后缀)
         const isUpgraded = cardId.endsWith('+');
@@ -347,9 +461,14 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
 
         if (playerMana < actualCost) return;
         setPlayerMana(p => p - actualCost);
-        const newHand = [...hand]; newHand.splice(index, 1);
-        if (!card.exhaust) { deckRef.current = { ...deckRef.current, hand: newHand, discardPile: [...discardPile, cardId] }; }
-        else { deckRef.current = { ...deckRef.current, hand: newHand }; }
+        const newHand = [...hand];
+        newHand.splice(index, 1);
+        const handSizeAfterPlay = newHand.length;
+        if (!card.exhaust) {
+            deckRef.current = { ...deckRef.current, hand: newHand, discardPile: [...discardPile, cardId] };
+        } else {
+            deckRef.current = { ...deckRef.current, hand: newHand };
+        }
         forceUpdate();
 
         // 记录最后打出的牌（用于内瑟斯/艾瑞莉娅被动）
@@ -366,6 +485,9 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
             playerStatus,
             enemyStatus
         });
+        if (effectUpdates.maxHpCost) {
+            battleDebtRef.current.maxHpCost += effectUpdates.maxHpCost;
+        }
         const globalAttackBonusBefore = playerStatus.globalAttackBonus || 0;
         const mergedPlayerStatus = {
             ...playerStatus,
@@ -420,8 +542,29 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
         if (effectUpdates.blockGain) {
             setPlayerBlock(b => b + effectUpdates.blockGain);
         }
-        if (effectUpdates.manaIfLowHand && handSizeBeforePlay <= 3) {
+        if (effectUpdates.manaIfLowHand && handSizeAfterPlay <= 3) {
             setPlayerMana(m => Math.max(0, m + effectUpdates.manaIfLowHand));
+        }
+        if (effectUpdates.playerStatus?.idleBlock) {
+            setIdleBlockState({ value: effectUpdates.playerStatus.idleBlock, armed: true, broken: false, sourceCard: cardId });
+        }
+        if (effectUpdates.permaUpgrade) {
+            applyPermaUpgrade();
+        }
+        if (effectUpdates.upgradeCard) {
+            upgradeCardsInHand();
+        }
+        if (effectUpdates.recycleCard) {
+            recycleDiscardToHand();
+        }
+        if (effectUpdates.transformCard) {
+            transformRandomHandCard();
+        }
+        if (effectUpdates.hunterBadge) {
+            hunterBadgeActiveRef.current = true;
+        }
+        if (effectUpdates.scoutCount || effectUpdates.revealEnemyIntent) {
+            revealEnemyIntent();
         }
         if (effectUpdates.placeTrap) {
             setEnemyTrap(effectUpdates.placeTrap);
@@ -776,9 +919,20 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
                 battleResult.gainedMaxHp = 2;
                 updatePlayerHp(prev => prev + 2, { showHeal: true, label: 'HP', clamp: false });
             }
+            if (hunterBadgeActiveRef.current) {
+                battleResult.gainedStr += 1;
+                hunterBadgeActiveRef.current = false;
+            }
+            if (permaUpgradeRef.current.length > 0) {
+                battleResult.permaUpgrades = Array.from(new Set(permaUpgradeRef.current));
+            }
 
             playSfx('WIN');
-            setTimeout(() => onWin(battleResult), 1000);
+            const resultPayload = {
+                ...battleResult,
+                maxHpCost: battleDebtRef.current.maxHpCost
+            };
+            setTimeout(() => onWin(resultPayload), 1000);
         }
     }, [enemyHp]);
 
@@ -855,6 +1009,15 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
 
         // FIX Bug #9: 回合结束时重置首次攻击标记
         setPlayerStatus(prev => ({ ...prev, firstAttackUsed: false }));
+        if (idleBlockState.armed) {
+            if (!idleBlockState.broken && idleBlockState.value > 0) {
+                setPlayerStatus(prev => ({
+                    ...prev,
+                    nextTurnBlock: (prev.nextTurnBlock || 0) + idleBlockState.value
+                }));
+            }
+            setIdleBlockState({ value: 0, armed: false, broken: false, sourceCard: null });
+        }
         achievementTracker.recordBattleStat('cardsPlayedInTurn', 0, { setValue: 0 });
         setTurnDamageTotal(0);
 
@@ -1103,6 +1266,11 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
                     <div className={`text-8xl font-black ${dmgOverlay.isCrit ? 'text-yellow-200 drop-shadow-[0_0_25px_rgba(255,255,0,0.8)]' : 'text-white drop-shadow-[0_0_10px_red]'} animate-ping`}>
                         {dmgOverlay.val}
                     </div>
+                </div>
+            )}
+            {scoutInfo && (
+                <div className="absolute top-12 left-1/2 -translate-x-1/2 bg-black/80 border border-cyan-400 text-cyan-200 px-4 py-2 rounded-lg text-sm z-50 shadow-lg">
+                    <span>敌人下一动：{scoutInfo.label}</span>
                 </div>
             )}
             <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-black via-black/80 to-transparent z-20 flex items-end justify-center pb-6 gap-4 pointer-events-none">
