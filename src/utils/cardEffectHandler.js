@@ -522,10 +522,10 @@ function applyEffect(effectType, value, context, updates, card = {}) {
             break;
 
         case 'PERMA_DRAW_ON_KILL':
-            // 永久击杀抽牌 - Permanent draw on kill (relic)
+            // 求知铭文 - 击杀后为下一场战斗提供抽牌奖励
             updates.playerStatus = {
                 ...(updates.playerStatus || playerStatus),
-                permaDraw: true
+                scholarRuneValue: ((updates.playerStatus?.scholarRuneValue || playerStatus.scholarRuneValue) || 0) + (value || 1)
             };
             break;
 
@@ -581,8 +581,8 @@ function applyEffect(effectType, value, context, updates, card = {}) {
             break;
 
         case 'DISCOUNT_ONE_CARD':
-            // 单卡减费 - Reduce one card cost
-            updates.discountCard = value;
+            // 单卡减费 - Reduce one card cost this turn
+            updates.discountCard = Math.max(1, value || 1);
             break;
 
         // ==================== BATCH 4: Strength Buffs ====================
@@ -904,11 +904,20 @@ function applyEffect(effectType, value, context, updates, card = {}) {
             updates.killReward = value;
             break;
 
-        case 'GAMBLE':
-            // 赌博 - Random outcome
-            const randomOutcome = Math.random() * value;
-            updates.gambleResult = Math.floor(randomOutcome);
+        case 'GAMBLE': {
+            // 赌博 - 金币/生命二选一
+            const penalty = card.failHpPenalty ?? 10;
+            const success = Math.random() < 0.5;
+            if (success) {
+                updates.goldGain = (updates.goldGain || 0) + value;
+                updates.gambleOutcome = { type: 'win', amount: value };
+            } else {
+                const hpLoss = Math.min(Math.max(0, penalty), Math.max(0, playerHp - 1));
+                updates.playerHp = Math.max(1, playerHp - hpLoss);
+                updates.gambleOutcome = { type: 'lose', amount: hpLoss };
+            }
             break;
+        }
 
         case 'GAIN_GOLD':
             // 获得金币 - Gold reward

@@ -13,8 +13,20 @@ import Card from './shared/Card';
 
 const DEX_BLOCK_PER_STACK = 5;
 const PERMA_UPGRADE_TYPES = new Set(['ATTACK', 'SKILL']);
+const BASIC_UPGRADE_BASES = new Set(['Strike', 'Defend']);
 
-const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex, act, onGoldChange }) => {
+const BattleScene = ({
+    heroData,
+    enemyId,
+    initialDeck,
+    onWin,
+    onLose,
+    floorIndex,
+    act,
+    onGoldChange,
+    openingDrawBonus = 0,
+    onConsumeOpeningDrawBonus
+}) => {
     const getScaledEnemy = (enemyId, floor, currentAct) => {
         const baseEnemy = ENEMY_POOL[enemyId];
         if (!baseEnemy) {
@@ -40,6 +52,8 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
     const battleDebtRef = useRef({ maxHpCost: 0 });
     const permaUpgradeRef = useRef([]);
     const hunterBadgeActiveRef = useRef(false);
+    const discountQueueRef = useRef([]);
+    const isFirstTurnRef = useRef(true);
     const [dmgOverlay, setDmgOverlay] = useState(null);
     const [enemyTrap, setEnemyTrap] = useState(null);
     const [enemyBaitDamage, setEnemyBaitDamage] = useState(0);
@@ -87,7 +101,8 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
         buffNextSkill: 0,
         tempStrength: 0,
         globalAttackBonus: 0,
-        winGoldBonus: 0
+        winGoldBonus: 0,
+        scholarRuneValue: 0
     });
     const [enemyStatus, setEnemyStatus] = useState({ strength: 0, weak: 0, vulnerable: 0, mark: 0, markDamage: 0, trap: 0 });
     const heroBaseCritChance = heroData?.id === 'Yasuo' ? 10 : 0;
@@ -122,6 +137,7 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
         achievementTracker.recordBattleStat('cardsPlayedInTurn', 0, { setValue: 0 });
         return () => {
             achievementTracker.cancelBattle();
+            clearDiscountQueue();
         };
     }, []);
 
@@ -139,6 +155,8 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
 
         const initialDrawPile = shuffle([...initialDeck]);
         deckRef.current = { drawPile: initialDrawPile, hand: [], discardPile: [] };
+        isFirstTurnRef.current = true;
+        clearDiscountQueue();
         let block = 0; let str = heroData.baseStr || 0;
         (heroData.relics || []).forEach(rid => {
             const relic = RELIC_DATABASE[rid];
@@ -169,6 +187,38 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
     const rewriteDeckRef = (hand, drawPile, discardPile) => {
         deckRef.current = { drawPile, hand, discardPile };
         forceUpdate();
+    };
+
+    const grantRandomDiscount = (amount = 1) => {
+        const { hand } = deckRef.current;
+        if (!hand || hand.length === 0) return false;
+        const candidates = hand.filter(Boolean);
+        if (candidates.length === 0) return false;
+        const target = candidates[Math.floor(Math.random() * candidates.length)];
+        const baseId = target.endsWith('+') ? target.slice(0, -1) : target;
+        discountQueueRef.current.push({ cardId: target, baseId, amount });
+        spawnOverlay({
+            val: `减费 ${CARD_DATABASE[baseId]?.name || baseId}`,
+            target: 'PLAYER',
+            color: 'text-sky-300'
+        }, 900);
+        return true;
+    };
+
+    const consumeDiscountForCard = (cardId) => {
+        if (!discountQueueRef.current.length) return 0;
+        const baseId = cardId.endsWith('+') ? cardId.slice(0, -1) : cardId;
+        let idx = discountQueueRef.current.findIndex(entry => entry.cardId === cardId);
+        if (idx === -1) {
+            idx = discountQueueRef.current.findIndex(entry => entry.baseId === baseId);
+        }
+        if (idx === -1) return 0;
+        const [entry] = discountQueueRef.current.splice(idx, 1);
+        return entry?.amount || 0;
+    };
+
+    const clearDiscountQueue = () => {
+        discountQueueRef.current = [];
     };
 
     const findAndUpgradeCard = () => {
@@ -208,6 +258,27 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
             setDmgOverlay({ val: '无可升级目标', target: 'PLAYER', color: 'text-red-200' });
             setTimeout(() => setDmgOverlay(null), 900);
         }
+    };
+
+    const upgradeBasicCardsInHand = () => {
+        const { hand, drawPile, discardPile } = deckRef.current;
+        let upgraded = false;
+        const nextHand = hand.map(cardId => {
+            if (!cardId || cardId.endsWith('+')) return cardId;
+            const baseId = cardId;
+            if (!BASIC_UPGRADE_BASES.has(baseId)) return cardId;
+            upgraded = true;
+            return `${cardId}+`;
+        });
+        if (upgraded) {
+            rewriteDeckRef(nextHand, drawPile, discardPile);
+            setDmgOverlay({ val: '基础卡强化', target: 'PLAYER', color: 'text-emerald-200' });
+            setTimeout(() => setDmgOverlay(null), 900);
+        } else {
+            setDmgOverlay({ val: '无基础牌可强化', target: 'PLAYER', color: 'text-red-200' });
+            setTimeout(() => setDmgOverlay(null), 900);
+        }
+        return upgraded;
     };
 
     const upgradeCardsInHand = () => {
@@ -358,9 +429,18 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
         setPlayerMana(initialMana + (heroData.relicId === "LuxPassive" ? 1 : 0));
         // 护甲不清零，累积到下一回合（符合 Slay the Spire 机制）
         // setPlayerBlock(0); // 已移除
+        clearDiscountQueue();
         const baseDraw = heroData.relicId === "JinxPassive" ? 6 : 5;
         const extraDraw = playerStatus?.extraDrawPerTurn || 0;
-        drawCards(baseDraw + extraDraw);
+        let bonusDraw = 0;
+        if (isFirstTurnRef.current && openingDrawBonus > 0) {
+            bonusDraw = openingDrawBonus;
+            onConsumeOpeningDrawBonus?.();
+        }
+        drawCards(baseDraw + extraDraw + bonusDraw);
+        if (isFirstTurnRef.current) {
+            isFirstTurnRef.current = false;
+        }
         setCardsPlayedCount(0); // 重置卡牌计数
         setAttacksThisTurn(0); // 重置攻击计数
         setCritCount(0); // Batch 2: 重置暴击计数
@@ -458,6 +538,10 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
             actualCost = Math.max(0, actualCost - reduction);
             setPlayerStatus(prev => ({ ...prev, nextCostReduce: 0 }));
         }
+        const discountAmount = consumeDiscountForCard(cardId);
+        if (discountAmount > 0) {
+            actualCost = Math.max(0, actualCost - discountAmount);
+        }
 
         if (playerMana < actualCost) return;
         setPlayerMana(p => p - actualCost);
@@ -522,6 +606,15 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
         if (effectUpdates.goldGain && typeof onGoldChange === 'function') {
             onGoldChange(effectUpdates.goldGain);
         }
+        if (effectUpdates.gambleOutcome) {
+            const outcome = effectUpdates.gambleOutcome;
+            const isWin = outcome.type === 'win';
+            spawnOverlay({
+                val: isWin ? `+${outcome.amount}G` : `HP -${outcome.amount}`,
+                target: 'PLAYER',
+                color: isWin ? 'text-yellow-300' : 'text-red-400'
+            }, 900);
+        }
 
         // FIX: 下回合效果 (Bug #5, #9) - merge status updates
         if (effectUpdates.playerStatus) {
@@ -552,7 +645,11 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
             applyPermaUpgrade();
         }
         if (effectUpdates.upgradeCard) {
-            upgradeCardsInHand();
+            if (card.id === 'Neutral_026') {
+                upgradeBasicCardsInHand();
+            } else {
+                upgradeCardsInHand();
+            }
         }
         if (effectUpdates.recycleCard) {
             recycleDiscardToHand();
@@ -575,6 +672,10 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
         }
         if (effectUpdates.placeBait) {
             setEnemyBaitDamage(effectUpdates.placeBait);
+        }
+
+        if (effectUpdates.discountCard) {
+            grantRandomDiscount(effectUpdates.discountCard);
         }
 
         if (effectUpdates.copyEnemySkill) {
@@ -926,6 +1027,9 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
             if (permaUpgradeRef.current.length > 0) {
                 battleResult.permaUpgrades = Array.from(new Set(permaUpgradeRef.current));
             }
+            if ((playerStatus.scholarRuneValue || 0) > 0) {
+                battleResult.nextBattleDrawBonus = (battleResult.nextBattleDrawBonus || 0) + playerStatus.scholarRuneValue;
+            }
 
             playSfx('WIN');
             const resultPayload = {
@@ -945,6 +1049,7 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
 
     const endTurn = () => {
         const { hand, discardPile } = deckRef.current;
+        clearDiscountQueue();
         deckRef.current = { ...deckRef.current, discardPile: [...discardPile, ...hand], hand: [] };
         forceUpdate();
         setGameState('ENEMY_TURN');

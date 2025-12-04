@@ -595,6 +595,7 @@ export default function LegendsOfTheSpire() {
     const [gold, setGold] = useState(100);
     const [relics, setRelics] = useState([]);
     const [baseStr, setBaseStr] = useState(0);
+    const [nextBattleDrawBonus, setNextBattleDrawBonus] = useState(0);
     const [activeNode, setActiveNode] = useState(null);
     const [usedEnemies, setUsedEnemies] = useState([]);
     const [pendingRelic, setPendingRelic] = useState(null);
@@ -946,6 +947,7 @@ export default function LegendsOfTheSpire() {
         setHasSave(false);
         setMapData({ grid: [], nodes: [], nodeMap: new Map() });
         setChampion(null);
+        setNextBattleDrawBonus(0);
     };
 
     const handleRestartMap = () => {
@@ -990,6 +992,7 @@ export default function LegendsOfTheSpire() {
         setRelics([RELIC_DATABASE[championPayload.relicId].id]);
         setBaseStr(0);
         setGold(0);
+        setNextBattleDrawBonus(0);
         achievementTracker.startRun({ type: 'run', heroId: championPayload.id });
         runStartRef.current = Date.now();
 
@@ -1323,6 +1326,7 @@ export default function LegendsOfTheSpire() {
         setActiveNode(null);
         setChampion(null);
         setView('CHAMPION_SELECT');
+        setNextBattleDrawBonus(0);
         showToast('GM：已清空存档，请重新选择英雄', 'default');
     };
 
@@ -1384,6 +1388,10 @@ export default function LegendsOfTheSpire() {
                 return next;
             });
             showToast(`永久升级 ${result.permaUpgrades.length} 张卡牌`, 'default');
+        }
+        if (result.nextBattleDrawBonus > 0) {
+            setNextBattleDrawBonus(prev => prev + result.nextBattleDrawBonus);
+            showToast(`下场战斗首抽 +${result.nextBattleDrawBonus}`, 'default');
         }
 
         setCurrentHp(Math.min(nextMaxHp, result.finalHp + passiveHeal));
@@ -1660,6 +1668,8 @@ export default function LegendsOfTheSpire() {
                         floorIndex={currentFloor}
                         act={currentAct}
                         onGoldChange={handleBattleGoldChange}
+                        openingDrawBonus={nextBattleDrawBonus}
+                        onConsumeOpeningDrawBonus={() => setNextBattleDrawBonus(0)}
                     />
                 );
             case 'REWARD': return <RewardView goldReward={50} onCardSelect={handleCardReward} onSkip={handleSkipReward} championName={champion.name} />;
