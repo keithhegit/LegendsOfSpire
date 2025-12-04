@@ -328,7 +328,9 @@ const AudioPlayer = ({ src }) => {
 };
 
 const Card = ({ cardId, index, totalCards, canPlay, onPlay }) => {
-    const card = CARD_DATABASE[cardId];
+    const isUpgraded = cardId.endsWith('+');
+    const baseId = isUpgraded ? cardId.slice(0, -1) : cardId;
+    const card = CARD_DATABASE[baseId];
     const overlap = totalCards > 5 ? -50 : 10;
     const rotation = (index - (totalCards - 1) / 2) * 3;
     const yOffset = Math.abs(index - (totalCards - 1) / 2) * 6;

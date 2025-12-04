@@ -650,14 +650,22 @@ function applyEffect(effectType, value, context, updates, card = {}) {
             };
             break;
 
-        case 'PERMA_STR_FOR_HP':
-            // 生命换力量（永久力量 + 代价）
-            updates.maxHpCost = (updates.maxHpCost || 0) + value;
+        case 'PERMA_STR_FOR_HP': {
+            // 野心契约：每场战斗仅可触发一次，战后获得永久力量
+            if (playerStatus?.ambitionPactUsed) {
+                updates.ambitionPactSkipped = true;
+                break;
+            }
+            const strengthGain = value || 1;
+            const hpCost = 5 * strengthGain;
+            updates.maxHpCost = (updates.maxHpCost || 0) + hpCost;
+            updates.permaStrPactGain = (updates.permaStrPactGain || 0) + strengthGain;
             updates.playerStatus = {
                 ...(updates.playerStatus || playerStatus),
-                strength: ((updates.playerStatus?.strength || playerStatus.strength) || 0) + value
+                ambitionPactUsed: true
             };
             break;
+        }
 
         case 'PER_ATTACK_BONUS':
             // 攻击叠加 - Stack bonus per attack

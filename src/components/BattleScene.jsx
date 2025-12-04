@@ -52,6 +52,7 @@ const BattleScene = ({
     const battleDebtRef = useRef({ maxHpCost: 0 });
     const permaUpgradeRef = useRef([]);
     const hunterBadgeActiveRef = useRef(false);
+    const ambitionPactPendingRef = useRef(0);
     const discountQueueRef = useRef([]);
     const isFirstTurnRef = useRef(true);
     const [dmgOverlay, setDmgOverlay] = useState(null);
@@ -102,7 +103,8 @@ const BattleScene = ({
         tempStrength: 0,
         globalAttackBonus: 0,
         winGoldBonus: 0,
-        scholarRuneValue: 0
+        scholarRuneValue: 0,
+        ambitionPactUsed: false
     });
     const [enemyStatus, setEnemyStatus] = useState({ strength: 0, weak: 0, vulnerable: 0, mark: 0, markDamage: 0, trap: 0 });
     const heroBaseCritChance = heroData?.id === 'Yasuo' ? 10 : 0;
@@ -135,6 +137,7 @@ const BattleScene = ({
         setIdleBlockState({ value: 0, armed: false, broken: false, sourceCard: null });
         achievementTracker.setBattleFlag('noAttackPlayed', true);
         achievementTracker.recordBattleStat('cardsPlayedInTurn', 0, { setValue: 0 });
+        ambitionPactPendingRef.current = 0;
         return () => {
             achievementTracker.cancelBattle();
             clearDiscountQueue();
@@ -157,13 +160,15 @@ const BattleScene = ({
         deckRef.current = { drawPile: initialDrawPile, hand: [], discardPile: [] };
         isFirstTurnRef.current = true;
         clearDiscountQueue();
+        ambitionPactPendingRef.current = 0;
         let block = 0; let str = heroData.baseStr || 0;
         (heroData.relics || []).forEach(rid => {
             const relic = RELIC_DATABASE[rid];
             if (relic && relic.onBattleStart) { const newState = relic.onBattleStart({ block, status: { strength: str } }); block = newState.block; str = newState.status.strength; }
             if (rid === heroData.relicId && heroData.relicId === "UrgotPassive") block += 15;
         });
-        setPlayerBlock(block); setPlayerStatus(prev => ({ ...prev, strength: str }));
+        setPlayerBlock(block);
+        setPlayerStatus(prev => ({ ...prev, strength: str, ambitionPactUsed: false }));
         startTurnLogic();
     }, []);
 
@@ -260,27 +265,6 @@ const BattleScene = ({
         }
     };
 
-    const upgradeBasicCardsInHand = () => {
-        const { hand, drawPile, discardPile } = deckRef.current;
-        let upgraded = false;
-        const nextHand = hand.map(cardId => {
-            if (!cardId || cardId.endsWith('+')) return cardId;
-            const baseId = cardId;
-            if (!BASIC_UPGRADE_BASES.has(baseId)) return cardId;
-            upgraded = true;
-            return `${cardId}+`;
-        });
-        if (upgraded) {
-            rewriteDeckRef(nextHand, drawPile, discardPile);
-            setDmgOverlay({ val: '基础卡强化', target: 'PLAYER', color: 'text-emerald-200' });
-            setTimeout(() => setDmgOverlay(null), 900);
-        } else {
-            setDmgOverlay({ val: '无基础牌可强化', target: 'PLAYER', color: 'text-red-200' });
-            setTimeout(() => setDmgOverlay(null), 900);
-        }
-        return upgraded;
-    };
-
     const upgradeCardsInHand = () => {
         const { hand, drawPile, discardPile } = deckRef.current;
         let upgraded = false;
@@ -303,7 +287,8 @@ const BattleScene = ({
     const recycleDiscardToHand = () => {
         const { hand, drawPile, discardPile } = deckRef.current;
         if (discardPile.length === 0) return null;
-        const recovered = discardPile.pop();
+        const randomIndex = Math.floor(Math.random() * discardPile.length);
+        const [recovered] = discardPile.splice(randomIndex, 1);
         hand.push(recovered);
         rewriteDeckRef(hand, drawPile, discardPile);
         setDmgOverlay({ val: `回收 ${recovered}`, target: 'PLAYER', color: 'text-slate-200' });
@@ -674,6 +659,16 @@ const BattleScene = ({
             setEnemyBaitDamage(effectUpdates.placeBait);
         }
 
+        if (effectUpdates.permaStrPactGain) {
+            ambitionPactPendingRef.current += effectUpdates.permaStrPactGain;
+            setDmgOverlay({ val: `战后力量 +${effectUpdates.permaStrPactGain}`, target: 'PLAYER', color: 'text-rose-200' });
+            setTimeout(() => setDmgOverlay(null), 900);
+        }
+        if (effectUpdates.ambitionPactSkipped) {
+            setDmgOverlay({ val: '契约已完成', target: 'PLAYER', color: 'text-slate-200' });
+            setTimeout(() => setDmgOverlay(null), 700);
+        }
+
         if (effectUpdates.discountCard) {
             grantRandomDiscount(effectUpdates.discountCard);
         }
@@ -1029,6 +1024,10 @@ const BattleScene = ({
             }
             if ((playerStatus.scholarRuneValue || 0) > 0) {
                 battleResult.nextBattleDrawBonus = (battleResult.nextBattleDrawBonus || 0) + playerStatus.scholarRuneValue;
+            }
+            if (ambitionPactPendingRef.current > 0) {
+                battleResult.gainedStr += ambitionPactPendingRef.current;
+                ambitionPactPendingRef.current = 0;
             }
 
             playSfx('WIN');
