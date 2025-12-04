@@ -601,6 +601,7 @@ export default function LegendsOfTheSpire() {
     const [showCodex, setShowCodex] = useState(false);
     const [showCollection, setShowCollection] = useState(false);
     const [showInventory, setShowInventory] = useState(false);
+    const [showDeck, setShowDeck] = useState(false);
     const [showAchievementPanel, setShowAchievementPanel] = useState(false);
     const [toasts, setToasts] = useState([]);
     const [lockedChoices, setLockedChoices] = useState(new Set()); // 三选一：已锁定的选项
