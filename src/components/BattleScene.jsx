@@ -14,7 +14,7 @@ import Card from './shared/Card';
 const DEX_BLOCK_PER_STACK = 5;
 const PERMA_UPGRADE_TYPES = new Set(['ATTACK', 'SKILL']);
 
-const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex, act }) => {
+const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex, act, onGoldChange }) => {
     const getScaledEnemy = (enemyId, floor, currentAct) => {
         const baseEnemy = ENEMY_POOL[enemyId];
         if (!baseEnemy) {
@@ -519,8 +519,8 @@ const BattleScene = ({ heroData, enemyId, initialDeck, onWin, onLose, floorIndex
         }
 
         // FIX: 金币奖励 (Bug #2)
-        if (effectUpdates.goldGain) {
-            setGold(gold => gold + effectUpdates.goldGain);
+        if (effectUpdates.goldGain && typeof onGoldChange === 'function') {
+            onGoldChange(effectUpdates.goldGain);
         }
 
         // FIX: 下回合效果 (Bug #5, #9) - merge status updates
