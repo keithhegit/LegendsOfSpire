@@ -1827,11 +1827,15 @@ export default function LegendsOfTheSpire() {
                                 <div className="flex flex-col">
                                     <span className="text-[#F0E6D2] font-bold text-lg shadow-black drop-shadow-md flex items-center gap-2">
                                         {champion.name}
-                                        <RelicTooltip relic={RELIC_DATABASE[champion.relicId]}>
-                                            <img src={RELIC_DATABASE[champion.relicId].img}
-                                                className="w-6 h-6 rounded border border-yellow-400 bg-black/50 cursor-help hover:scale-110 transition-transform"
-                                            />
-                                        </RelicTooltip>
+                                        {RELIC_DATABASE[champion.relicId] && (
+                                            <RelicTooltip relic={RELIC_DATABASE[champion.relicId]}>
+                                                <img
+                                                    src={RELIC_DATABASE[champion.relicId].img || 'https://ddragon.leagueoflegends.com/cdn/13.1.1/img/profileicon/29.png'}
+                                                    className="w-6 h-6 rounded border border-yellow-400 bg-black/50 cursor-help hover:scale-110 transition-transform"
+                                                    alt={RELIC_DATABASE[champion.relicId].name || 'relic'}
+                                                />
+                                            </RelicTooltip>
+                                        )}
                                     </span>
                                     <div className="flex items-center gap-4 text-sm font-bold"><span className="text-red-400 flex items-center gap-1"><Heart size={14} fill="currentColor" /> {currentHp}/{maxHp}</span><span className="text-yellow-400 flex items-center gap-1"><Coins size={14} fill="currentColor" /> {gold}</span></div>
                                 </div>
@@ -1839,10 +1843,11 @@ export default function LegendsOfTheSpire() {
                                 <div className="flex gap-2 flex-wrap max-w-md">
                                     {relics.filter(rid => rid !== champion.relicId).map((rid, i) => {
                                         const relic = RELIC_DATABASE[rid];
+                                        if (!relic) return null;
                                         return (
                                             <RelicTooltip key={i} relic={relic}>
                                                 <div className="w-9 h-9 rounded border border-[#C8AA6E]/50 bg-black/50 relative group cursor-help hover:scale-110 transition-transform">
-                                                    <img src={relic.img} className="w-full h-full object-cover" />
+                                                    <img src={relic.img || 'https://ddragon.leagueoflegends.com/cdn/13.1.1/img/profileicon/29.png'} className="w-full h-full object-cover" alt={relic.name || 'relic'} />
                                                 </div>
                                             </RelicTooltip>
                                         );

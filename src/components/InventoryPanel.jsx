@@ -273,7 +273,7 @@ const InventoryPanel = ({
                     <h4 className="text-xs uppercase tracking-[0.4em] text-slate-400 mb-2">英雄被动</h4>
                     {passiveRelic ? (
                         <div className="flex gap-3">
-                            <img src={passiveRelic.img} alt={passiveRelic.name} className="w-12 h-12 rounded border border-amber-500/40 object-cover" />
+                            <img src={passiveRelic.img || 'https://ddragon.leagueoflegends.com/cdn/13.1.1/img/profileicon/29.png'} alt={passiveRelic.name || 'relic'} className="w-12 h-12 rounded border border-amber-500/40 object-cover" />
                             <div>
                                 <div className="text-sm text-amber-200 font-semibold">{passiveRelic.name}</div>
                                 <div className="text-xs text-slate-300">{passiveRelic.description}</div>
@@ -308,7 +308,7 @@ const InventoryPanel = ({
                             <div key={`slot-${idx}`} className="bg-slate-900/70 border border-slate-700 rounded-xl p-3 flex flex-col items-center text-center min-h-[130px]">
                                 {relic ? (
                                     <>
-                                        <img src={relic.img} alt={relic.name} className="w-12 h-12 rounded border border-slate-600 object-cover mb-2" />
+                                        <img src={relic.img || 'https://ddragon.leagueoflegends.com/cdn/13.1.1/img/profileicon/29.png'} alt={relic.name || 'relic'} className="w-12 h-12 rounded border border-slate-600 object-cover mb-2" />
                                         <div className="text-sm text-white font-semibold">{relic.name}</div>
                                         <div className="text-[11px] text-slate-400 line-clamp-2">{relic.description}</div>
                                         {pendingRelicData && (
