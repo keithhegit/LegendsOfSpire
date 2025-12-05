@@ -10,10 +10,12 @@ import { playSfx, playChampionVoice } from '../utils/audioManager';
 import { applyCardEffects, calculateBlockValue } from '../utils/cardEffectHandler';
 import { achievementTracker } from '../utils/achievementTracker';
 import Card from './shared/Card';
+import { getBaseCardId, getCardWithUpgrade, getUpgradeLevel } from '../utils/cardUtils';
 
 const DEX_BLOCK_PER_STACK = 5;
 const PERMA_UPGRADE_TYPES = new Set(['ATTACK', 'SKILL']);
 const BASIC_UPGRADE_BASES = new Set(['Strike', 'Defend']);
+const HAMMER_TARGET_BASES = ['Strike', 'Defend'];
 
 const BattleScene = ({
     heroData,
@@ -51,6 +53,7 @@ const BattleScene = ({
     const forceUpdate = () => setRenderTrigger(prev => prev + 1);
     const battleDebtRef = useRef({ maxHpCost: 0 });
     const permaUpgradeRef = useRef([]);
+    const consumedCardsRef = useRef([]);
     const hunterBadgeActiveRef = useRef(false);
     const ambitionPactPendingRef = useRef(0);
     const discountQueueRef = useRef([]);
@@ -133,6 +136,7 @@ const BattleScene = ({
         achievementTracker.startBattle();
         battleDebtRef.current = { maxHpCost: 0 };
         permaUpgradeRef.current = [];
+        consumedCardsRef.current = [];
         hunterBadgeActiveRef.current = false;
         setIdleBlockState({ value: 0, armed: false, broken: false, sourceCard: null });
         achievementTracker.setBattleFlag('noAttackPlayed', true);
@@ -200,77 +204,81 @@ const BattleScene = ({
         const candidates = hand.filter(Boolean);
         if (candidates.length === 0) return false;
         const target = candidates[Math.floor(Math.random() * candidates.length)];
-        const baseId = target.endsWith('+') ? target.slice(0, -1) : target;
+        const baseId = getBaseCardId(target);
         discountQueueRef.current.push({ cardId: target, baseId, amount });
         spawnOverlay({
             val: `减费 ${CARD_DATABASE[baseId]?.name || baseId}`,
             target: 'PLAYER',
             color: 'text-sky-300'
         }, 900);
+        forceUpdate();
         return true;
     };
 
     const consumeDiscountForCard = (cardId) => {
         if (!discountQueueRef.current.length) return 0;
-        const baseId = cardId.endsWith('+') ? cardId.slice(0, -1) : cardId;
+        const baseId = getBaseCardId(cardId);
         let idx = discountQueueRef.current.findIndex(entry => entry.cardId === cardId);
         if (idx === -1) {
             idx = discountQueueRef.current.findIndex(entry => entry.baseId === baseId);
         }
         if (idx === -1) return 0;
         const [entry] = discountQueueRef.current.splice(idx, 1);
+        forceUpdate();
         return entry?.amount || 0;
     };
 
     const clearDiscountQueue = () => {
         discountQueueRef.current = [];
+        forceUpdate();
     };
 
-    const findAndUpgradeCard = () => {
-        const { hand, drawPile, discardPile } = deckRef.current;
-        const piles = [
-            { name: 'hand', cards: [...hand] },
-            { name: 'drawPile', cards: [...drawPile] },
-            { name: 'discardPile', cards: [...discardPile] }
-        ];
-        for (const pile of piles) {
-            const idx = pile.cards.findIndex(cardId => {
-                if (!cardId || cardId.endsWith('+')) return false;
-                const baseCard = CARD_DATABASE[cardId];
-                if (!baseCard) return false;
-                return PERMA_UPGRADE_TYPES.has(baseCard.type || '');
-            });
-            if (idx !== -1) {
-                const baseId = pile.cards[idx];
-                pile.cards[idx] = `${baseId}+`;
-                const nextHand = pile.name === 'hand' ? pile.cards : piles[0].cards;
-                const nextDraw = pile.name === 'drawPile' ? pile.cards : piles[1].cards;
-                const nextDiscard = pile.name === 'discardPile' ? pile.cards : piles[2].cards;
-                rewriteDeckRef(nextHand, nextDraw, nextDiscard);
-                return baseId;
-            }
-        }
-        return null;
+    const getDiscountForCard = (cardId) => {
+        if (!discountQueueRef.current.length || !cardId) return 0;
+        const baseId = getBaseCardId(cardId);
+        const entry = discountQueueRef.current.find(item => item.cardId === cardId) ||
+            discountQueueRef.current.find(item => item.baseId === baseId);
+        return entry?.amount || 0;
     };
 
     const applyPermaUpgrade = () => {
-        const upgradedId = findAndUpgradeCard();
-        if (upgradedId) {
-            permaUpgradeRef.current.push(upgradedId);
-            setDmgOverlay({ val: '升阶成功', target: 'PLAYER', color: 'text-amber-200' });
+        const { hand, drawPile, discardPile } = deckRef.current;
+        const pools = {
+            hand: [...hand],
+            drawPile: [...drawPile],
+            discardPile: [...discardPile]
+        };
+        const candidates = [];
+        Object.entries(pools).forEach(([pileKey, cards]) => {
+            cards.forEach((cardId, idx) => {
+                if (!cardId) return;
+                const baseId = getBaseCardId(cardId);
+                if (HAMMER_TARGET_BASES.includes(baseId)) {
+                    candidates.push({ pileKey, index: idx, baseId });
+                }
+            });
+        });
+        if (!candidates.length) {
+            setDmgOverlay({ val: '无打击/防御可升级', target: 'PLAYER', color: 'text-red-200' });
             setTimeout(() => setDmgOverlay(null), 900);
-        } else {
-            setDmgOverlay({ val: '无可升级目标', target: 'PLAYER', color: 'text-red-200' });
-            setTimeout(() => setDmgOverlay(null), 900);
+            return;
         }
+        const pick = candidates[Math.floor(Math.random() * candidates.length)];
+        pools[pick.pileKey][pick.index] = `${pools[pick.pileKey][pick.index]}+`;
+        rewriteDeckRef(pools.hand, pools.drawPile, pools.discardPile);
+        permaUpgradeRef.current.push(pick.baseId);
+        const upgradedName = CARD_DATABASE[pick.baseId]?.name || pick.baseId;
+        setDmgOverlay({ val: `匠魂强化 ${upgradedName}`, target: 'PLAYER', color: 'text-amber-200' });
+        setTimeout(() => setDmgOverlay(null), 900);
     };
 
     const upgradeCardsInHand = () => {
         const { hand, drawPile, discardPile } = deckRef.current;
         let upgraded = false;
         const nextHand = hand.map(cardId => {
-            if (!cardId || cardId.endsWith('+')) return cardId;
-            const baseCard = CARD_DATABASE[cardId];
+            if (!cardId || getUpgradeLevel(cardId) > 0) return cardId;
+            const baseId = getBaseCardId(cardId);
+            const baseCard = CARD_DATABASE[baseId];
             if (!baseCard) return cardId;
             if (!PERMA_UPGRADE_TYPES.has(baseCard.type || '')) return cardId;
             upgraded = true;
@@ -284,6 +292,28 @@ const BattleScene = ({
         return upgraded;
     };
 
+    const upgradeBasicCardsInHand = () => {
+        const { hand, drawPile, discardPile } = deckRef.current;
+        let upgraded = false;
+        const nextHand = hand.map(cardId => {
+            if (!cardId) return cardId;
+            if (getUpgradeLevel(cardId) > 0) return cardId;
+            const baseId = getBaseCardId(cardId);
+            if (!BASIC_UPGRADE_BASES.has(baseId)) return cardId;
+            upgraded = true;
+            return `${cardId}+`;
+        });
+        if (upgraded) {
+            rewriteDeckRef(nextHand, drawPile, discardPile);
+            setDmgOverlay({ val: '基础卡强化', target: 'PLAYER', color: 'text-emerald-200' });
+            setTimeout(() => setDmgOverlay(null), 900);
+        } else {
+            setDmgOverlay({ val: '无基础牌可强化', target: 'PLAYER', color: 'text-red-200' });
+            setTimeout(() => setDmgOverlay(null), 900);
+        }
+        return upgraded;
+    };
+
     const recycleDiscardToHand = () => {
         const { hand, drawPile, discardPile } = deckRef.current;
         if (discardPile.length === 0) return null;
@@ -291,7 +321,8 @@ const BattleScene = ({
         const [recovered] = discardPile.splice(randomIndex, 1);
         hand.push(recovered);
         rewriteDeckRef(hand, drawPile, discardPile);
-        setDmgOverlay({ val: `回收 ${recovered}`, target: 'PLAYER', color: 'text-slate-200' });
+        const recoveredCard = getCardWithUpgrade(recovered);
+        setDmgOverlay({ val: `回收 ${recoveredCard?.name || recovered}`, target: 'PLAYER', color: 'text-slate-200' });
         setTimeout(() => setDmgOverlay(null), 800);
         return recovered;
     };
@@ -491,26 +522,17 @@ const BattleScene = ({
             setIdleBlockState(prev => ({ ...prev, broken: true }));
         }
 
-        // 处理升级卡牌 (带 + 后缀)
-        const isUpgraded = cardId.endsWith('+');
-        const baseId = isUpgraded ? cardId.slice(0, -1) : cardId;
-        const baseCard = CARD_DATABASE[baseId];
-
-        if (!baseCard) {
-            console.error(`Card not found in database: ${baseId}`);
+        const cardTemplate = getCardWithUpgrade(cardId);
+        if (!cardTemplate) {
+            console.error(`Card not found in database: ${cardId}`);
             return;
         }
+        const baseId = cardTemplate.baseId;
 
         const cardsPlayedBefore = cardsPlayedCount;
         const attackCountBeforeCard = attacksThisTurn;
 
-        // 如果是升级卡牌，增强属性
-        let card = {
-            ...baseCard,
-            value: isUpgraded && baseCard.value ? baseCard.value + 3 : baseCard.value,
-            block: isUpgraded && baseCard.block ? baseCard.block + 3 : baseCard.block,
-            effectValue: isUpgraded && baseCard.effectValue ? baseCard.effectValue + 1 : baseCard.effectValue
-        };
+        let card = { ...cardTemplate };
 
         // 盲僧被动：技能牌后下一张攻击牌-1费
         let actualCost = card.cost;
@@ -644,6 +666,7 @@ const BattleScene = ({
         }
         if (effectUpdates.hunterBadge) {
             hunterBadgeActiveRef.current = true;
+            consumedCardsRef.current.push(baseId);
         }
         if (effectUpdates.scoutCount || effectUpdates.revealEnemyIntent) {
             revealEnemyIntent();
@@ -1020,7 +1043,8 @@ const BattleScene = ({
                 hunterBadgeActiveRef.current = false;
             }
             if (permaUpgradeRef.current.length > 0) {
-                battleResult.permaUpgrades = Array.from(new Set(permaUpgradeRef.current));
+                battleResult.permaUpgrades = [...permaUpgradeRef.current];
+                permaUpgradeRef.current = [];
             }
             if ((playerStatus.scholarRuneValue || 0) > 0) {
                 battleResult.nextBattleDrawBonus = (battleResult.nextBattleDrawBonus || 0) + playerStatus.scholarRuneValue;
@@ -1035,6 +1059,10 @@ const BattleScene = ({
                 ...battleResult,
                 maxHpCost: battleDebtRef.current.maxHpCost
             };
+            if (consumedCardsRef.current.length > 0) {
+                resultPayload.consumedCards = [...consumedCardsRef.current];
+                consumedCardsRef.current = [];
+            }
             setTimeout(() => onWin(resultPayload), 1000);
         }
     }, [enemyHp]);
@@ -1386,12 +1414,13 @@ const BattleScene = ({
                 <div className="flex items-end justify-center pointer-events-auto" style={{ width: '600px', height: '240px', position: 'relative' }}>
                     <AnimatePresence>
                         {hand.map((cid, i) => {
-                            const card = CARD_DATABASE[cid];
+                            const card = getCardWithUpgrade(cid);
                             if (!card) {
                                 console.warn(`Card not found in database: ${cid}`);
                                 return null;
                             }
                             const canPlay = playerMana >= card.cost && gameState === 'PLAYER_TURN';
+                            const discountAmount = getDiscountForCard(cid);
                             return (
                                 <Card
                                     key={`${cid}-${i}`}
@@ -1400,6 +1429,7 @@ const BattleScene = ({
                                     totalCards={hand.length}
                                     canPlay={canPlay}
                                     onPlay={playCard}
+                                    discountAmount={discountAmount}
                                 />
                             )
                         })}

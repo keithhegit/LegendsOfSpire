@@ -5,6 +5,7 @@ import { CARD_DATABASE } from '../data/cards';
 import { RELIC_DATABASE } from '../data/relics';
 import { ITEM_URL } from '../data/constants';
 import RelicTooltip from './shared/RelicTooltip';
+import { getBaseCardId, getUpgradeLevel } from '../utils/cardUtils';
 
 const ShopView = ({ onLeave, onBuyCard, onBuyRelic, onUpgradeCard, onBuyMana, gold, relics, deck, championName }) => {
     const cardStock = useMemo(() => shuffle(Object.values(CARD_DATABASE).filter(c => c.rarity !== 'BASIC' && (c.hero === 'Neutral' || c.hero === championName))).slice(0, 5), [championName]);
@@ -15,9 +16,8 @@ const ShopView = ({ onLeave, onBuyCard, onBuyRelic, onUpgradeCard, onBuyMana, go
     // 计算可升级的卡牌（排除已升级的）
     const upgradableCards = useMemo(() => {
         if (!deck) return [];
-        // 过滤掉已经升级过的卡牌（带+号的）
-        // 注意：deck 是 cardId 数组
-        return [...new Set(deck.filter(id => !id.endsWith('+')))].map(id => CARD_DATABASE[id]).filter(Boolean);
+        const baseIds = [...new Set(deck.filter(id => getUpgradeLevel(id) === 0).map(getBaseCardId))];
+        return baseIds.map(id => CARD_DATABASE[id]).filter(Boolean);
     }, [deck]);
 
     const handleBuy = (item, type) => { 

@@ -1,16 +1,16 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Search, Trash2, BookOpen, Coins } from 'lucide-react';
-import { CARD_DATABASE } from '../data/cards';
+import { getCardWithUpgrade } from '../utils/cardUtils';
 import { RELIC_DATABASE } from '../data/relics';
 
 const CARD_DELETE_COST = { COMMON: 50, UNCOMMON: 100, RARE: 200 };
 const MAX_RELIC_SLOTS = 6;
 
-const getHeroStats = (champion, deckSize, relicCount) => [
-    { label: '最大生命', value: champion?.maxHp ?? '-' },
-    { label: '最大法力', value: champion?.maxMana ?? 3 },
-    { label: '基础力量', value: champion?.baseStr ?? 0 },
+const getHeroStats = (champion, deckSize, relicCount, overrides = {}) => [
+    { label: '最大生命', value: overrides.maxHp ?? champion?.maxHp ?? '-' },
+    { label: '最大法力', value: overrides.maxMana ?? champion?.maxMana ?? 3 },
+    { label: '基础力量', value: overrides.baseStr ?? champion?.baseStr ?? 0 },
     { label: '基础暴击率', value: champion?.id === 'Yasuo' ? '10%' : '0%' },
     { label: '基础暴击伤害', value: '200%' },
     { label: '敏捷', value: 0 },
@@ -23,6 +23,9 @@ const InventoryPanel = ({
     deck = [],
     relics = [],
     champion,
+    currentHp,
+    maxHp,
+    baseStr,
     gold = 0,
     onRemoveCard,
     initialTab = 'CARDS',
@@ -51,7 +54,7 @@ const InventoryPanel = ({
             return acc;
         }, {});
         return Object.entries(counts)
-            .map(([id, count]) => ({ id, count, card: CARD_DATABASE[id] }))
+            .map(([id, count]) => ({ id, count, card: getCardWithUpgrade(id) }))
             .filter(entry => entry.card);
     }, [deck]);
 
@@ -78,13 +81,18 @@ const InventoryPanel = ({
         [extraRelics]
     );
     const pendingRelicData = pendingRelic ? RELIC_DATABASE[pendingRelic.id] : null;
-    const heroStats = getHeroStats(champion, deck.length, extraRelics.length);
+    const heroStats = getHeroStats(champion, deck.length, extraRelics.length, {
+        maxHp,
+        baseStr,
+        maxMana: champion?.maxMana,
+        currentHp
+    });
 
     const canDeleteCard = (card) =>
         card && card.hero === 'Neutral' && card.rarity !== 'BASIC' && CARD_DELETE_COST[card.rarity];
 
     const handleDelete = (cardId) => {
-        const card = CARD_DATABASE[cardId];
+        const card = getCardWithUpgrade(cardId);
         if (!canDeleteCard(card)) return;
         onRemoveCard?.(cardId);
     };

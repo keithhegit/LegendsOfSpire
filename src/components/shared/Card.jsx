@@ -1,25 +1,17 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { CARD_DATABASE } from '../../data/cards';
+import { getCardWithUpgrade } from '../../utils/cardUtils';
 
-const Card = ({ cardId, index, totalCards, canPlay, onPlay }) => {
-  const isUpgraded = cardId.endsWith('+');
-  const baseId = isUpgraded ? cardId.slice(0, -1) : cardId;
-  const baseCard = CARD_DATABASE[baseId];
+const Card = ({ cardId, index, totalCards, canPlay, onPlay, discountAmount = 0 }) => {
+  const card = getCardWithUpgrade(cardId);
 
-  // 如果卡牌不存在，返回空组件或占位符
-  if (!baseCard) {
+  if (!card) {
     console.warn(`Card not found: ${cardId}`);
     return null;
   }
-  
-  const card = {
-    ...baseCard,
-    name: isUpgraded ? `${baseCard.name}+` : baseCard.name,
-    value: isUpgraded && baseCard.value ? baseCard.value + 3 : baseCard.value,
-    block: isUpgraded && baseCard.block ? baseCard.block + 3 : baseCard.block,
-    description: isUpgraded ? baseCard.description.replace(/(\d+)/g, match => parseInt(match) + 3) : baseCard.description
-  };
+
+  const { baseId, upgradeLevel } = card;
+  const isUpgraded = upgradeLevel > 0;
 
   const isUltimate = card.hero && card.hero !== 'Neutral' && baseId.endsWith('R');
   
@@ -75,6 +67,14 @@ const Card = ({ cardId, index, totalCards, canPlay, onPlay }) => {
         <div className="absolute top-2 left-2 w-8 h-8 bg-[#091428] rounded-full border border-[#C8AA6E] flex items-center justify-center text-[#C8AA6E] font-bold text-lg shadow-md">
           {card.cost}
         </div>
+        {discountAmount > 0 && (
+          <div
+            className="absolute top-2 left-11 px-1 py-0.5 rounded bg-sky-900/80 border border-sky-400 text-xs font-bold text-sky-200 animate-pulse"
+            aria-label={`Mana discount ${discountAmount}`}
+          >
+            -{discountAmount}
+          </div>
+        )}
       </div>
       
       {/* 卡牌文本 */}

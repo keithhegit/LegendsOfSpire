@@ -3,6 +3,7 @@ import { Sword, Shield, Zap, Skull, Heart, RefreshCw, AlertTriangle, Flame, XCir
 import { motion, AnimatePresence } from 'framer-motion';
 import { generateGridMap } from './data/gridMapLayout_v4'; // v4生成器（带死胡同检测）
 import { CARD_DATABASE } from './data/cards'; // 卡牌数据
+import { getBaseCardId, getCardWithUpgrade, getUpgradeLevel } from './utils/cardUtils';
 import GridMapView_v3 from './components/GridMapView_v3'; // 新版六边形地图视图（三选一机制）
 import ChampionSelect from './components/ChampionSelect';
 import BattleScene from './components/BattleScene';
@@ -328,9 +329,13 @@ const AudioPlayer = ({ src }) => {
 };
 
 const Card = ({ cardId, index, totalCards, canPlay, onPlay }) => {
-    const isUpgraded = cardId.endsWith('+');
-    const baseId = isUpgraded ? cardId.slice(0, -1) : cardId;
-    const card = CARD_DATABASE[baseId];
+    const card = getCardWithUpgrade(cardId);
+    if (!card) {
+        console.warn(`Card not found: ${cardId}`);
+        return null;
+    }
+    const { baseId, upgradeLevel } = card;
+    const isUpgraded = upgradeLevel > 0;
     const overlap = totalCards > 5 ? -50 : 10;
     const rotation = (index - (totalCards - 1) / 2) * 3;
     const yOffset = Math.abs(index - (totalCards - 1) / 2) * 6;
@@ -1382,14 +1387,27 @@ export default function LegendsOfTheSpire() {
             setMasterDeck(prev => {
                 const next = [...prev];
                 result.permaUpgrades.forEach(baseId => {
-                    const idx = next.indexOf(baseId);
+                    const idx = next.findIndex(cardId => getBaseCardId(cardId) === baseId);
                     if (idx !== -1) {
-                        next[idx] = `${baseId}+`;
+                        next[idx] = `${next[idx]}+`;
                     }
                 });
                 return next;
             });
             showToast(`永久升级 ${result.permaUpgrades.length} 张卡牌`, 'default');
+        }
+        if (Array.isArray(result.consumedCards) && result.consumedCards.length > 0) {
+            setMasterDeck(prev => {
+                const next = [...prev];
+                result.consumedCards.forEach(baseId => {
+                    const idx = next.findIndex(cardId => getBaseCardId(cardId) === baseId);
+                    if (idx !== -1) {
+                        next.splice(idx, 1);
+                    }
+                });
+                return next;
+            });
+            showToast(`猎手徽章 消失 x${result.consumedCards.length}`, 'default');
         }
         if (result.nextBattleDrawBonus > 0) {
             setNextBattleDrawBonus(prev => prev + result.nextBattleDrawBonus);
@@ -1440,11 +1458,13 @@ export default function LegendsOfTheSpire() {
         }
         if (reward.type === 'UPGRADE_RANDOM') {
             // 随机升级一张卡
-            const upgradableIndices = masterDeck.map((id, idx) => !id.endsWith('+') ? idx : -1).filter(i => i !== -1);
+            const upgradableIndices = masterDeck
+                .map((id, idx) => (getUpgradeLevel(id) === 0 ? idx : -1))
+                .filter(i => i !== -1);
             if (upgradableIndices.length > 0) {
                 const randomIdx = upgradableIndices[Math.floor(Math.random() * upgradableIndices.length)];
                 const newDeck = [...masterDeck];
-                newDeck[randomIdx] = newDeck[randomIdx] + '+';
+                newDeck[randomIdx] = `${newDeck[randomIdx]}+`;
                 setMasterDeck(newDeck);
             }
         }
@@ -1454,10 +1474,11 @@ export default function LegendsOfTheSpire() {
 
     const handleUpgradeCard = (cardId) => {
         // 升级指定卡牌（找到第一个匹配的未升级版本）
-        const idx = masterDeck.findIndex(id => id === cardId);
+        const targetBaseId = getBaseCardId(cardId);
+        const idx = masterDeck.findIndex(id => getBaseCardId(id) === targetBaseId);
         if (idx !== -1) {
             const newDeck = [...masterDeck];
-            newDeck[idx] = cardId + '+';
+            newDeck[idx] = `${newDeck[idx]}+`;
             setMasterDeck(newDeck);
             setGold(prev => prev - 100);
         }
@@ -1854,6 +1875,7 @@ export default function LegendsOfTheSpire() {
                     deck={masterDeck}
                     relics={relics}
                     champion={champion}
+                    baseStr={baseStr}
                     currentHp={currentHp}
                     maxHp={maxHp}
                     gold={gold}

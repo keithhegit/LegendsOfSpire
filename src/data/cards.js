@@ -61,8 +61,8 @@ const NEUTRAL_CARD_CDN = {
 };
 export const CARD_DATABASE = {
   // ---------- BASIC CARDS ----------
-  Strike: { id: 'Strike', hero: 'Neutral', name: '打击', price: 0, type: 'ATTACK', cost: 1, value: 6, description: '造成 6 点伤害。', img: `${SPELL_URL}/SummonerFlash.png`, rarity: 'BASIC' },
-  Defend: { id: 'Defend', hero: 'Neutral', name: '防御', price: 0, type: 'SKILL', cost: 1, block: 5, description: '获得 5 点护甲。', img: `${SPELL_URL}/SummonerBarrier.png`, rarity: 'BASIC' },
+  Strike: { id: 'Strike', hero: 'Neutral', name: '打击', price: 0, type: 'ATTACK', cost: 1, value: 6, description: '造成 6 点伤害。', img: `${SPELL_URL}/SummonerFlash.png`, rarity: 'BASIC', upgradeValueIncrement: 1, upgradeDescriptionIncrement: 1 },
+  Defend: { id: 'Defend', hero: 'Neutral', name: '防御', price: 0, type: 'SKILL', cost: 1, block: 5, description: '获得 5 点护甲。', img: `${SPELL_URL}/SummonerBarrier.png`, rarity: 'BASIC', upgradeBlockIncrement: 1, upgradeDescriptionIncrement: 1 },
   Ignite: { id: 'Ignite', hero: 'Neutral', name: '点燃', price: 80, type: 'SKILL', cost: 0, value: 0, effect: 'STRENGTH', effectValue: 2, exhaust: true, description: '获得 2 点力量。消耗。', img: `${SPELL_URL}/SummonerDot.png`, rarity: 'UNCOMMON' },
   Heal: { id: 'Heal', hero: 'Neutral', name: '治疗术', price: 80, type: 'SKILL', cost: 1, effect: 'HEAL', effectValue: 10, exhaust: true, description: '恢复 10 点生命。消耗。', img: `${SPELL_URL}/SummonerHeal.png`, rarity: 'UNCOMMON' },
 
@@ -216,9 +216,9 @@ export const CARD_DATABASE = {
   Neutral_016: { id: 'Neutral_016', name: '法力石碎片', type: 'SKILL', cost: 0, value: 0, rarity: 'COMMON', hero: 'Neutral', target: 'self', effect: 'MANA_IF_LOW_HAND', effectValue: 1, description: '若你手牌≤3，则获得1法力并抽1。', img: `${SPELL_URL}/SummonerClarity.png`, price: 40 },
 
   Neutral_017: { id: 'Neutral_017', name: '求知铭文', type: 'POWER', cost: 2, value: 0, rarity: 'RARE', hero: 'Neutral', target: 'self', effect: 'PERMA_DRAW_ON_KILL', effectValue: 1, description: '战斗中击杀敌人后，下个战斗的首个回合额外抽 1 张牌。', img: `${SPELL_URL}/SummonerSnowball.png`, price: 200 },
-  Neutral_018: { id: 'Neutral_018', name: '匠魂之锤', type: 'SKILL', cost: 3, value: 0, rarity: 'RARE', hero: 'Neutral', target: 'self', effect: 'PERMA_UPGRADE_CARD', effectValue: 1, exhaust: true, description: '本战斗仅能使用一次：永久升级一张攻击/技能牌（附带即时升级）。', img: `${SPELL_URL}/SummonerSnowball.png`, price: 220 },
+  Neutral_018: { id: 'Neutral_018', name: '匠魂之锤', type: 'SKILL', cost: 3, value: 0, rarity: 'RARE', hero: 'Neutral', target: 'self', effect: 'PERMA_UPGRADE_CARD', effectValue: 1, exhaust: true, description: '随机让《打击》或《防御》牌数值永久 +1（立即生效，本局保留成长）。', img: `${SPELL_URL}/SummonerSnowball.png`, price: 220 },
   Neutral_019: { id: 'Neutral_019', name: '荣誉奖章', type: 'SKILL', cost: 1, value: 0, rarity: 'COMMON', hero: 'Neutral', target: 'self', effect: 'WIN_GOLD_BONUS', effectValue: 10, description: '战斗胜利时获得额外+10金币（可叠）。', img: `${SPELL_URL}/SummonerTeleport.png`, price: 60 },
-  Neutral_020: { id: 'Neutral_020', name: '猎手徽章', type: 'POWER', cost: 1, value: 0, rarity: 'UNCOMMON', hero: 'Neutral', target: 'self', effect: 'TEMP_STR_ON_KILLS', effectValue: 1, description: '若携带此徽章击败敌人，永久获得 +1 力量。', img: `${SPELL_URL}/SummonerHaste.png`, price: 120 },
+  Neutral_020: { id: 'Neutral_020', name: '猎手徽章', type: 'POWER', cost: 1, value: 0, rarity: 'UNCOMMON', hero: 'Neutral', target: 'self', effect: 'TEMP_STR_ON_KILLS', effectValue: 1, exhaust: true, description: '一次性：若携带此徽章击败敌人，永久获得 +1 力量后从牌组移除。', img: `${SPELL_URL}/SummonerHaste.png`, price: 120 },
   Neutral_021: { id: 'Neutral_021', name: '野心契约', type: 'SKILL', cost: 0, value: 0, rarity: 'RARE', hero: 'Neutral', target: 'self', effect: 'PERMA_STR_FOR_HP', effectValue: 1, description: '每场战斗限一次：牺牲 5 最大生命，战斗结束后永久获得 +1 力量。', img: `${SPELL_URL}/SummonerHaste.png`, price: 0 },
   Neutral_022: { id: 'Neutral_022', name: '古老碑铭', type: 'POWER', cost: 3, value: 0, rarity: 'RARE', hero: 'Neutral', target: 'self', effect: 'DRAW_AT_START', effectValue: 1, description: '战斗开始时若持有本卡则每回合开始额外抽1张（持续战斗期）。', img: `${SPELL_URL}/SummonerSnowball.png`, price: 200 },
 

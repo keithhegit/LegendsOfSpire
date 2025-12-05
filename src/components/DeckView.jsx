@@ -1,6 +1,7 @@
 import React from 'react';
 import { X, Layers } from 'lucide-react';
 import { CARD_DATABASE } from '../data/cards';
+import { getCardWithUpgrade } from '../utils/cardUtils';
 
 const DeckView = ({ deck, onClose, gmConfig }) => {
     // 统计卡牌数量
@@ -40,7 +41,7 @@ const DeckView = ({ deck, onClose, gmConfig }) => {
                 )}
                 <div className="flex-1 overflow-y-auto p-4 sm:p-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 content-start">
                     {Object.entries(deckCounts).map(([cardId, count]) => {
-                        const card = CARD_DATABASE[cardId];
+                        const card = getCardWithUpgrade(cardId) || CARD_DATABASE[cardId];
                         if (!card) return null;
 
                         return (
