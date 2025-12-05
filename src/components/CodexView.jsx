@@ -12,7 +12,9 @@ const CodexView = ({ onClose }) => {
             case 'CARDS':
                 return (
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 p-4 overflow-y-auto h-full">
-                        {Object.values(CARD_DATABASE).map(card => (
+                        {Object.values(CARD_DATABASE).map(card => {
+                            if (!card) return null;
+                            return (
                             <div key={card.id} className="bg-[#1E2328] border border-slate-600 p-2 rounded flex flex-col items-center hover:border-[#C8AA6E] transition-colors">
                                 <img 
                                     src={card?.img || 'https://ddragon.leagueoflegends.com/cdn/13.1.1/img/profileicon/29.png'} 
@@ -26,7 +28,8 @@ const CodexView = ({ onClose }) => {
                                 <div className="text-[10px] text-[#A09B8C] text-center line-clamp-2">{card?.description}</div>
                                 <div className="text-[8px] text-slate-500 mt-1">{card?.type}</div>
                             </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 );
 

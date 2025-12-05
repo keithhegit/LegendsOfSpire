@@ -49,7 +49,9 @@ const RewardView = ({ onSkip, onCardSelect, goldReward, championName }) => {
        <p className="text-[#F0E6D2] mb-8 flex items-center gap-2 text-xl"><Coins className="text-yellow-400"/> +{goldReward} 金币</p>
        <h3 className="text-xl text-white mb-6 uppercase tracking-widest">选择战利品</h3>
        <div className="flex gap-6 mb-10">
-          {rewards.map((card, idx) => (
+          {rewards.map((card, idx) => {
+             if (!card) return null;
+             return (
              <div key={idx} onClick={() => onCardSelect(card.id)} className="w-48 h-72 bg-[#1E2328] border-2 border-[#C8AA6E] rounded-xl hover:scale-105 transition-transform cursor-pointer flex flex-col overflow-hidden group shadow-xl">
                 <div className="h-32 bg-black relative">
                     <img
@@ -64,7 +66,8 @@ const RewardView = ({ onSkip, onCardSelect, goldReward, championName }) => {
                     <div className="mt-auto text-xs font-bold text-[#C8AA6E] uppercase">{card.rarity}</div>
                 </div>
              </div>
-          ))}
+             );
+          })}
        </div>
        <button onClick={onSkip} className="px-8 py-3 border border-slate-600 text-slate-400 hover:text-white hover:border-white rounded uppercase tracking-widest">跳过</button>
     </div>

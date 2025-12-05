@@ -38,6 +38,7 @@ const CollectionSystem = ({ onClose }) => {
     // 杩囨护鍗＄墝
     const filteredCards = useMemo(() => {
         return allCards.filter(card => {
+            if (!card) return false;
             const matchSearch = card.name.includes(searchTerm) || card.description.includes(searchTerm);
             const matchHero = filterHero === 'ALL' || card.hero === filterHero;
             const matchRarity = filterRarity === 'ALL' || card.rarity === filterRarity;
@@ -45,37 +46,40 @@ const CollectionSystem = ({ onClose }) => {
         });
     }, [allCards, searchTerm, filterHero, filterRarity]);
 
-    // 娓叉煋鍗＄墝
-    const renderCard = (card) => (
-        <motion.div
-            key={card.id}
-            layoutId={card.id}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="relative group w-48 h-64 bg-slate-900/80 border border-amber-500/30 rounded-lg overflow-hidden hover:border-amber-400 hover:shadow-[0_0_15px_rgba(251,191,36,0.3)] transition-all duration-300"
-        >
-            {/* 鍗＄墝鍥剧墖 */}
-            <div className="h-32 overflow-hidden bg-black">
-                <img
-                    src={card.img || 'https://ddragon.leagueoflegends.com/cdn/13.1.1/img/profileicon/29.png'}
-                    alt={card.name || 'card'}
-                    className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
-                />
-            </div>
-            {/* 鍗＄墝淇℃伅 */}
-            <div className="p-3">
-                <div className="flex justify-between items-start mb-1">
-                    <h3 className="text-amber-100 font-bold text-sm truncate">{card.name}</h3>
-                    <span className="text-xs text-amber-500 font-mono">{card.cost} Mana</span>
+    // 卡牌渲染
+    const renderCard = (card) => {
+        if (!card) return null;
+        return (
+            <motion.div
+                key={card.id}
+                layoutId={card.id}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="relative group w-48 h-64 bg-slate-900/80 border border-amber-500/30 rounded-lg overflow-hidden hover:border-amber-400 hover:shadow-[0_0_15px_rgba(251,191,36,0.3)] transition-all duration-300"
+            >
+                {/* 卡牌图片 */}
+                <div className="h-32 overflow-hidden bg-black">
+                    <img
+                        src={card.img || 'https://ddragon.leagueoflegends.com/cdn/13.1.1/img/profileicon/29.png'}
+                        alt={card.name || 'card'}
+                        className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+                    />
                 </div>
-                <div className="text-[10px] text-slate-400 mb-2 flex gap-2">
-                    <span className={`uppercase ${getRarityColor(card.rarity)}`}>{card.rarity}</span>
-                    <span className="uppercase text-slate-500">{card.type}</span>
+                {/* 卡牌信息 */}
+                <div className="p-3">
+                    <div className="flex justify-between items-start mb-1">
+                        <h3 className="text-amber-100 font-bold text-sm truncate">{card.name}</h3>
+                        <span className="text-xs text-amber-500 font-mono">{card.cost} Mana</span>
+                    </div>
+                    <div className="text-[10px] text-slate-400 mb-2 flex gap-2">
+                        <span className={`uppercase ${getRarityColor(card.rarity)}`}>{card.rarity}</span>
+                        <span className="uppercase text-slate-500">{card.type}</span>
+                    </div>
+                    <p className="text-xs text-slate-300 leading-tight line-clamp-3">{card.description}</p>
                 </div>
-                <p className="text-xs text-slate-300 leading-tight line-clamp-3">{card.description}</p>
-            </div>
-        </motion.div>
-    );
+            </motion.div>
+        );
+    };
 
     // 娓叉煋閬楃墿
     const renderRelic = (relic) => (

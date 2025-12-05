@@ -50,7 +50,9 @@ const ShopView = ({ onLeave, onBuyCard, onBuyRelic, onUpgradeCard, onBuyMana, go
                 <div className="absolute inset-0 z-[60] bg-black/95 flex flex-col items-center justify-center animate-in fade-in">
                     <h3 className="text-3xl text-[#C8AA6E] mb-8 font-bold">选择一张卡牌升级 (100 G)</h3>
                     <div className="grid grid-cols-5 gap-4 max-w-5xl overflow-y-auto p-4 max-h-[70vh]">
-                        {upgradableCards.map((card, idx) => (
+                        {upgradableCards.map((card, idx) => {
+                            if (!card) return null;
+                            return (
                              <div key={`${card.id}-${idx}`} onClick={() => handleUpgrade(card.id)} className="w-32 h-48 bg-[#1E2328] border border-slate-600 rounded hover:scale-105 hover:border-green-500 cursor-pointer transition-all relative group">
                             <img
                                 src={card.img || 'https://ddragon.leagueoflegends.com/cdn/13.1.1/img/profileicon/29.png'}
@@ -62,7 +64,8 @@ const ShopView = ({ onLeave, onBuyCard, onBuyRelic, onUpgradeCard, onBuyMana, go
                                     <div className="text-[10px] text-green-400 mt-2">升级后: 数值+3</div>
                                 </div>
                              </div>
-                        ))}
+                            );
+                        })}
                     </div>
                     <button onClick={() => setShowUpgrade(false)} className="mt-8 px-8 py-2 border border-slate-600 text-slate-400 hover:text-white rounded">取消</button>
                 </div>
@@ -101,6 +104,7 @@ const ShopView = ({ onLeave, onBuyCard, onBuyRelic, onUpgradeCard, onBuyMana, go
                         <h3 className="text-xl text-[#F0E6D2] mb-4 uppercase tracking-widest border-l-4 border-blue-500 pl-3">技能卷轴</h3>
                         <div className="flex flex-wrap gap-4">
                             {cardStock.map(card => {
+                                if (!card) return null;
                                 const isBought = purchasedItems.includes(card.id);
                                 const isUltimateCard = card.hero && card.hero !== 'Neutral' && card.id.endsWith('R');
                                 const hoverable = !isBought ? 'hover:scale-105 cursor-pointer' : 'opacity-20 grayscale pointer-events-none';
@@ -138,10 +142,11 @@ const ShopView = ({ onLeave, onBuyCard, onBuyRelic, onUpgradeCard, onBuyMana, go
                         <h3 className="text-xl text-[#F0E6D2] mb-4 uppercase tracking-widest border-l-4 border-purple-500 pl-3">海克斯装备</h3>
                         <div className="flex flex-wrap gap-6">
                             {relicStock.map(relic => {
+                                if (!relic) return null;
                                 const isBought = purchasedItems.includes(relic.id);
                                 return (
                                     <div key={relic.id} onClick={() => !isBought && handleBuy(relic, 'RELIC')} className={`w-20 h-20 relative group transition-all ${isBought ? 'opacity-20 grayscale pointer-events-none' : 'hover:scale-110 cursor-pointer'}`}>
-                                        <img src={relic.img} className="w-full h-full object-cover rounded-lg border-2 border-[#C8AA6E] shadow-[0_0_10px_#C8AA6E]" />
+                                        <img src={relic.img || 'https://ddragon.leagueoflegends.com/cdn/13.1.1/img/profileicon/29.png'} className="w-full h-full object-cover rounded-lg border-2 border-[#C8AA6E] shadow-[0_0_10px_#C8AA6E]" alt={relic.name || 'relic'} />
                                         <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-black/80 px-2 rounded text-yellow-400 font-bold text-sm whitespace-nowrap">{relic.price} G</div>
                                         <RelicTooltip relic={relic}><div className="w-full h-full absolute inset-0"></div></RelicTooltip>
                                     </div>
