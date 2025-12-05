@@ -135,7 +135,11 @@ const InventoryPanel = ({
                 className="relative group w-48 h-64 bg-slate-900/80 border border-amber-500/30 rounded-lg overflow-hidden hover:border-amber-400 hover:shadow-[0_0_15px_rgba(251,191,36,0.3)] transition-all duration-300"
             >
                 <div className="h-32 overflow-hidden bg-black">
-                    <img src={card.img} alt={card.name} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+                    <img
+                        src={card.img || 'https://ddragon.leagueoflegends.com/cdn/13.1.1/img/profileicon/29.png'}
+                        alt={card.name || 'card'}
+                        className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+                    />
                 </div>
                 <div className="p-3 flex flex-col h-32">
                         <div className="flex justify-between items-start mb-1 gap-2">

@@ -63,7 +63,11 @@ const Card = ({ cardId, index, totalCards, canPlay, onPlay, discountAmount = 0 }
       )}
       {/* 卡牌图片 */}
       <div className="w-full h-40 bg-black overflow-hidden relative pointer-events-none">
-        <img src={card.img} className="w-full h-full object-cover opacity-90" alt={card.name} />
+        <img
+          src={card.img || 'https://ddragon.leagueoflegends.com/cdn/13.1.1/img/profileicon/29.png'}
+          className="w-full h-full object-cover opacity-90"
+          alt={card.name || 'card'}
+        />
         <div className="absolute top-2 left-2 w-8 h-8 bg-[#091428] rounded-full border border-[#C8AA6E] flex items-center justify-center text-[#C8AA6E] font-bold text-lg shadow-md">
           {card.cost}
         </div>

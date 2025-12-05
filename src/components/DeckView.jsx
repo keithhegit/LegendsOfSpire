@@ -74,9 +74,9 @@ const DeckView = ({ deck, onClose, gmConfig }) => {
                                         </div>
                                     )}
                                     <img 
-                                        src={card.img} 
+                                        src={card.img || 'https://ddragon.leagueoflegends.com/cdn/13.1.1/img/profileicon/29.png'} 
                                         className="w-full h-full object-cover opacity-80" 
-                                        alt={card.name}
+                                        alt={card.name || 'card'}
                                         onError={(e) => {
                                             e.target.src = 'https://ddragon.leagueoflegends.com/cdn/13.1.1/img/profileicon/29.png';
                                         }}
