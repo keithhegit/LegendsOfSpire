@@ -15,16 +15,16 @@ const CodexView = ({ onClose }) => {
                         {Object.values(CARD_DATABASE).map(card => (
                             <div key={card.id} className="bg-[#1E2328] border border-slate-600 p-2 rounded flex flex-col items-center hover:border-[#C8AA6E] transition-colors">
                                 <img 
-                                    src={card.img} 
+                                    src={card?.img || 'https://ddragon.leagueoflegends.com/cdn/13.1.1/img/profileicon/29.png'} 
                                     className="w-16 h-16 object-cover rounded mb-2" 
-                                    alt={card.name}
+                                    alt={card?.name || 'card'}
                                     onError={(e) => {
                                         e.target.src = 'https://ddragon.leagueoflegends.com/cdn/13.1.1/img/profileicon/29.png';
                                     }}
                                 />
-                                <div className="text-xs text-[#F0E6D2] font-bold text-center mb-1">{card.name}</div>
-                                <div className="text-[10px] text-[#A09B8C] text-center line-clamp-2">{card.description}</div>
-                                <div className="text-[8px] text-slate-500 mt-1">{card.type}</div>
+                                <div className="text-xs text-[#F0E6D2] font-bold text-center mb-1">{card?.name}</div>
+                                <div className="text-[10px] text-[#A09B8C] text-center line-clamp-2">{card?.description}</div>
+                                <div className="text-[8px] text-slate-500 mt-1">{card?.type}</div>
                             </div>
                         ))}
                     </div>

@@ -52,7 +52,11 @@ const ShopView = ({ onLeave, onBuyCard, onBuyRelic, onUpgradeCard, onBuyMana, go
                     <div className="grid grid-cols-5 gap-4 max-w-5xl overflow-y-auto p-4 max-h-[70vh]">
                         {upgradableCards.map((card, idx) => (
                              <div key={`${card.id}-${idx}`} onClick={() => handleUpgrade(card.id)} className="w-32 h-48 bg-[#1E2328] border border-slate-600 rounded hover:scale-105 hover:border-green-500 cursor-pointer transition-all relative group">
-                                <img src={card.img} className="w-full h-20 object-cover opacity-70 group-hover:opacity-100" />
+                            <img
+                                src={card.img || 'https://ddragon.leagueoflegends.com/cdn/13.1.1/img/profileicon/29.png'}
+                                className="w-full h-20 object-cover opacity-70 group-hover:opacity-100"
+                                alt={card.name || 'card'}
+                            />
                                 <div className="p-2">
                                     <div className="text-xs font-bold text-[#F0E6D2]">{card.name}</div>
                                     <div className="text-[10px] text-green-400 mt-2">升级后: 数值+3</div>
@@ -112,7 +116,11 @@ const ShopView = ({ onLeave, onBuyCard, onBuyRelic, onUpgradeCard, onBuyMana, go
                                                 <div className="absolute inset-[-6px] rounded-xl bg-gradient-to-r from-yellow-200/15 via-transparent to-yellow-200/15 blur-sm" />
                                             </div>
                                         )}
-                                        <img src={card.img} className={`w-full h-full object-cover rounded-lg border ${borderClass}`} />
+                                        <img
+                                            src={card.img || 'https://ddragon.leagueoflegends.com/cdn/13.1.1/img/profileicon/29.png'}
+                                            className={`w-full h-full object-cover rounded-lg border ${borderClass}`}
+                                            alt={card.name || 'card'}
+                                        />
                                         <div className="absolute bottom-0 left-0 right-0 bg-black/90 text-center py-1 text-xs font-bold text-[#C8AA6E] border-t border-[#C8AA6E]">{card.price} G</div>
                                         <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-40 bg-black border border-[#C8AA6E] p-2 z-50 hidden group-hover:block text-center pointer-events-none text-xs text-white">
                                             <div className="font-bold mb-1 flex items-center justify-center gap-1">

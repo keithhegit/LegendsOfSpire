@@ -361,7 +361,11 @@ const Card = ({ cardId, index, totalCards, canPlay, onPlay }) => {
             className={`w-40 h-60 bg-[#1E2328] border-2 rounded-lg flex flex-col items-center overflow-hidden shadow-2xl ${canPlay ? 'border-[#C8AA6E] cursor-grab active:cursor-grabbing' : 'border-slate-700 opacity-60 cursor-not-allowed'}`}
         >
             <div className="w-full h-36 bg-black overflow-hidden relative pointer-events-none">
-                <img src={card.img} className="w-full h-full object-cover opacity-90" alt={card.name} />
+                                <img
+                                    src={card.img || 'https://ddragon.leagueoflegends.com/cdn/13.1.1/img/profileicon/29.png'}
+                                    className="w-full h-full object-cover opacity-90"
+                                    alt={card.name || 'card'}
+                                />
                 <div className="absolute top-1 left-1 w-6 h-6 bg-[#091428] rounded-full border border-[#C8AA6E] flex items-center justify-center text-[#C8AA6E] font-bold text-sm shadow-md">{card.cost}</div>
             </div>
             <div className="flex-1 p-2 text-center flex flex-col w-full pointer-events-none bg-[#1E2328]">
@@ -465,7 +469,11 @@ const ShopView = ({ onLeave, onBuyCard, onBuyRelic, gold, deck, relics, champion
                                 const isBought = purchasedItems.includes(card.id);
                                 return (
                                     <div key={card.id} onClick={() => !isBought && handleBuy(card, 'CARD')} className={`w-32 h-48 relative group transition-all ${isBought ? 'opacity-20 grayscale pointer-events-none' : 'hover:scale-105 cursor-pointer'}`}>
-                                        <img src={card.img} className="w-full h-full object-cover rounded border border-slate-600" />
+                                        <img
+                                            src={card.img || 'https://ddragon.leagueoflegends.com/cdn/13.1.1/img/profileicon/29.png'}
+                                            className="w-full h-full object-cover rounded border border-slate-600"
+                                            alt={card.name || 'card'}
+                                        />
                                         <div className="absolute bottom-0 left-0 right-0 bg-black/90 text-center py-1 text-xs font-bold text-[#C8AA6E] border-t border-[#C8AA6E]">{card.price} G</div>
                                         <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-40 bg-black border border-[#C8AA6E] p-2 z-50 hidden group-hover:block text-center pointer-events-none text-xs text-white"><div className="font-bold mb-1">{card.name}</div>{card.description}</div>
                                     </div>

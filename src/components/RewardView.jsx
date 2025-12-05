@@ -51,7 +51,13 @@ const RewardView = ({ onSkip, onCardSelect, goldReward, championName }) => {
        <div className="flex gap-6 mb-10">
           {rewards.map((card, idx) => (
              <div key={idx} onClick={() => onCardSelect(card.id)} className="w-48 h-72 bg-[#1E2328] border-2 border-[#C8AA6E] rounded-xl hover:scale-105 transition-transform cursor-pointer flex flex-col overflow-hidden group shadow-xl">
-                <div className="h-32 bg-black relative"><img src={card.img} className="w-full h-full object-cover opacity-80 group-hover:opacity-100" /></div>
+                <div className="h-32 bg-black relative">
+                    <img
+                        src={card.img || 'https://ddragon.leagueoflegends.com/cdn/13.1.1/img/profileicon/29.png'}
+                        className="w-full h-full object-cover opacity-80 group-hover:opacity-100"
+                        alt={card.name || 'card'}
+                    />
+                </div>
                 <div className="p-4 flex-1 flex flex-col items-center text-center">
                     <h4 className="font-bold text-[#F0E6D2] mb-2">{card.name}</h4>
                     <p className="text-xs text-[#A09B8C]">{card.description}</p>

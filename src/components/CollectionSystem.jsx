@@ -56,7 +56,11 @@ const CollectionSystem = ({ onClose }) => {
         >
             {/* 鍗＄墝鍥剧墖 */}
             <div className="h-32 overflow-hidden bg-black">
-                <img src={card.img} alt={card.name} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+                <img
+                    src={card.img || 'https://ddragon.leagueoflegends.com/cdn/13.1.1/img/profileicon/29.png'}
+                    alt={card.name || 'card'}
+                    className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+                />
             </div>
             {/* 鍗＄墝淇℃伅 */}
             <div className="p-3">
