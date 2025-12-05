@@ -138,17 +138,24 @@ const InventoryPanel = ({
                     <img src={card.img} alt={card.name} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
                 </div>
                 <div className="p-3 flex flex-col h-32">
-                    <div className="flex justify-between items-start mb-1 gap-2">
-                        <h3 className="text-amber-100 font-bold text-sm truncate">{card.name}</h3>
-                        <div className="flex items-center gap-1">
-                            {card.hammerBonus > 0 && (
-                                <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/20 text-amber-200 border border-amber-400/40">
-                                    匠魂+{card.hammerBonus}
-                                </span>
-                            )}
-                            <span className="text-xs text-amber-500 font-mono whitespace-nowrap">{card.cost} Mana</span>
+                        <div className="flex justify-between items-start mb-1 gap-2">
+                            <div className="flex items-center gap-1">
+                                <h3 className="text-amber-100 font-bold text-sm truncate">{card.name}</h3>
+                                {card.singleUse && (
+                                    <span className="px-2 py-0.5 rounded-full bg-rose-500/20 border border-rose-400/40 text-[10px] font-semibold text-rose-200">
+                                        一次性
+                                    </span>
+                                )}
+                            </div>
+                            <div className="flex items-center gap-1">
+                                {card.hammerBonus > 0 && (
+                                    <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/20 text-amber-200 border border-amber-400/40">
+                                        匠魂+{card.hammerBonus}
+                                    </span>
+                                )}
+                                <span className="text-xs text-amber-500 font-mono whitespace-nowrap">{card.cost} Mana</span>
+                            </div>
                         </div>
-                    </div>
                     <div className="text-[10px] text-slate-400 mb-2 flex gap-2">
                         <span className="uppercase text-green-400">{card.rarity}</span>
                         <span className="uppercase text-slate-500">{card.type}</span>

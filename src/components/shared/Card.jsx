@@ -10,7 +10,7 @@ const Card = ({ cardId, index, totalCards, canPlay, onPlay, discountAmount = 0 }
     return null;
   }
 
-  const { baseId, upgradeLevel, hammerBonus = 0 } = card;
+  const { baseId, upgradeLevel, hammerBonus = 0, singleUse = false } = card;
   const isUpgraded = upgradeLevel > 0;
 
   const isUltimate = card.hero && card.hero !== 'Neutral' && baseId.endsWith('R');
@@ -73,6 +73,11 @@ const Card = ({ cardId, index, totalCards, canPlay, onPlay, discountAmount = 0 }
             aria-label={`匠魂加成 ${hammerBonus}`}
           >
             匠魂+{hammerBonus}
+          </div>
+        )}
+        {singleUse && (
+          <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-rose-600/80 border border-rose-400 text-[10px] font-bold text-white shadow-md">
+            一次性
           </div>
         )}
         {discountAmount > 0 && (

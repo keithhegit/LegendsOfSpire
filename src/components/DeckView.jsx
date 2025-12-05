@@ -56,6 +56,7 @@ const DeckView = ({ deck, onClose, gmConfig }) => {
                             acc[label] = (acc[label] || 0) + 1;
                             return acc;
                         }, {});
+                        const singleUseCount = sorted.filter(c => c.singleUse).length;
                         const hammerSummary = Object.entries(summaryMap)
                             .sort((a, b) => {
                                 const parse = (label) => (label === '基础' ? -1 : parseInt(label.replace('匠魂+', ''), 10));
@@ -91,6 +92,11 @@ const DeckView = ({ deck, onClose, gmConfig }) => {
                                                     </span>
                                                 ))}
                                             </div>
+                                        )}
+                                        {singleUseCount > 0 && (
+                                            <span className="px-1 py-[1px] rounded-full bg-rose-500/20 border border-rose-300/40 text-[9px] text-rose-100">
+                                                一次性 ×{singleUseCount}
+                                            </span>
                                         )}
                                         <div className="text-[9px] text-slate-500 mt-1">{card.type}</div>
                                     </div>
