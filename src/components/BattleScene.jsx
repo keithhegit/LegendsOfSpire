@@ -53,7 +53,7 @@ const BattleScene = ({
     const forceUpdate = () => setRenderTrigger(prev => prev + 1);
     const battleDebtRef = useRef({ maxHpCost: 0 });
     const permaUpgradeRef = useRef([]);
-    const consumedCardsRef = useRef([]);
+    const singleUseCardsRef = useRef([]);
     const hunterBadgeActiveRef = useRef(false);
     const ambitionPactPendingRef = useRef(0);
     const discountQueueRef = useRef([]);
@@ -136,7 +136,7 @@ const BattleScene = ({
         achievementTracker.startBattle();
         battleDebtRef.current = { maxHpCost: 0 };
         permaUpgradeRef.current = [];
-        consumedCardsRef.current = [];
+        singleUseCardsRef.current = [];
         hunterBadgeActiveRef.current = false;
         setIdleBlockState({ value: 0, armed: false, broken: false, sourceCard: null });
         achievementTracker.setBattleFlag('noAttackPlayed', true);
@@ -557,6 +557,9 @@ const BattleScene = ({
         const newHand = [...hand];
         newHand.splice(index, 1);
         const handSizeAfterPlay = newHand.length;
+        if (card.singleUse) {
+            singleUseCardsRef.current.push(baseId);
+        }
         if (!card.exhaust) {
             deckRef.current = { ...deckRef.current, hand: newHand, discardPile: [...discardPile, cardId] };
         } else {
@@ -668,7 +671,6 @@ const BattleScene = ({
         }
         if (effectUpdates.hunterBadge) {
             hunterBadgeActiveRef.current = true;
-            consumedCardsRef.current.push(baseId);
         }
         if (effectUpdates.scoutCount || effectUpdates.revealEnemyIntent) {
             revealEnemyIntent();
@@ -1061,9 +1063,9 @@ const BattleScene = ({
                 ...battleResult,
                 maxHpCost: battleDebtRef.current.maxHpCost
             };
-            if (consumedCardsRef.current.length > 0) {
-                resultPayload.consumedCards = [...consumedCardsRef.current];
-                consumedCardsRef.current = [];
+            if (singleUseCardsRef.current.length > 0) {
+                resultPayload.consumedCards = [...singleUseCardsRef.current];
+                singleUseCardsRef.current = [];
             }
             setTimeout(() => onWin(resultPayload), 1000);
         }
