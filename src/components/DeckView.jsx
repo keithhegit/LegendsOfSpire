@@ -4,9 +4,16 @@ import { CARD_DATABASE } from '../data/cards';
 import { getCardWithUpgrade } from '../utils/cardUtils';
 
 const DeckView = ({ deck, onClose, gmConfig }) => {
-    // 统计卡牌数量
+    // 统计卡牌数量（聚合基础ID，兼容匠魂加成）
     const deckCounts = deck.reduce((acc, cardId) => {
-        acc[cardId] = (acc[cardId] || 0) + 1;
+        const card = getCardWithUpgrade(cardId);
+        if (!card) return acc;
+        const key = card.baseId || card.id;
+        if (!acc[key]) {
+            acc[key] = { baseId: key, cards: [], total: 0 };
+        }
+        acc[key].cards.push(card);
+        acc[key].total += 1;
         return acc;
     }, {});
 
@@ -40,12 +47,24 @@ const DeckView = ({ deck, onClose, gmConfig }) => {
                     </div>
                 )}
                 <div className="flex-1 overflow-y-auto p-4 sm:p-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 content-start">
-                    {Object.entries(deckCounts).map(([cardId, count]) => {
-                        const card = getCardWithUpgrade(cardId) || CARD_DATABASE[cardId];
+                    {Object.values(deckCounts).map(group => {
+                        const sorted = [...group.cards].sort((a, b) => (b.hammerBonus || 0) - (a.hammerBonus || 0));
+                        const card = sorted[0] || CARD_DATABASE[group.baseId];
                         if (!card) return null;
+                        const summaryMap = sorted.reduce((acc, c) => {
+                            const label = c.hammerBonus > 0 ? `匠魂+${c.hammerBonus}` : '基础';
+                            acc[label] = (acc[label] || 0) + 1;
+                            return acc;
+                        }, {});
+                        const hammerSummary = Object.entries(summaryMap)
+                            .sort((a, b) => {
+                                const parse = (label) => (label === '基础' ? -1 : parseInt(label.replace('匠魂+', ''), 10));
+                                return parse(b[0]) - parse(a[0]);
+                            })
+                            .map(([label, count]) => ({ label, count }));
 
                         return (
-                            <div key={cardId} className="relative group cursor-help">
+                            <div key={group.baseId} className="relative group cursor-help">
                                 {/* 简易卡牌样式 */}
                                 <div className="w-full aspect-[2/3] bg-black border border-slate-600 rounded overflow-hidden relative hover:border-[#C8AA6E] transition-colors">
                                     {card.hammerBonus > 0 && (
@@ -64,12 +83,21 @@ const DeckView = ({ deck, onClose, gmConfig }) => {
                                     <div className="absolute inset-0 flex flex-col justify-end p-2 bg-gradient-to-t from-black/90 to-transparent">
                                         <div className="text-xs font-bold text-[#F0E6D2]">{card.name}</div>
                                         <div className="text-[10px] text-[#A09B8C] line-clamp-2">{card.description}</div>
+                                        {hammerSummary.length > 0 && (
+                                            <div className="text-[9px] text-amber-200 mt-1 flex flex-wrap gap-1">
+                                                {hammerSummary.map(item => (
+                                                    <span key={`${group.baseId}-${item.label}`} className="px-1 py-[1px] rounded-full bg-amber-500/20 border border-amber-300/40">
+                                                        {item.label} ×{item.count}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        )}
                                         <div className="text-[9px] text-slate-500 mt-1">{card.type}</div>
                                     </div>
                                     {/* 数量角标 */}
-                                    {count > 1 && (
+                                    {group.total > 1 && (
                                         <div className="absolute top-1 right-1 w-5 h-5 sm:w-6 sm:h-6 bg-[#C8AA6E] text-black font-bold rounded-full flex items-center justify-center text-[10px] sm:text-xs border border-white">
-                                            x{count}
+                                            x{group.total}
                                         </div>
                                     )}
                                     {/* 费用显示 */}

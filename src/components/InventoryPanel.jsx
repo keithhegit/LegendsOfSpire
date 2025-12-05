@@ -49,13 +49,38 @@ const InventoryPanel = ({
     };
 
     const deckEntries = useMemo(() => {
-        const counts = deck.reduce((acc, id) => {
-            acc[id] = (acc[id] || 0) + 1;
+        const groups = deck.reduce((acc, cardId) => {
+            const card = getCardWithUpgrade(cardId);
+            if (!card) return acc;
+            const key = card.baseId || card.id;
+            if (!acc[key]) {
+                acc[key] = { baseId: key, cards: [], total: 0 };
+            }
+            acc[key].cards.push(card);
+            acc[key].total += 1;
             return acc;
         }, {});
-        return Object.entries(counts)
-            .map(([id, count]) => ({ id, count, card: getCardWithUpgrade(id) }))
-            .filter(entry => entry.card);
+
+        return Object.values(groups).map(group => {
+            const sorted = [...group.cards].sort((a, b) => (b.hammerBonus || 0) - (a.hammerBonus || 0));
+            const summaryMap = sorted.reduce((summary, card) => {
+                const label = card.hammerBonus > 0 ? `匠魂+${card.hammerBonus}` : '基础';
+                summary[label] = (summary[label] || 0) + 1;
+                return summary;
+            }, {});
+            const hammerSummary = Object.entries(summaryMap)
+                .sort((a, b) => {
+                    const parse = (label) => (label === '基础' ? -1 : parseInt(label.replace('匠魂+', ''), 10));
+                    return parse(b[0]) - parse(a[0]);
+                })
+                .map(([label, count]) => ({ label, count }));
+            return {
+                id: group.baseId,
+                count: group.total,
+                card: sorted[0],
+                hammerSummary
+            };
+        }).filter(entry => entry.card);
     }, [deck]);
 
     const heroOptions = useMemo(() => {
@@ -97,7 +122,8 @@ const InventoryPanel = ({
         onRemoveCard?.(cardId);
     };
 
-    const renderCardTile = ({ id, count, card }) => {
+    const renderCardTile = (entry) => {
+        const { id, count, card, hammerSummary } = entry;
         const deletable = canDeleteCard(card);
         const cost = deletable ? CARD_DELETE_COST[card.rarity] : null;
         return (
@@ -129,7 +155,21 @@ const InventoryPanel = ({
                     </div>
                     <p className="text-xs text-slate-300 leading-tight line-clamp-2 flex-1">{card.description}</p>
                     <div className="mt-auto flex items-center justify-between text-[11px] text-slate-400">
-                        <span>数量 x{count}</span>
+                        <div className="flex flex-col items-end gap-0.5">
+                            <span>数量 x{count}</span>
+                            {card.hammerBonus > 0 && (
+                                <span className="text-[10px] text-amber-300 font-semibold">最高匠魂 +{card.hammerBonus}</span>
+                            )}
+                            {hammerSummary?.length > 0 && (
+                                <div className="text-[10px] text-slate-400 flex flex-wrap gap-1 justify-end">
+                                    {hammerSummary.map(summary => (
+                                        <span key={`${entry.id}-${summary.label}`} className="px-1 rounded-full bg-slate-800/60 border border-slate-600">
+                                            {summary.label} ×{summary.count}
+                                        </span>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
                         <button
                             disabled={!deletable}
                             onClick={() => handleDelete(id)}
