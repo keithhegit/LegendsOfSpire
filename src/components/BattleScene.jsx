@@ -264,13 +264,34 @@ const BattleScene = ({
             return;
         }
         const pick = candidates[Math.floor(Math.random() * candidates.length)];
-        const originalId = pools[pick.pileKey][pick.index];
-        const upgradedId = addHammerBonus(originalId, 1);
-        pools[pick.pileKey][pick.index] = upgradedId;
-        rewriteDeckRef(pools.hand, pools.drawPile, pools.discardPile);
-        permaUpgradeRef.current.push({ from: originalId, to: upgradedId });
-        const upgradedName = CARD_DATABASE[pick.baseId]?.name || pick.baseId;
-        setDmgOverlay({ val: `匠魂强化 ${upgradedName}`, target: 'PLAYER', color: 'text-amber-200' });
+        const targetBase = pick.baseId;
+        const updateCardId = (id) => {
+            if (!id) return id;
+            const baseId = getBaseCardId(id);
+            if (baseId !== targetBase) return id;
+            return addHammerBonus(id, 1);
+        };
+        const nextHand = pools.hand.map(updateCardId);
+        const nextDraw = pools.drawPile.map(updateCardId);
+        const nextDiscard = pools.discardPile.map(updateCardId);
+
+        // 记录所有被升级的映射，用于战后写回 masterDeck
+        pools.hand.forEach((id, idx) => {
+            const updated = nextHand[idx];
+            if (id !== updated) permaUpgradeRef.current.push({ from: id, to: updated });
+        });
+        pools.drawPile.forEach((id, idx) => {
+            const updated = nextDraw[idx];
+            if (id !== updated) permaUpgradeRef.current.push({ from: id, to: updated });
+        });
+        pools.discardPile.forEach((id, idx) => {
+            const updated = nextDiscard[idx];
+            if (id !== updated) permaUpgradeRef.current.push({ from: id, to: updated });
+        });
+
+        rewriteDeckRef(nextHand, nextDraw, nextDiscard);
+        const upgradedName = CARD_DATABASE[targetBase]?.name || targetBase;
+        setDmgOverlay({ val: `匠魂强化 ${upgradedName} 全部`, target: 'PLAYER', color: 'text-amber-200' });
         setTimeout(() => setDmgOverlay(null), 900);
     };
 
