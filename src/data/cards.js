@@ -61,8 +61,8 @@ const NEUTRAL_CARD_CDN = {
 };
 export const CARD_DATABASE = {
   // ---------- BASIC CARDS ----------
-  Strike: { id: 'Strike', hero: 'Neutral', name: '打击', price: 0, type: 'ATTACK', cost: 1, value: 6, description: '造成 6 点伤害。', img: `${SPELL_URL}/SummonerFlash.png`, rarity: 'BASIC', upgradeValueIncrement: 1, upgradeDescriptionIncrement: 1 },
-  Defend: { id: 'Defend', hero: 'Neutral', name: '防御', price: 0, type: 'SKILL', cost: 1, block: 5, description: '获得 5 点护甲。', img: `${SPELL_URL}/SummonerBarrier.png`, rarity: 'BASIC', upgradeBlockIncrement: 1, upgradeDescriptionIncrement: 1 },
+  Strike: { id: 'Strike', hero: 'Neutral', name: '打击', price: 0, type: 'ATTACK', cost: 1, value: 6, description: '造成 6 点伤害。', img: `${SPELL_URL}/SummonerFlash.png`, rarity: 'BASIC' },
+  Defend: { id: 'Defend', hero: 'Neutral', name: '防御', price: 0, type: 'SKILL', cost: 1, block: 5, description: '获得 5 点护甲。', img: `${SPELL_URL}/SummonerBarrier.png`, rarity: 'BASIC' },
   Ignite: { id: 'Ignite', hero: 'Neutral', name: '点燃', price: 80, type: 'SKILL', cost: 0, value: 0, effect: 'STRENGTH', effectValue: 2, exhaust: true, description: '获得 2 点力量。消耗。', img: `${SPELL_URL}/SummonerDot.png`, rarity: 'UNCOMMON' },
   Heal: { id: 'Heal', hero: 'Neutral', name: '治疗术', price: 80, type: 'SKILL', cost: 1, effect: 'HEAL', effectValue: 10, exhaust: true, description: '恢复 10 点生命。消耗。', img: `${SPELL_URL}/SummonerHeal.png`, rarity: 'UNCOMMON' },
 

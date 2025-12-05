@@ -1289,7 +1289,7 @@ export default function LegendsOfTheSpire() {
     };
 
     const handleRemoveCard = (cardId) => {
-        const card = CARD_DATABASE[cardId];
+        const card = CARD_DATABASE[getBaseCardId(cardId)];
         if (!card) {
             showToast('卡牌不存在');
             return;
@@ -1386,10 +1386,23 @@ export default function LegendsOfTheSpire() {
         if (Array.isArray(result.permaUpgrades) && result.permaUpgrades.length > 0) {
             setMasterDeck(prev => {
                 const next = [...prev];
-                result.permaUpgrades.forEach(baseId => {
-                    const idx = next.findIndex(cardId => getBaseCardId(cardId) === baseId);
-                    if (idx !== -1) {
-                        next[idx] = `${next[idx]}+`;
+                result.permaUpgrades.forEach(entry => {
+                    if (!entry) return;
+                    if (typeof entry === 'string') {
+                        const idx = next.findIndex(cardId => getBaseCardId(cardId) === entry);
+                        if (idx !== -1) {
+                            next[idx] = `${next[idx]}+`;
+                        }
+                        return;
+                    }
+                    const { from, to } = entry;
+                    if (!from || !to) return;
+                    let targetIdx = next.findIndex(cardId => cardId === from);
+                    if (targetIdx === -1) {
+                        targetIdx = next.findIndex(cardId => getBaseCardId(cardId) === getBaseCardId(from));
+                    }
+                    if (targetIdx !== -1) {
+                        next[targetIdx] = to;
                     }
                 });
                 return next;

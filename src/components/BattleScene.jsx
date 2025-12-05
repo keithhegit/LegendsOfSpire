@@ -10,7 +10,7 @@ import { playSfx, playChampionVoice } from '../utils/audioManager';
 import { applyCardEffects, calculateBlockValue } from '../utils/cardEffectHandler';
 import { achievementTracker } from '../utils/achievementTracker';
 import Card from './shared/Card';
-import { getBaseCardId, getCardWithUpgrade, getUpgradeLevel } from '../utils/cardUtils';
+import { getBaseCardId, getCardWithUpgrade, getUpgradeLevel, addHammerBonus } from '../utils/cardUtils';
 
 const DEX_BLOCK_PER_STACK = 5;
 const PERMA_UPGRADE_TYPES = new Set(['ATTACK', 'SKILL']);
@@ -264,9 +264,11 @@ const BattleScene = ({
             return;
         }
         const pick = candidates[Math.floor(Math.random() * candidates.length)];
-        pools[pick.pileKey][pick.index] = `${pools[pick.pileKey][pick.index]}+`;
+        const originalId = pools[pick.pileKey][pick.index];
+        const upgradedId = addHammerBonus(originalId, 1);
+        pools[pick.pileKey][pick.index] = upgradedId;
         rewriteDeckRef(pools.hand, pools.drawPile, pools.discardPile);
-        permaUpgradeRef.current.push(pick.baseId);
+        permaUpgradeRef.current.push({ from: originalId, to: upgradedId });
         const upgradedName = CARD_DATABASE[pick.baseId]?.name || pick.baseId;
         setDmgOverlay({ val: `匠魂强化 ${upgradedName}`, target: 'PLAYER', color: 'text-amber-200' });
         setTimeout(() => setDmgOverlay(null), 900);
@@ -1043,7 +1045,7 @@ const BattleScene = ({
                 hunterBadgeActiveRef.current = false;
             }
             if (permaUpgradeRef.current.length > 0) {
-                battleResult.permaUpgrades = [...permaUpgradeRef.current];
+                battleResult.permaUpgrades = permaUpgradeRef.current.map(entry => ({ ...entry }));
                 permaUpgradeRef.current = [];
             }
             if ((playerStatus.scholarRuneValue || 0) > 0) {
