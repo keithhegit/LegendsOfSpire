@@ -352,26 +352,27 @@ const BattleScene = ({
 
     const transformRandomHandCard = () => {
         const { hand, drawPile, discardPile } = deckRef.current;
-        if (hand.length === 0 || !initialDeck?.length) return false;
+        if (hand.length === 0) return false;
         const targetIndex = Math.floor(Math.random() * hand.length);
         const targetCardId = hand[targetIndex];
-        const targetCard = CARD_DATABASE[getBaseCardId(targetCardId)];
+        const baseId = getBaseCardId(targetCardId);
+        const targetCard = CARD_DATABASE[baseId];
         const targetRarity = targetCard?.rarity || 'COMMON';
 
         const getPoolByRarity = (rarity) =>
-            initialDeck
-                .map(id => getCardWithUpgrade(id))
-                .filter(c => c && c.rarity === rarity && c.id !== targetCard?.id)
+            Object.values(CARD_DATABASE)
+                .filter(c => c && c.rarity === rarity && c.id !== baseId)
                 .map(c => c.id);
 
         let replacementPool = getPoolByRarity(targetRarity);
         if (replacementPool.length === 0 && targetRarity === 'RARE') {
-            // 罕见情况下没有 Rare，降级到 Uncommon
             replacementPool = getPoolByRarity('UNCOMMON');
         }
         if (replacementPool.length === 0) return false;
 
         const newCardId = replacementPool[Math.floor(Math.random() * replacementPool.length)];
+        if (!newCardId) return false;
+
         hand[targetIndex] = newCardId;
         rewriteDeckRef(hand, drawPile, discardPile);
         setDmgOverlay({ val: `转换 → ${newCardId}`, target: 'PLAYER', color: 'text-purple-200' });
