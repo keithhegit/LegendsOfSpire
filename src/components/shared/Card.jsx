@@ -10,7 +10,7 @@ const Card = ({ cardId, index, totalCards, canPlay, onPlay, discountAmount = 0 }
     return null;
   }
 
-  const { baseId, upgradeLevel } = card;
+  const { baseId, upgradeLevel, hammerBonus = 0 } = card;
   const isUpgraded = upgradeLevel > 0;
 
   const isUltimate = card.hero && card.hero !== 'Neutral' && baseId.endsWith('R');
@@ -67,6 +67,14 @@ const Card = ({ cardId, index, totalCards, canPlay, onPlay, discountAmount = 0 }
         <div className="absolute top-2 left-2 w-8 h-8 bg-[#091428] rounded-full border border-[#C8AA6E] flex items-center justify-center text-[#C8AA6E] font-bold text-lg shadow-md">
           {card.cost}
         </div>
+        {hammerBonus > 0 && (
+          <div
+            className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-amber-600/80 border border-amber-300 text-[10px] font-bold text-amber-100 shadow-sm"
+            aria-label={`匠魂加成 ${hammerBonus}`}
+          >
+            匠魂+{hammerBonus}
+          </div>
+        )}
         {discountAmount > 0 && (
           <div
             className="absolute top-2 left-11 px-1 py-0.5 rounded bg-sky-900/80 border border-sky-400 text-xs font-bold text-sky-200 animate-pulse"

@@ -48,6 +48,11 @@ const DeckView = ({ deck, onClose, gmConfig }) => {
                             <div key={cardId} className="relative group cursor-help">
                                 {/* 简易卡牌样式 */}
                                 <div className="w-full aspect-[2/3] bg-black border border-slate-600 rounded overflow-hidden relative hover:border-[#C8AA6E] transition-colors">
+                                    {card.hammerBonus > 0 && (
+                                        <div className="absolute top-1 left-1 px-2 py-0.5 rounded-full bg-amber-500/80 text-[10px] font-bold text-black shadow">
+                                            匠魂+{card.hammerBonus}
+                                        </div>
+                                    )}
                                     <img 
                                         src={card.img} 
                                         className="w-full h-full object-cover opacity-80" 

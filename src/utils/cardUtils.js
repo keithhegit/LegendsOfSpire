@@ -54,6 +54,13 @@ const upgradeDescription = (description, level, increment) => {
     });
 };
 
+const replaceNumericToken = (text, original, replacement) => {
+    if (typeof text !== 'string') return text;
+    if (typeof original !== 'number' || typeof replacement !== 'number' || original === replacement) return text;
+    const pattern = new RegExp(`\\b${original}\\b`);
+    return text.replace(pattern, replacement);
+};
+
 export const getCardWithUpgrade = (cardId) => {
     if (!cardId) return null;
     const hammerBonus = getHammerBonus(cardId);
@@ -72,6 +79,13 @@ export const getCardWithUpgrade = (cardId) => {
 
     const applyHammer = (stat) => (typeof stat === 'number' ? stat + hammerBonus : stat);
 
+    const finalValue = applyHammer(upgradedValue);
+    const finalBlock = applyHammer(upgradedBlock);
+
+    let description = upgradeDescription(baseCard.description, upgradeLevel, descriptionIncrement);
+    description = replaceNumericToken(description, baseCard.value, finalValue);
+    description = replaceNumericToken(description, baseCard.block, finalBlock);
+
     return {
         ...baseCard,
         id: cardId,
@@ -79,10 +93,10 @@ export const getCardWithUpgrade = (cardId) => {
         upgradeLevel,
         hammerBonus,
         name: upgradeLevel > 0 ? `${baseCard.name}${'+'.repeat(upgradeLevel)}` : baseCard.name,
-        value: applyHammer(upgradedValue),
-        block: applyHammer(upgradedBlock),
+        value: finalValue,
+        block: finalBlock,
         effectValue: applyIncrement(baseCard.effectValue, upgradeLevel, effectIncrement),
-        description: upgradeDescription(baseCard.description, upgradeLevel, descriptionIncrement)
+        description
     };
 };
 
