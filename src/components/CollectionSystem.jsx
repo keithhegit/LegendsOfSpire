@@ -82,23 +82,30 @@ const CollectionSystem = ({ onClose }) => {
     };
 
     // 娓叉煋閬楃墿
-    const renderRelic = (relic) => (
-        <motion.div
-            key={relic.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-4 p-4 bg-slate-800/50 border border-slate-600 rounded-lg hover:bg-slate-800 transition-colors"
-        >
-            <div className="w-16 h-16 rounded border border-amber-500/50 overflow-hidden shrink-0">
-                <img src={relic.img} alt={relic.name} className="w-full h-full object-cover" />
-            </div>
-            <div>
-                <h3 className="text-amber-200 font-bold">{relic.name}</h3>
-                <p className="text-xs text-amber-500/80 mb-1 uppercase tracking-wider">{relic.rarity}</p>
-                <p className="text-sm text-slate-300">{relic.description}</p>
-            </div>
-        </motion.div>
-    );
+    const renderRelic = (relic) => {
+        if (!relic) return null;
+        return (
+            <motion.div
+                key={relic.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-center gap-4 p-4 bg-slate-800/50 border border-slate-600 rounded-lg hover:bg-slate-800 transition-colors"
+            >
+                <div className="w-16 h-16 rounded border border-amber-500/50 overflow-hidden shrink-0">
+                    <img
+                        src={relic.img || 'https://ddragon.leagueoflegends.com/cdn/13.1.1/img/profileicon/29.png'}
+                        alt={relic.name || 'relic'}
+                        className="w-full h-full object-cover"
+                    />
+                </div>
+                <div>
+                    <h3 className="text-amber-200 font-bold">{relic.name}</h3>
+                    <p className="text-xs text-amber-500/80 mb-1 uppercase tracking-wider">{relic.rarity}</p>
+                    <p className="text-sm text-slate-300">{relic.description}</p>
+                </div>
+            </motion.div>
+        );
+    };
 
     // 娓叉煋鏁堟灉璇嶆潯
     const renderEffect = (effect) => (
