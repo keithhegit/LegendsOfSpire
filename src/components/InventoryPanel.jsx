@@ -160,7 +160,7 @@ const InventoryPanel = ({
                         <span className="uppercase text-green-400">{card.rarity}</span>
                         <span className="uppercase text-slate-500">{card.type}</span>
                     </div>
-                    <p className="text-xs text-slate-300 leading-tight line-clamp-2 flex-1">{card.description}</p>
+                    <p className="text-xs text-slate-300 leading-snug line-clamp-3 min-h-[36px] flex-1">{card.description}</p>
                     <div className="mt-auto flex items-center justify-between text-[11px] text-slate-400">
                         <div className="flex flex-col items-end gap-0.5">
                             <span>数量 x{count}</span>

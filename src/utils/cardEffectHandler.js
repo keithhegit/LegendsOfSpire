@@ -446,14 +446,16 @@ function applyEffect(effectType, value, context, updates, card = {}) {
             updates.manaChange = (updates.manaChange || 0) + value;
             break;
 
-        case 'REGEN_MANA':
-            // 法力回复 - 本回合 + 下回合回蓝
-            updates.manaChange = (updates.manaChange || 0) + value;
+        case 'REGEN_MANA': {
+            // 法力回复 - 本回合 + 下回合各回蓝 value 点（默认1）
+            const regen = Math.max(1, value || 1);
+            updates.manaChange = (updates.manaChange || 0) + regen;
             updates.playerStatus = {
                 ...(updates.playerStatus || playerStatus),
-                nextTurnMana: ((updates.playerStatus?.nextTurnMana || playerStatus.nextTurnMana) || 0) + value
+                nextTurnMana: ((updates.playerStatus?.nextTurnMana || playerStatus.nextTurnMana) || 0) + regen
             };
             break;
+        }
 
         case 'TEMP_MANA':
             // 临时法力 - Gain temporary mana this turn

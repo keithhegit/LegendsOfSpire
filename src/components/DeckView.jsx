@@ -83,7 +83,7 @@ const DeckView = ({ deck, onClose, gmConfig }) => {
                                     />
                                     <div className="absolute inset-0 flex flex-col justify-end p-2 bg-gradient-to-t from-black/90 to-transparent">
                                         <div className="text-xs font-bold text-[#F0E6D2]">{card.name}</div>
-                                        <div className="text-[10px] text-[#A09B8C] line-clamp-2">{card.description}</div>
+                                        <div className="text-[10px] text-[#A09B8C] leading-snug line-clamp-3 min-h-[36px]">{card.description}</div>
                                         {hammerSummary.length > 0 && (
                                             <div className="text-[9px] text-amber-200 mt-1 flex flex-wrap gap-1">
                                                 {hammerSummary.map(item => (

@@ -354,8 +354,23 @@ const BattleScene = ({
         const { hand, drawPile, discardPile } = deckRef.current;
         if (hand.length === 0 || !initialDeck?.length) return false;
         const targetIndex = Math.floor(Math.random() * hand.length);
-        const replacementPool = initialDeck.filter(id => id && id !== hand[targetIndex]);
+        const targetCardId = hand[targetIndex];
+        const targetCard = CARD_DATABASE[getBaseCardId(targetCardId)];
+        const targetRarity = targetCard?.rarity || 'COMMON';
+
+        const getPoolByRarity = (rarity) =>
+            initialDeck
+                .map(id => getCardWithUpgrade(id))
+                .filter(c => c && c.rarity === rarity && c.id !== targetCard?.id)
+                .map(c => c.id);
+
+        let replacementPool = getPoolByRarity(targetRarity);
+        if (replacementPool.length === 0 && targetRarity === 'RARE') {
+            // 罕见情况下没有 Rare，降级到 Uncommon
+            replacementPool = getPoolByRarity('UNCOMMON');
+        }
         if (replacementPool.length === 0) return false;
+
         const newCardId = replacementPool[Math.floor(Math.random() * replacementPool.length)];
         hand[targetIndex] = newCardId;
         rewriteDeckRef(hand, drawPile, discardPile);
