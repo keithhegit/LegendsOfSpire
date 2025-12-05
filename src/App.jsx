@@ -446,7 +446,7 @@ const MapView = ({ mapData, onNodeSelect, act }) => {
 const ShopView = ({ onLeave, onBuyCard, onBuyRelic, gold, deck, relics, championName, act }) => {
     const cardStock = useMemo(() => shuffle(Object.values(CARD_DATABASE).filter(c => c.rarity !== 'BASIC' && (c.hero === 'Neutral' || c.hero === championName))).slice(0, 5), [championName]);
     const relicStock = useMemo(() => Object.values(RELIC_DATABASE)
-        .filter(r => r.rarity !== 'PASSIVE' && !relics.includes(r.id) && isRelicAvailableInAct(r.id, act))
+        .filter(r => r && r.rarity !== 'PASSIVE' && !relics.includes(r.id) && isRelicAvailableInAct(r.id, act))
         .slice(0, 3), [relics, act]);
     const [purchasedItems, setPurchasedItems] = useState([]);
     const handleBuy = (item, type) => { if (gold >= item.price && !purchasedItems.includes(item.id)) { setPurchasedItems([...purchasedItems, item.id]); if (type === 'CARD') onBuyCard(item); if (type === 'RELIC') onBuyRelic(item); } };
@@ -485,10 +485,11 @@ const ShopView = ({ onLeave, onBuyCard, onBuyRelic, gold, deck, relics, champion
                         <h3 className="text-xl text-[#F0E6D2] mb-4 uppercase tracking-widest border-l-4 border-purple-500 pl-3">海克斯装备</h3>
                         <div className="flex flex-wrap gap-6">
                             {relicStock.map(relic => {
+                                if (!relic) return null;
                                 const isBought = purchasedItems.includes(relic.id);
                                 return (
                                     <div key={relic.id} onClick={() => !isBought && handleBuy(relic, 'RELIC')} className={`w-20 h-20 relative group transition-all ${isBought ? 'opacity-20 grayscale pointer-events-none' : 'hover:scale-110 cursor-pointer'}`}>
-                                        <img src={relic.img} className="w-full h-full object-cover rounded-lg border-2 border-[#C8AA6E] shadow-[0_0_10px_#C8AA6E]" />
+                                        <img src={relic.img || 'https://ddragon.leagueoflegends.com/cdn/13.1.1/img/profileicon/29.png'} className="w-full h-full object-cover rounded-lg border-2 border-[#C8AA6E] shadow-[0_0_10px_#C8AA6E]" alt={relic.name || 'relic'} />
                                         <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-black/80 px-2 rounded text-yellow-400 font-bold text-sm whitespace-nowrap">{relic.price} G</div>
                                         <RelicTooltip relic={relic}><div className="w-full h-full absolute inset-0"></div></RelicTooltip>
                                     </div>
@@ -505,7 +506,7 @@ const ShopView = ({ onLeave, onBuyCard, onBuyRelic, gold, deck, relics, champion
 
 const ChestView = ({ onLeave, onRelicReward, relics, act }) => {
     // 根据当前章节过滤遗物：ACT1只能获得通用遗物，ACT2可以获得ACT1+ACT2，ACT3可以获得所有
-    const availableRelics = Object.values(RELIC_DATABASE).filter(r => r.rarity !== 'PASSIVE' && !relics.includes(r.id) && isRelicAvailableInAct(r.id, act));
+    const availableRelics = Object.values(RELIC_DATABASE).filter(r => r && r.rarity !== 'PASSIVE' && !relics.includes(r.id) && isRelicAvailableInAct(r.id, act));
     const rewards = useMemo(() => shuffle(availableRelics).slice(0, 3), [relics, act]);
     const [rewardChosen, setRewardChosen] = useState(false);
     const handleChoose = (relic) => { if (rewardChosen) return; setRewardChosen(true); onRelicReward(relic); };
@@ -516,9 +517,9 @@ const ChestView = ({ onLeave, onRelicReward, relics, act }) => {
                 <h2 className="text-4xl font-bold text-[#C8AA6E] mb-6">海克斯宝箱</h2>
                 <p className="text-[#F0E6D2] text-lg mb-8">打开宝箱，选择一件强大的装备来武装自己。</p>
                 <div className="flex justify-center gap-8">
-                    {rewards.map((relic) => (
+                    {rewards.filter(Boolean).map((relic) => (
                         <div key={relic.id} onClick={() => handleChoose(relic)} className={`w-36 relative group transition-all p-4 rounded-lg border-2 ${rewardChosen ? 'opacity-40 pointer-events-none' : 'hover:scale-110 cursor-pointer border-[#C8AA6E] shadow-xl hover:shadow-[0_0_20px_#C8AA6E]'}`}>
-                            <img src={relic.img} className="w-full h-auto object-cover rounded-lg" />
+                            <img src={relic.img || 'https://ddragon.leagueoflegends.com/cdn/13.1.1/img/profileicon/29.png'} className="w-full h-auto object-cover rounded-lg" alt={relic.name || 'relic'} />
                             <div className="font-bold text-[#F0E6D2] mt-3">{relic.name}</div>
                             <div className="text-xs text-[#A09B8C] mt-1">{relic.description}</div>
                             {rewardChosen && <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-3xl font-bold text-green-400">已选</div>}

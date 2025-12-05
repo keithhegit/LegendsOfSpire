@@ -61,12 +61,14 @@ const CodexView = ({ onClose }) => {
             case 'RELICS':
                 return (
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 p-4 overflow-y-auto h-full">
-                        {Object.values(RELIC_DATABASE).map(relic => (
+                        {Object.values(RELIC_DATABASE).map(relic => {
+                            if (!relic) return null;
+                            return (
                             <div key={relic.id} className="bg-[#1E2328] border border-slate-600 p-2 rounded flex flex-col items-center hover:border-[#C8AA6E] transition-colors">
                                 <img 
-                                    src={relic.img} 
+                                    src={relic.img || 'https://ddragon.leagueoflegends.com/cdn/13.1.1/img/profileicon/29.png'} 
                                     className="w-16 h-16 object-cover rounded mb-2" 
-                                    alt={relic.name}
+                                    alt={relic.name || 'relic'}
                                     onError={(e) => {
                                         e.target.src = 'https://ddragon.leagueoflegends.com/cdn/13.1.1/img/profileicon/29.png';
                                     }}
@@ -77,7 +79,8 @@ const CodexView = ({ onClose }) => {
                                     <div className="text-[8px] text-slate-500 mt-1">{relic.rarity}</div>
                                 )}
                             </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 );
 
