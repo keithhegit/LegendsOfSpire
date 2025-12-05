@@ -178,7 +178,7 @@ export const CARD_DATABASE = {
 
   // Irelia
   IreliaQ: { id: 'IreliaQ', name: '利刃冲击', type: 'ATTACK', cost: 1, value: 8, rarity: 'COMMON', hero: 'Irelia', target: 'single', effect: 'KILL_REWARD', effectValue: 1, description: '造成6伤；若击杀目标则抽1并回复1法力。', img: `${SPELL_URL}/IreliaQ.png`, price: 50 },
-  IreliaW: { id: 'IreliaW', name: '反击之舞', type: 'SKILL', cost: 1, value: 12, rarity: 'UNCOMMON', hero: 'Irelia', target: 'self', effect: 'REFLECT_BUFF', effectValue: 2, description: '获得12护甲；若被命中则下一次攻击伤害×2。', img: `${SPELL_URL}/IreliaW.png`, price: 80 },
+  IreliaW: { id: 'IreliaW', name: '反击之舞', type: 'SKILL', cost: 1, value: 0, block: 12, rarity: 'UNCOMMON', hero: 'Irelia', target: 'self', effect: 'REFLECT_BUFF', effectValue: 2, description: '获得12护甲；若被命中则下一次攻击伤害×2。', img: `${SPELL_URL}/IreliaW.png`, price: 80 },
   IreliaE: { id: 'IreliaE', name: '束缚之刃', type: 'ATTACK', cost: 1, value: 8, rarity: 'UNCOMMON', hero: 'Irelia', target: 'single', effect: 'STUN', effectValue: 1, description: '对目标造成8伤并使其眩晕1回合。', img: `${SPELL_URL}/IreliaE.png`, price: 100 },
   IreliaR: { id: 'IreliaR', name: '先锋突袭', type: 'ATTACK', cost: 3, value: 12, rarity: 'RARE', hero: 'Irelia', target: 'single', effect: 'ALL_ATTACKS_BONUS', effectValue: 2, description: '造成12伤；本回合你所有对该目标的攻击额外+2伤。', img: `${SPELL_URL}/IreliaR.png`, price: 150 },
 
@@ -233,7 +233,7 @@ export const CARD_DATABASE = {
 
   Neutral_031: { id: 'Neutral_031', name: '守护之盾', type: 'SKILL', cost: 1, value: 0, block: 10, rarity: 'COMMON', hero: 'Neutral', target: 'self', effect: null, effectValue: 0, description: '获得10护甲。', img: `${SPELL_URL}/SummonerBarrier.png`, price: 60 },
   Neutral_032: { id: 'Neutral_032', name: '回复秘药', type: 'SKILL', cost: 1, value: 10, rarity: 'COMMON', hero: 'Neutral', target: 'self', effect: 'HEAL', effectValue: 10, description: '回复10生命。', img: `${SPELL_URL}/SummonerHeal.png`, price: 60 },
-  Neutral_033: { id: 'Neutral_033', name: '格挡之歌', type: 'SKILL', cost: 1, value: 6, rarity: 'COMMON', hero: 'Neutral', target: 'self', effect: 'NEXT_DAMAGE_REDUCE', effectValue: 4, description: '获得6护甲并使下一次受到的伤害额外减少4。', img: `${SPELL_URL}/SummonerBarrier.png`, price: 70 },
+  Neutral_033: { id: 'Neutral_033', name: '格挡之歌', type: 'SKILL', cost: 1, value: 0, block: 6, rarity: 'COMMON', hero: 'Neutral', target: 'self', effect: 'NEXT_DAMAGE_REDUCE', effectValue: 4, description: '获得6护甲并使下一次受到的伤害额外减少4。', img: `${SPELL_URL}/SummonerBarrier.png`, price: 70 },
   Neutral_034: { id: 'Neutral_034', name: '逆伤反震', type: 'SKILL', cost: 2, value: 0, rarity: 'UNCOMMON', hero: 'Neutral', target: 'self', effect: 'RETALIATE_ON_HIT', effectValue: 8, description: '若在本回合被攻击，则反弹8伤给攻击者。', img: `${SPELL_URL}/SummonerBarrier.png`, price: 100 },
   Neutral_035: { id: 'Neutral_035', name: '能量回复', type: 'SKILL', cost: 2, value: 0, rarity: 'UNCOMMON', hero: 'Neutral', target: 'self', effect: 'REGEN_MANA', effectValue: 1, description: '恢复2法力：本回合+1，下回合再+1（总计2点）。', img: `${SPELL_URL}/SummonerClarity.png`, price: 120 },
   Neutral_036: { id: 'Neutral_036', name: '稳固姿态', type: 'POWER', cost: 0, value: 0, rarity: 'COMMON', hero: 'Neutral', target: 'self', effect: 'PASSIVE_BLOCK_IF_IDLE', effectValue: 6, description: '若本回合没有出牌，则下回合获得6护甲（鼓励保留）。', img: `${SPELL_URL}/SummonerBarrier.png`, price: 40 },
@@ -1550,7 +1550,8 @@ export const CARD_DATABASE = {
     type: 'SKILL',
     target: 'self',
     cost: 1,
-    value: 12,
+    value: 0,
+    block: 12,
     rarity: 'COMMON',
     effect: 'CLEANSE',
     effectValue: 1,

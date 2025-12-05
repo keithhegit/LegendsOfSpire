@@ -52,6 +52,7 @@ const BattleScene = ({
     const [renderTrigger, setRenderTrigger] = useState(0);
     const forceUpdate = () => setRenderTrigger(prev => prev + 1);
     const battleDebtRef = useRef({ maxHpCost: 0 });
+    const permaStrGainRef = useRef(0);
     const permaUpgradeRef = useRef([]);
     const singleUseCardsRef = useRef([]);
     const hunterBadgeActiveRef = useRef(false);
@@ -107,7 +108,16 @@ const BattleScene = ({
         globalAttackBonus: 0,
         winGoldBonus: 0,
         scholarRuneValue: 0,
-        ambitionPactUsed: false
+        ambitionPactUsed: false,
+        nextDamageReduce: 0,
+        passiveBlock: 0,
+        retaliation: 0,
+        damageReduction: 0,
+        reflectBuff: false,
+        strPerHit: 0,
+        strWhenHit: 0,
+        permaStrOnKill: false,
+        nextAttackX2: false
     });
     const [enemyStatus, setEnemyStatus] = useState({ strength: 0, weak: 0, vulnerable: 0, mark: 0, markDamage: 0, trap: 0 });
     const heroBaseCritChance = heroData?.id === 'Yasuo' ? 10 : 0;
@@ -876,6 +886,10 @@ const BattleScene = ({
                 baseDmg *= 2;
                 setPlayerStatus(prev => ({ ...prev, nextAttackDouble: false }));
             }
+            if (mergedPlayerStatus.nextAttackX2) {
+                baseDmg *= 2;
+                setPlayerStatus(prev => ({ ...prev, nextAttackX2: false }));
+            }
 
             if (effectUpdates.doubleIfAttacked && attackCountBeforeCard > 0) {
                 baseDmg *= 2;
@@ -1015,6 +1029,21 @@ const BattleScene = ({
                         setTimeout(() => setDmgOverlay(null), didCrit ? 600 : 250);
                     }, i * 300);
                 }
+            const willKill = enemyHp - total <= 0;
+            if (willKill) {
+                if (effectUpdates.killReward) {
+                    const reward = effectUpdates.killReward;
+                    setPlayerMana(m => Math.min(initialMana, m + reward));
+                    drawCards(reward);
+                }
+                if (effectUpdates.drawIfKill) {
+                    drawCards(effectUpdates.drawIfKill);
+                }
+                if (playerStatus.permaStrOnKill) {
+                    permaStrGainRef.current += 1;
+                    setPlayerStatus(prev => ({ ...prev, strength: (prev.strength || 0) + 1 }));
+                }
+            }
             };
 
             if (shouldExecute || shouldBleedExecute) {
@@ -1093,6 +1122,10 @@ const BattleScene = ({
             if (ambitionPactPendingRef.current > 0) {
                 battleResult.gainedStr += ambitionPactPendingRef.current;
                 ambitionPactPendingRef.current = 0;
+            }
+            if (permaStrGainRef.current > 0) {
+                battleResult.gainedStr += permaStrGainRef.current;
+                permaStrGainRef.current = 0;
             }
 
             playSfx('WIN');
@@ -1232,6 +1265,11 @@ const BattleScene = ({
                 updates.nextTurnStrength = 0;
             }
 
+            // 每回合开始的被动格挡
+            if (prev.passiveBlock > 0) {
+                setPlayerBlock(b => b + prev.passiveBlock);
+            }
+
             return updates;
         });
     };
@@ -1312,6 +1350,13 @@ const BattleScene = ({
             const count = act.count || 1;
             for (let i = 0; i < count; i++) {
                 let finalDmg = dmg;
+                if (playerStatus.damageReduction > 0) {
+                    finalDmg = Math.max(0, Math.floor(finalDmg * (1 - playerStatus.damageReduction / 100)));
+                }
+                if (playerStatus.nextDamageReduce > 0) {
+                    finalDmg = Math.max(0, finalDmg - playerStatus.nextDamageReduce);
+                    setPlayerStatus(prev => ({ ...prev, nextDamageReduce: 0 }));
+                }
                 if (playerStatus.vulnerable > 0) finalDmg = Math.floor(finalDmg * 1.5);
                 if (remBlock >= finalDmg) {
                     // 玩家格挡时播放格挡音效
@@ -1337,6 +1382,20 @@ const BattleScene = ({
             setPlayerBlock(remBlock); setPlayerHp(currHp); setDmgOverlay({ val: total, target: 'PLAYER' }); setTimeout(() => setDmgOverlay(null), 800);
             if (damageTaken > 0) {
                 achievementTracker.recordPlayerDamage(damageTaken);
+                if (playerStatus.retaliation > 0) {
+                    applyDirectDamage(playerStatus.retaliation, 'RETALIATE');
+                }
+                if ((playerStatus.strPerHit || 0) > 0) {
+                    setPlayerStatus(prev => ({ ...prev, strength: (prev.strength || 0) + playerStatus.strPerHit }));
+                    setDmgOverlay({ val: `力量 +${playerStatus.strPerHit}`, target: 'PLAYER', color: 'text-red-300' });
+                    setTimeout(() => setDmgOverlay(null), 700);
+                }
+                if ((playerStatus.strWhenHit || 0) > 0) {
+                    setPlayerStatus(prev => ({ ...prev, strength: (prev.strength || 0) + playerStatus.strWhenHit }));
+                }
+                if (playerStatus.reflectBuff) {
+                    setPlayerStatus(prev => ({ ...prev, reflectBuff: false, nextAttackDouble: true }));
+                }
             }
         }
         if (act.type === 'BUFF') {
@@ -1376,6 +1435,7 @@ const BattleScene = ({
             {status.regenMana > 0 && <div className="flex items-center text-[10px] text-blue-400 bg-blue-900/40 px-1 rounded border border-blue-800 shadow-sm"><Zap size={10} className="mr-1" /> 回蓝 {status.regenMana}</div>}
             {status.nextAttackBonus > 0 && <div className="flex items-center text-[10px] text-amber-200 bg-amber-900/30 px-1 rounded border border-amber-700 shadow-sm"><Sword size={10} className="mr-1" /> 下一击 +{status.nextAttackBonus}</div>}
             {status.nextAttackDouble && <div className="flex items-center text-[10px] text-red-400 bg-red-900/40 px-1 rounded border border-red-800 shadow-sm"><Sword size={10} className="mr-1" /> 双倍伤害</div>}
+            {status.nextAttackX2 && <div className="flex items-center text-[10px] text-red-300 bg-red-900/30 px-1 rounded border border-red-700 shadow-sm"><Sword size={10} className="mr-1" /> 下一击 x2</div>}
 
             {/* Next Turn Effects */}
             {status.nextTurnBlock > 0 && <div className="flex items-center text-[10px] text-blue-200 bg-blue-900/40 px-1 rounded border border-blue-800 shadow-sm"><Shield size={10} className="mr-1" /><Clock size={8} className="mr-1" /> +{status.nextTurnBlock}</div>}

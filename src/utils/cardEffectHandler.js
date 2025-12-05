@@ -116,9 +116,10 @@ function applyEffect(effectType, value, context, updates, card = {}) {
 
         case 'NEXT_DAMAGE_REDUCE':
             // 格挡之歌: 获得护甲并使下一次受到的伤害减少
-            // 这里只处理护甲部分，减伤逻辑需要在 BattleScene 中实现
-            // 暂时只给护甲作为 fallback，或者我们可以添加一个 status
-            // updates.playerStatus.damageReduce = value; // 需要 BattleScene 支持
+            updates.playerStatus = {
+                ...(updates.playerStatus || playerStatus),
+                nextDamageReduce: ((updates.playerStatus?.nextDamageReduce || playerStatus.nextDamageReduce) || 0) + value
+            };
             break;
 
         case 'DRAW_NEXT':
@@ -1055,7 +1056,7 @@ function applyEffect(effectType, value, context, updates, card = {}) {
 
         case 'BLOCK_DRAW':
             // 格挡抽牌 - Block + draw combo
-            updates.blockGain = Math.floor(value / 2);
+            updates.blockGain = (updates.blockGain || 0) + value;
             updates.drawCount += 1;
             break;
 
