@@ -27,7 +27,9 @@ const BattleScene = ({
     act,
     onGoldChange,
     openingDrawBonus = 0,
-    onConsumeOpeningDrawBonus
+    onConsumeOpeningDrawBonus,
+    openingManaBonus = 0,
+    onConsumeOpeningManaBonus
 }) => {
     const getScaledEnemy = (enemyId, floor, currentAct) => {
         const baseEnemy = ENEMY_POOL[enemyId];
@@ -56,6 +58,7 @@ const BattleScene = ({
     const permaUpgradeRef = useRef([]);
     const singleUseCardsRef = useRef([]);
     const hunterBadgeActiveRef = useRef(false);
+    const nextBattleBonusRef = useRef({ draw: 0, mana: 0 });
     const ambitionPactPendingRef = useRef(0);
     const discountQueueRef = useRef([]);
     const isFirstTurnRef = useRef(true);
@@ -117,7 +120,8 @@ const BattleScene = ({
         strPerHit: 0,
         strWhenHit: 0,
         permaStrOnKill: false,
-        nextAttackX2: false
+        nextAttackX2: false,
+        nextAttackDoubleNextTurn: false
     });
     const [enemyStatus, setEnemyStatus] = useState({ strength: 0, weak: 0, vulnerable: 0, mark: 0, markDamage: 0, trap: 0 });
     const heroBaseCritChance = heroData?.id === 'Yasuo' ? 10 : 0;
@@ -491,7 +495,11 @@ const BattleScene = ({
 
     const startTurnLogic = () => {
         setGameState('PLAYER_TURN');
-        setPlayerMana(initialMana + (heroData.relicId === "LuxPassive" ? 1 : 0));
+        const startMana = initialMana + (heroData.relicId === "LuxPassive" ? 1 : 0) + (isFirstTurnRef.current ? openingManaBonus : 0);
+        if (isFirstTurnRef.current && openingManaBonus > 0) {
+            onConsumeOpeningManaBonus?.();
+        }
+        setPlayerMana(startMana);
         // 护甲不清零，累积到下一回合（符合 Slay the Spire 机制）
         // setPlayerBlock(0); // 已移除
         clearDiscountQueue();
@@ -1036,6 +1044,11 @@ const BattleScene = ({
                     setPlayerMana(m => Math.min(initialMana, m + reward));
                     drawCards(reward);
                 }
+                if (effectUpdates.killRewardNextBattle) {
+                    const { draw = 0, mana = 0 } = effectUpdates.killRewardNextBattle;
+                    nextBattleBonusRef.current.draw += draw;
+                    nextBattleBonusRef.current.mana += mana;
+                }
                 if (effectUpdates.drawIfKill) {
                     drawCards(effectUpdates.drawIfKill);
                 }
@@ -1090,6 +1103,16 @@ const BattleScene = ({
                 gainedMaxHp: 0,
                 winGoldBonus: playerStatus.winGoldBonus || 0
             };
+
+            if (nextBattleBonusRef.current.draw > 0 || nextBattleBonusRef.current.mana > 0) {
+                if (nextBattleBonusRef.current.draw > 0) {
+                    battleResult.nextBattleDrawBonus = (battleResult.nextBattleDrawBonus || 0) + nextBattleBonusRef.current.draw;
+                }
+                if (nextBattleBonusRef.current.mana > 0) {
+                    battleResult.nextBattleManaBonus = (battleResult.nextBattleManaBonus || 0) + nextBattleBonusRef.current.mana;
+                }
+                nextBattleBonusRef.current = { draw: 0, mana: 0 };
+            }
 
             // 内瑟斯被动：用攻击牌击杀获得1永久力量
             if (heroData.relicId === "NasusPassive" && lastPlayedCard && lastPlayedCard.type === 'ATTACK') {
@@ -1258,6 +1281,16 @@ const BattleScene = ({
                 setPlayerBlock(b => b + prev.nextTurnBlock);
                 updates.nextTurnBlock = 0;
             }
+
+            // 下回合首次攻击翻倍 (反击之舞)
+            if (prev.nextAttackDoubleNextTurn) {
+                updates.nextAttackDouble = true;
+                updates.nextAttackDoubleNextTurn = false;
+            }
+
+            // 清理一次性防守状态
+            updates.retaliation = 0;
+            updates.damageReduction = 0;
 
             // 下回合力量
             if (prev.nextTurnStrength > 0) {

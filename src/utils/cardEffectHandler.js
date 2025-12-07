@@ -417,8 +417,11 @@ function applyEffect(effectType, value, context, updates, card = {}) {
             break;
 
         case 'REFLECT_BUFF':
-            // 反弹增益 - Reflect buffs to enemy
-            updates.reflectBuff = true;
+            // 反击之舞：下回合第一次攻击伤害翻倍
+            updates.playerStatus = {
+                ...(updates.playerStatus || playerStatus),
+                nextAttackDoubleNextTurn: true
+            };
             break;
 
         case 'IMMUNE_ONCE':
@@ -723,10 +726,10 @@ function applyEffect(effectType, value, context, updates, card = {}) {
             break;
 
         case 'PASSIVE_BLOCK_IF_IDLE':
-            // 待机格挡 - Block if didn't attack
+            // 稳固姿态 - 下回合无条件获得护甲
             updates.playerStatus = {
                 ...(updates.playerStatus || playerStatus),
-                idleBlock: ((updates.playerStatus?.idleBlock || playerStatus.idleBlock) || 0) + value
+                nextTurnBlock: ((updates.playerStatus?.nextTurnBlock || playerStatus.nextTurnBlock) || 0) + value
             };
             break;
 
@@ -913,6 +916,14 @@ function applyEffect(effectType, value, context, updates, card = {}) {
         case 'KILL_REWARD':
             // 击杀奖励 - Irelia Q reset
             updates.killReward = value;
+            break;
+
+        case 'KILL_NEXT_BATTLE_BUFF':
+            // 利刃冲击：击杀后下场战斗开局 +1 抽牌 +1 法力
+            updates.killRewardNextBattle = {
+                draw: value,
+                mana: value
+            };
             break;
 
         case 'GAMBLE': {

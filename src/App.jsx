@@ -612,6 +612,7 @@ export default function LegendsOfTheSpire() {
     const [relics, setRelics] = useState([]);
     const [baseStr, setBaseStr] = useState(0);
     const [nextBattleDrawBonus, setNextBattleDrawBonus] = useState(0);
+    const [nextBattleManaBonus, setNextBattleManaBonus] = useState(0);
     const [activeNode, setActiveNode] = useState(null);
     const [usedEnemies, setUsedEnemies] = useState([]);
     const [pendingRelic, setPendingRelic] = useState(null);
@@ -1343,6 +1344,7 @@ export default function LegendsOfTheSpire() {
         setChampion(null);
         setView('CHAMPION_SELECT');
         setNextBattleDrawBonus(0);
+        setNextBattleManaBonus(0);
         showToast('GM：已清空存档，请重新选择英雄', 'default');
     };
 
@@ -1434,6 +1436,10 @@ export default function LegendsOfTheSpire() {
         if (result.nextBattleDrawBonus > 0) {
             setNextBattleDrawBonus(prev => prev + result.nextBattleDrawBonus);
             showToast(`下场战斗首抽 +${result.nextBattleDrawBonus}`, 'default');
+        }
+        if (result.nextBattleManaBonus > 0) {
+            setNextBattleManaBonus(prev => prev + result.nextBattleManaBonus);
+            showToast(`下场战斗首回合法力 +${result.nextBattleManaBonus}`, 'default');
         }
 
         setCurrentHp(Math.min(nextMaxHp, result.finalHp + passiveHeal));
@@ -1715,6 +1721,8 @@ export default function LegendsOfTheSpire() {
                         onGoldChange={handleBattleGoldChange}
                         openingDrawBonus={nextBattleDrawBonus}
                         onConsumeOpeningDrawBonus={() => setNextBattleDrawBonus(0)}
+                        openingManaBonus={nextBattleManaBonus}
+                        onConsumeOpeningManaBonus={() => setNextBattleManaBonus(0)}
                     />
                 );
             case 'REWARD': return <RewardView goldReward={50} onCardSelect={handleCardReward} onSkip={handleSkipReward} championName={champion.name} />;
