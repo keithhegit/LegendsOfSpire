@@ -60,16 +60,6 @@ const BattleScene = ({
     const hunterBadgeActiveRef = useRef(false);
     const nextBattleBonusRef = useRef({ draw: 0, mana: 0 });
     const ambitionPactPendingRef = useRef(0);
-    const jinxEmptyHandGrantedRef = useRef(false);
-    const playerDamagedThisTurnRef = useRef(false);
-    const sonaSkillCountRef = useRef(0);
-    const powerChordReadyRef = useRef(false);
-    const ekkoHitRef = useRef(0);
-    const sylasEmpowerRef = useRef(false);
-    const viktorShardsRef = useRef(0);
-    const leeSinStacksRef = useRef(0);
-    const vayneHitsRef = useRef(0);
-    const teemoIdleRef = useRef(false);
     const discountQueueRef = useRef([]);
     const isFirstTurnRef = useRef(true);
     const [dmgOverlay, setDmgOverlay] = useState(null);
@@ -521,13 +511,6 @@ const BattleScene = ({
             onConsumeOpeningDrawBonus?.();
         }
         drawCards(baseDraw + extraDraw + bonusDraw);
-        jinxEmptyHandGrantedRef.current = false;
-        playerDamagedThisTurnRef.current = false;
-        if (teemoIdleRef.current && heroData.relicId === "TeemoPassive") {
-            setPlayerMana(m => Math.min(heroData.maxMana || initialMana, m + 1));
-            drawCards(1);
-            teemoIdleRef.current = false;
-        }
         if (isFirstTurnRef.current) {
             isFirstTurnRef.current = false;
         }
@@ -608,7 +591,12 @@ const BattleScene = ({
 
         let card = { ...cardTemplate };
 
+        // 盲僧被动：技能牌后下一张攻击牌-1费
         let actualCost = card.cost;
+        if (heroData.relicId === "LeeSinPassive" && card.type === 'ATTACK' && leeSinSkillBuff) {
+            actualCost = Math.max(0, card.cost - 1);
+            setLeeSinSkillBuff(false); // 消耗buff
+        }
         if (card.type === 'ATTACK' && (playerStatus.nextCostReduce || 0) > 0) {
             const reduction = playerStatus.nextCostReduce;
             actualCost = Math.max(0, actualCost - reduction);
@@ -720,14 +708,6 @@ const BattleScene = ({
         if (effectUpdates.playerStatus?.idleBlock) {
             setIdleBlockState({ value: effectUpdates.playerStatus.idleBlock, armed: true, broken: false, sourceCard: cardId });
         }
-        if (heroData.relicId === "LuxPassive" && card.type === 'SKILL' && (card.value > 0 || effectUpdates.damageAmount)) {
-            setPlayerStatus(prev => ({ ...prev, nextAttackBonus: (prev.nextAttackBonus || 0) + 4 }));
-            setDmgOverlay({ val: '光芒 +4', target: 'PLAYER', color: 'text-amber-200' });
-            setTimeout(() => setDmgOverlay(null), 700);
-        }
-        if (heroData.relicId === "YasuoPassive") {
-            setPlayerBlock(b => b + 1);
-        }
         if (effectUpdates.permaUpgrade) {
             applyPermaUpgrade();
         }
@@ -779,21 +759,9 @@ const BattleScene = ({
             executeCopiedEnemyAction();
         }
 
-        // 娑娜被动：技能计数，满3次强化下一次攻击
-        if (card.type === 'SKILL' && heroData.relicId === "SonaPassive") {
-            sonaSkillCountRef.current += 1;
-            if (sonaSkillCountRef.current >= 3) {
-                powerChordReadyRef.current = true;
-                sonaSkillCountRef.current = 0;
-            }
-        }
-        // 塞拉斯被动：技能后强化下一次攻击
-        if (card.type === 'SKILL' && heroData.relicId === "SylasPassive") {
-            sylasEmpowerRef.current = true;
-        }
-        // 盲僧被动：技能后下2次攻击回蓝
+        // 盲僧被动：技能牌后设置buff
         if (card.type === 'SKILL' && heroData.relicId === "LeeSinPassive") {
-            leeSinStacksRef.current = 2;
+            setLeeSinSkillBuff(true);
         }
 
         if (card.type === 'ATTACK') {
@@ -890,7 +858,7 @@ const BattleScene = ({
             }
 
             // FIX: 支持 MULTI_HIT from effectUpdates
-                const hits = multiStrikeSegments || (card.isMultiHit ? card.hits : (effectUpdates.multiHitCount || 1));
+            const hits = multiStrikeSegments || (card.isMultiHit ? card.hits : (effectUpdates.multiHitCount || 1));
             let total = 0;
             let isFirstHit = true; // 用于劫被动
             let drawOnHitCharges = effectUpdates.drawOnHit || 0;
@@ -899,10 +867,7 @@ const BattleScene = ({
             const cardsPlayedIncludingCurrent = cardsPlayedBefore + 1;
             const priorCardsThisTurn = Math.max(0, cardsPlayedIncludingCurrent - 1);
             const strengthCritBonus = ((mergedPlayerStatus.strength || 0) * heroStrengthCritMultiplier);
-            let totalCritChancePercent = Math.max(0, heroBaseCritChance + (mergedPlayerStatus.critChance || 0) + strengthCritBonus);
-            if (heroData.relicId === "YasuoPassive") {
-                totalCritChancePercent *= 2;
-            }
+            const totalCritChancePercent = Math.max(0, heroBaseCritChance + (mergedPlayerStatus.critChance || 0) + strengthCritBonus);
             const critChanceDecimal = Math.min(1, totalCritChancePercent / 100);
             const critDamageMultiplier = mergedPlayerStatus.critDamageMultiplier || 2;
             const shouldForceCrit = !!effectUpdates.critIfVuln && (currentEnemyStatus.vulnerable > 0);
@@ -932,36 +897,6 @@ const BattleScene = ({
             if (mergedPlayerStatus.nextAttackX2) {
                 baseDmg *= 2;
                 setPlayerStatus(prev => ({ ...prev, nextAttackX2: false }));
-            }
-
-            // 娑娜被动：能量和弦
-            if (powerChordReadyRef.current && card.type === 'ATTACK' && heroData.relicId === "SonaPassive") {
-                baseDmg += 3;
-                powerChordReadyRef.current = false;
-            }
-            // 塞拉斯被动：强化下一次攻击
-            if (sylasEmpowerRef.current && card.type === 'ATTACK' && heroData.relicId === "SylasPassive") {
-                baseDmg += 4;
-                sylasEmpowerRef.current = false;
-            }
-            // 艾克被动：每3次攻击触发额外伤害+1敏捷
-            if (heroData.relicId === "EkkoPassive" && card.type === 'ATTACK') {
-                ekkoHitRef.current += 1;
-                if (ekkoHitRef.current >= 3) {
-                    baseDmg += 3;
-                    ekkoHitRef.current = 0;
-                    setPlayerStatus(prev => ({ ...prev, dexterity: (prev.dexterity || 0) + 1 }));
-                }
-            }
-            // 维克托被动：技能牌获得碎片加成
-            if (heroData.relicId === "ViktorPassive" && card.type === 'SKILL' && (card.block || baseDmg)) {
-                const shard = viktorShardsRef.current || 0;
-                if (shard > 0) {
-                    baseDmg += shard;
-                    if (card.block) {
-                        effectUpdates.blockGain = (effectUpdates.blockGain || 0) + shard;
-                    }
-                }
             }
 
             if (effectUpdates.doubleIfAttacked && attackCountBeforeCard > 0) {
@@ -1093,7 +1028,7 @@ const BattleScene = ({
                     if (heroData.relics.includes("VampiricScepter")) {
                         updatePlayerHp(prev => prev + 1, { showHeal: true, label: 'LIFE' });
                     }
-            if (heroData.relicId === "DariusPassive") setEnemyStatus(s => ({ ...s, bleed: (s.bleed || 0) + 1 }));
+                    if (heroData.relicId === "DariusPassive") setEnemyStatus(s => ({ ...s, weak: s.weak + 1 }));
 
                     // FIX: Multi-hit display - Stagger damage numbers
                     const hitDmg = dmgToHp; // Capture current hit damage
@@ -1101,26 +1036,6 @@ const BattleScene = ({
                         setDmgOverlay({ val: hitDmg, target: 'ENEMY', isCrit: didCrit });
                         setTimeout(() => setDmgOverlay(null), didCrit ? 600 : 250);
                     }, i * 300);
-
-                    // 厄加特被动：额外3点伤害（忽略护甲）
-                    if (heroData.relicId === "UrgotPassive" && dmgToHp > 0) {
-                        applyDirectDamage(3, 'FIRE');
-                    }
-
-                    // 内瑟斯被动：吸血 20%
-                    if (heroData.relicId === "NasusPassive" && dmgToHp > 0) {
-                        const heal = Math.floor(dmgToHp * 0.2);
-                        if (heal > 0) updatePlayerHp(h => h + heal, { showHeal: true, label: 'LIFE' });
-                    }
-
-                    // 薇恩被动：第3次命中触发真实伤害
-                    if (heroData.relicId === "VaynePassive" && card.type === 'ATTACK' && dmgToHp > 0) {
-                        vayneHitsRef.current = (vayneHitsRef.current || 0) + 1;
-                        if (vayneHitsRef.current >= 3) {
-                            applyDirectDamage(10, 'TRUE');
-                            vayneHitsRef.current = 0;
-                        }
-                    }
                 }
             const willKill = enemyHp - total <= 0;
             if (willKill) {
@@ -1133,13 +1048,6 @@ const BattleScene = ({
                     const { draw = 0, mana = 0 } = effectUpdates.killRewardNextBattle;
                     nextBattleBonusRef.current.draw += draw;
                     nextBattleBonusRef.current.mana += mana;
-                }
-                if (heroData.relicId === "JinxPassive") {
-                    setPlayerMana(m => Math.min(initialMana, m + 1));
-                    drawCards(1);
-                }
-                if (heroData.relicId === "ViktorPassive") {
-                    viktorShardsRef.current = (viktorShardsRef.current || 0) + 1;
                 }
                 if (effectUpdates.drawIfKill) {
                     drawCards(effectUpdates.drawIfKill);
@@ -1182,15 +1090,6 @@ const BattleScene = ({
             if (noAttackPlayed) {
                 setNoAttackPlayed(false);
                 achievementTracker.setBattleFlag('noAttackPlayed', false);
-            }
-            if (heroData.relicId === "LeeSinPassive" && leeSinStacksRef.current > 0) {
-                setPlayerMana(m => Math.min(initialMana, m + 1));
-                leeSinStacksRef.current -= 1;
-            }
-            if (heroData.relicId === "JinxPassive" && newHand.length === 0 && !jinxEmptyHandGrantedRef.current) {
-                setPlayerMana(m => Math.min(initialMana, m + 1));
-                drawCards(1);
-                jinxEmptyHandGrantedRef.current = true;
             }
         }
     };
@@ -1393,19 +1292,6 @@ const BattleScene = ({
             updates.retaliation = 0;
             updates.damageReduction = 0;
 
-            // 盖伦被动：若上回合未受击，回合开始回复6点生命
-            if (heroData.relicId === "GarenPassive" && !playerDamagedThisTurnRef.current) {
-                updatePlayerHp(h => Math.min(heroData.maxHp, h + 6), { showHeal: true, label: 'HEAL' });
-            }
-            playerDamagedThisTurnRef.current = false;
-
-            // 提莫被动：若上回合未出牌，下回合已执行奖励（startTurn），此处清理标记
-            if (heroData.relicId === "TeemoPassive" && cardsPlayedCount === 0) {
-                teemoIdleRef.current = true;
-            } else {
-                teemoIdleRef.current = false;
-            }
-
             // 下回合力量
             if (prev.nextTurnStrength > 0) {
                 updates.strength = (prev.strength || 0) + prev.nextTurnStrength;
@@ -1518,9 +1404,6 @@ const BattleScene = ({
                     currHp -= pierce;
                     // 玩家受击时播放受击音效
                     setTimeout(() => playSfx('HIT_TAKEN'), 250);
-                    if (pierce > 0) {
-                        playerDamagedThisTurnRef.current = true;
-                    }
                     if (heroData.relics.includes("BrambleVest")) setEnemyHp(h => Math.max(0, h - 3));
                     if (playerStatus.reflectDamage > 0) {
                         applyDirectDamage(playerStatus.reflectDamage, 'REFLECT');
