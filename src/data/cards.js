@@ -206,7 +206,7 @@ export const CARD_DATABASE = {
   Neutral_007: { id: 'Neutral_007', name: '逆流牵制', type: 'ATTACK', cost: 1, value: 10, rarity: 'UNCOMMON', hero: 'Neutral', target: 'single', effect: 'REMOVE_BUFF', effectValue: 1, description: '若目标本回合有增益，则对其造成10伤并移除一个增益。', img: `${SPELL_URL}/SummonerSmite.png`, price: 100 },
   Neutral_008: { id: 'Neutral_008', name: '强制斩击', type: 'ATTACK', cost: 2, value: 14, rarity: 'UNCOMMON', hero: 'Neutral', target: 'single', effect: 'FREE_IF_WEAK', effectValue: 0, description: '对单体造成14伤；若目标虚弱则费用变为0。', img: `${SPELL_URL}/SummonerIgnite.png`, price: 120 },
 
-  Neutral_009: { id: 'Neutral_009', name: '净化之页', type: 'SKILL', cost: 0, value: 0, rarity: 'COMMON', hero: 'Neutral', target: 'self', effect: 'DRAW', effectValue: 2, description: '抽2张牌。', img: `${SPELL_URL}/SummonerFlash.png`, price: 40 },
+  Neutral_009: { id: 'Neutral_009', name: '净化之页', type: 'SKILL', cost: 0, value: 0, rarity: 'COMMON', hero: 'Neutral', target: 'self', effect: 'DRAW', effectValue: 1, description: '抽1张牌。', img: `${SPELL_URL}/SummonerFlash.png`, price: 40 },
   Neutral_010: { id: 'Neutral_010', name: '法力容器', type: 'SKILL', cost: 1, value: 0, rarity: 'COMMON', hero: 'Neutral', target: 'self', effect: 'TEMP_MANA', effectValue: 1, description: '获得1点临时法力（本回合）。', img: `${SPELL_URL}/SummonerClarity.png`, price: 50 },
   Neutral_011: { id: 'Neutral_011', name: '贪婪商券', type: 'SKILL', cost: 0, value: 10, rarity: 'COMMON', hero: 'Neutral', target: 'self', effect: 'GAIN_GOLD', effectValue: 10, description: '获得10金币；若弃置此牌则额外获得10金币（弃置风险换奖励）。', img: `${SPELL_URL}/SummonerTeleport.png`, price: 30 },
   Neutral_012: { id: 'Neutral_012', name: '战争学识', type: 'SKILL', cost: 1, value: 0, rarity: 'UNCOMMON', hero: 'Neutral', target: 'self', effect: 'CONDITIONAL_DRAW', effectValue: 2, description: '抽1；若本回合已打出≥2张攻击则改为抽2。', img: `${SPELL_URL}/SummonerGhost.png`, price: 80 },
@@ -239,7 +239,7 @@ export const CARD_DATABASE = {
   Neutral_036: { id: 'Neutral_036', name: '稳固姿态', type: 'POWER', cost: 0, value: 0, rarity: 'COMMON', hero: 'Neutral', target: 'self', effect: 'PASSIVE_BLOCK_IF_IDLE', effectValue: 6, description: '下回合开始获得6护甲（无条件生效，法力不变）。', img: `${SPELL_URL}/SummonerBarrier.png`, price: 40 },
 
   // World-theme / small group (4)
-  Neutral_037: { id: 'Neutral_037', name: '暗影岛之歌', type: 'ATTACK', cost: 2, value: 8, rarity: 'UNCOMMON', hero: 'Neutral', target: 'single', effect: 'OPEN_SHADOW_EVENT', effectValue: 0, description: '对单体造成8伤；胜利时解锁一次暗影岛事件（剧情/奖励）。', img: `${SPELL_URL}/SummonerDot.png`, price: 100 },
+  Neutral_037: { id: 'Neutral_037', name: '暗影岛之歌', type: 'ATTACK', cost: 0, value: 0, rarity: 'HIDDEN', hero: 'Neutral', target: 'single', effect: null, effectValue: 0, description: '暂未实装（下架）', img: `${SPELL_URL}/SummonerDot.png`, price: 0, disabled: true },
   Neutral_038: { id: 'Neutral_038', name: '诺克萨斯断章', type: 'SKILL', cost: 1, value: 0, rarity: 'UNCOMMON', hero: 'Neutral', target: 'single', effect: 'HEAL_REDUCE', effectValue: 50, description: '目标获取治疗效果降低50%，持续2回合。', img: `${SPELL_URL}/SummonerExhaust.png`, price: 90 },
   Neutral_039: { id: 'Neutral_039', name: '德玛之徽', type: 'SKILL', cost: 2, value: 0, rarity: 'UNCOMMON', hero: 'Neutral', target: 'single', effect: 'DAMAGE_REDUCE', effectValue: 30, description: '本回合内，目标对你造成的伤害减少30%（优先消耗护甲）。', img: `${SPELL_URL}/SummonerBarrier.png`, price: 110 },
   Neutral_040: { id: 'Neutral_040', name: '虚空砂', type: 'SKILL', cost: 3, value: 0, rarity: 'RARE', hero: 'Neutral', target: 'single', effect: 'VOID_DOT', effectValue: 5, description: '标记目标：其在3回合内每回合损失5生命；若击杀目标则返还20G。', img: `${SPELL_URL}/SummonerDot.png`, price: 200 },
@@ -311,12 +311,12 @@ export const CARD_DATABASE = {
     name: '积蓄怒火',
     type: 'POWER',
     target: 'self',
-    cost: 1,
+    cost: 3,
     value: 0,
     rarity: 'UNCOMMON',
     effect: 'GAIN_STRENGTH_PER_HIT',
     effectValue: 1,
-    description: '每当你受到伤害时，获得1点力量。',
+    description: '当你受到伤害时，本场战斗获得1点力量（战后清空）。',
     price: 90
   },
 
