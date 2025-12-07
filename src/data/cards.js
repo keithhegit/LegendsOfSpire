@@ -337,18 +337,18 @@ export const CARD_DATABASE = {
 
   Neutral_047: {
     id: 'Neutral_047',
-    name: '坚韧不拔7',
-    type: 'POWER',
+    name: '诱敌深入',
+    type: 'SKILL',
     target: 'self',
-    cost: 3,
-    value: 2,
-    rarity: 'RARE',
+    cost: 1,
+    value: 0,
+    rarity: 'UNCOMMON',
     hero: 'Neutral',
-    effect: 'PASSIVE_BLOCK',
-    effectValue: 5,
-    description: '每回合开始获得5护甲（本战斗）。',
+    effect: 'RETALIATE_ON_HIT',
+    effectValue: 8,
+    description: '本回合若被攻击，则反弹8点伤害给攻击者（回合结束清除）。',
     img: `${SPELL_URL}/SummonerBarrier.png`,
-    price: 50
+    price: 100
   },
   Neutral_048: {
     id: 'Neutral_048',
@@ -457,18 +457,19 @@ export const CARD_DATABASE = {
   },
   Neutral_055: {
     id: 'Neutral_055',
-    name: '治疗波5',
+    name: '不屈意志',
     type: 'SKILL',
     target: 'self',
     cost: 1,
-    value: 6,
+    value: 0,
+    block: 12,
     rarity: 'UNCOMMON',
     hero: 'Neutral',
     effect: 'BLOCK_DRAW',
-    effectValue: 5,
-    description: '获得6护甲并抽1牌。',
-    img: `${SPELL_URL}/SummonerHeal.png`,
-    price: 74
+    effectValue: 1,
+    description: '获得12点护甲，抽1张牌，并移除1个负面状态。',
+    img: `${SPELL_URL}/SummonerBarrier.png`,
+    price: 60
   },
   Neutral_056: {
     id: 'Neutral_056',
@@ -1428,14 +1429,16 @@ export const CARD_DATABASE = {
     id: 'Neutral_047',
     name: '诱敌深入',
     type: 'SKILL',
-    target: 'single',
+    target: 'self',
     cost: 1,
     value: 0,
     rarity: 'UNCOMMON',
-    effect: 'MARK',
-    effectValue: 1,
-    description: '给目标施加“诱捕标记”：目标下次攻击你时受到8点反噬。',
-    price: 70
+    hero: 'Neutral',
+    effect: 'RETALIATE_ON_HIT',
+    effectValue: 8,
+    description: '本回合若被攻击，则反弹8点伤害给攻击者（回合结束清除）。',
+    img: `${SPELL_URL}/SummonerBarrier.png`,
+    price: 100
   },
 
   // Neutral_048
@@ -1552,10 +1555,12 @@ export const CARD_DATABASE = {
     cost: 1,
     value: 0,
     block: 12,
-    rarity: 'COMMON',
-    effect: 'CLEANSE',
+    rarity: 'UNCOMMON',
+    hero: 'Neutral',
+    effect: 'BLOCK_DRAW',
     effectValue: 1,
-    description: '获得12点护甲并移除1个负面状态。',
+    description: '获得12点护甲，抽1张牌，并移除1个负面状态。',
+    img: `${SPELL_URL}/SummonerBarrier.png`,
     price: 60
   },
 

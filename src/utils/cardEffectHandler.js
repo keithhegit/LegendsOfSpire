@@ -1067,8 +1067,18 @@ function applyEffect(effectType, value, context, updates, card = {}) {
 
         case 'BLOCK_DRAW':
             // 格挡抽牌 - Block + draw combo
-            updates.blockGain = (updates.blockGain || 0) + value;
+            updates.blockGain = (updates.blockGain || 0) + (card.block || value || 0);
             updates.drawCount += 1;
+            // 额外：移除1层弱或易伤（若存在）
+            const nextWeak = Math.max(0, (playerStatus.weak || 0) - 1);
+            const nextVuln = nextWeak < (playerStatus.weak || 0)
+                ? (playerStatus.vulnerable || 0)
+                : Math.max(0, (playerStatus.vulnerable || 0) - 1);
+            updates.playerStatus = {
+                ...(updates.playerStatus || playerStatus),
+                weak: nextWeak,
+                vulnerable: nextVuln
+            };
             break;
 
         case 'EXHAUST':
