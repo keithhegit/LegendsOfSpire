@@ -929,6 +929,11 @@ const BattleScene = ({
             let isFirstHit = true; // 用于劫被动
             let drawOnHitCharges = effectUpdates.drawOnHit || 0;
 
+            // LuxQ 特判：当回合伤害不应吃到“本次施加的易伤”
+            const vulnStacksForThisAttack = card.id === 'LuxQ'
+                ? enemyStatus.vulnerable
+                : mergedEnemyStatus.vulnerable;
+
             const currentEnemyStatus = mergedEnemyStatus;
             const cardsPlayedIncludingCurrent = cardsPlayedBefore + 1;
             const priorCardsThisTurn = Math.max(0, cardsPlayedIncludingCurrent - 1);
@@ -942,7 +947,7 @@ const BattleScene = ({
             }
 
             // 易伤加成应用于基础伤害 (方案A) - 使用合并后的状态
-            if (currentEnemyStatus.vulnerable > 0) {
+            if (vulnStacksForThisAttack > 0) {
                 baseDmg = Math.floor(baseDmg * 1.5);
             }
 

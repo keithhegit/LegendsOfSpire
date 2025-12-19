@@ -146,7 +146,7 @@ export const CARD_DATABASE = {
   ZedR: { id: 'ZedR', name: '死亡印记', type: 'SKILL', cost: 3, value: 0, rarity: 'RARE', hero: 'Zed', target: 'single', effect: 'DEATHMARK', effectValue: 3, description: '对目标施加印记（3回合）；若在印记期间造成致命伤害，则额外造成等量伤害。', img: `${SPELL_URL}/ZedR.png`, price: 150 },
   ZedQ: { id: 'ZedQ', name: '手里剑', type: 'ATTACK', cost: 1, value: 9, rarity: 'COMMON', hero: 'Zed', target: 'single', effect: 'MULTI_HIT', effectValue: 3, description: '对目标造成三段伤害，总计9点。', img: `${SPELL_URL}/ZedQ.png`, price: 50 },
   ZedW: { id: 'ZedW', name: '影分身', type: 'SKILL', cost: 1, value: 0, rarity: 'UNCOMMON', hero: 'Zed', target: 'self', effect: 'COPY_NEXT_ATTACK', effectValue: 50, description: '召唤影分身：在本回合复制下一次对单体的攻击（分身造成50%伤害）。', img: `${SPELL_URL}/ZedW.png`, price: 80 },
-  ZedE: { id: 'ZedE', name: '影刃', type: 'ATTACK', cost: 1, value: 6, rarity: 'UNCOMMON', hero: 'Zed', target: 'single', effect: 'SLOW', effectValue: 1, description: '造成6伤并使目标减速1回合。', img: `${SPELL_URL}/ZedE.png`, price: 100 },
+  ZedE: { id: 'ZedE', name: '影刃', type: 'ATTACK', cost: 1, value: 6, rarity: 'UNCOMMON', hero: 'Zed', target: 'single', effect: 'VULNERABLE', effectValue: 1, description: '造成6伤并施加1层易伤。', img: `${SPELL_URL}/ZedE.png`, price: 100 },
 
   // Vayne
   VayneQ: { id: 'VayneQ', name: '闪避突袭', type: 'ATTACK', cost: 1, value: 7, rarity: 'COMMON', hero: 'Vayne', target: 'single', effect: 'NEXT_ATTACK_BONUS', effectValue: 3, description: '造成7伤，下一次攻击+3伤害。', img: `${SPELL_URL}/VayneTumble.png`, price: 50 },

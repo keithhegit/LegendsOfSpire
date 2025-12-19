@@ -662,7 +662,23 @@ export default function LegendsOfTheSpire() {
     const [currentUser, setCurrentUser] = useState(null);
     const [showDeadEndPrompt, setShowDeadEndPrompt] = useState(false);
     const [bgmStarted, setBgmStarted] = useState(false);
+    const [language, setLanguage] = useState(() => {
+        try {
+            return localStorage.getItem('lang') || 'zh';
+        } catch {
+            return 'zh';
+        }
+    });
     const [activeInventoryTab, setActiveInventoryTab] = useState('CARDS');
+
+    useEffect(() => {
+        document.documentElement.lang = language === 'en' ? 'en' : 'zh';
+        try {
+            localStorage.setItem('lang', language);
+        } catch {
+            /* ignore */
+        }
+    }, [language]);
 
     const openInventory = (tab = 'CARDS') => {
         setActiveInventoryTab(tab);
@@ -1793,6 +1809,12 @@ export default function LegendsOfTheSpire() {
 
     return (
         <div className="relative h-screen w-full bg-[#091428] font-sans select-none overflow-hidden">
+            <button
+                onClick={() => setLanguage(prev => prev === 'en' ? 'zh' : 'en')}
+                className="fixed top-4 right-16 z-[110] px-3 py-1.5 rounded-full border border-white/30 bg-black/50 hover:bg-white/10 text-xs font-semibold text-white uppercase tracking-[0.25em] pointer-events-auto"
+            >
+                {language === 'en' ? '中文' : 'EN'}
+            </button>
             <AudioPlayer src={bgmStarted || view !== 'MENU' ? getCurrentBgm() : null} />
             {renderUserPanel()}
             {view === 'MAP' && showDeadEndPrompt && (
