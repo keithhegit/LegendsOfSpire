@@ -1041,8 +1041,8 @@ const BattleScene = ({
 
                     // 薇恩被动：连续命中计数 (圣银弩箭)
                     const hasVaynePassive = heroData.relicId === "VaynePassive" || 
-                                           heroData.relics.includes("VaynePassive") ||
-                                           (Array.isArray(playerDeck) && playerDeck.some(c => c.id === 'VaynePassive'));
+                                           (heroData.relics && heroData.relics.includes("VaynePassive")) ||
+                                           (Array.isArray(initialDeck) && initialDeck.some(c => c.id === 'VaynePassive'));
                     
                     if (hasVaynePassive && dmgToHp > 0) {
                         const newHitCount = (vayneHitCount || 0) + 1;
