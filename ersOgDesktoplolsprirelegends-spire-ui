@@ -1,0 +1,190 @@
+[33mcommit dee1f5a1e18387cd9bd553b03ea404c0b003a45a[m
+Author: keithhegit <keith@ogcloud.com>
+Date:   Mon Dec 1 14:46:46 2025 +0800
+
+    feat: add in-game GM R skill panel
+
+[1mdiff --git a/src/App.jsx b/src/App.jsx[m
+[1mindex 75a5f8c..484f31f 100644[m
+[1m--- a/src/App.jsx[m
+[1m+++ b/src/App.jsx[m
+[36m@@ -9,6 +9,7 @@[m [mimport BattleScene from './components/BattleScene';[m
+ import LoginView from './components/LoginView'; // 登录界面[m
+ import ToastContainer from './components/shared/Toast'; // 导入 ToastContainer[m
+ import CollectionSystem from './components/CollectionSystem';[m
+[32m+[m[32mimport GMPanel from './components/GMPanel';[m
+ import { unlockAudio } from './utils/audioContext'; // 音频解锁工具[m
+ import { getHexNeighbors } from './utils/hexagonGrid'; // 六边形邻居帮助函数[m
+ import { authService } from './services/authService';[m
+[36m@@ -55,6 +56,33 @@[m [mconst SFX = {[m
+ const STARTING_DECK_BASIC = ["Strike", "Strike", "Strike", "Strike", "Defend", "Defend", "Defend", "Defend"];[m
+ const SAVE_KEY = 'lots_save_v75';[m
+ const UNLOCK_KEY = 'lots_unlocks_v75';[m
+[32m+[m[32mconst GM_STORAGE_KEY = 'lots_gm_config_v1';[m
+[32m+[m[32mconst DEFAULT_GM_CONFIG = {[m
+[32m+[m[32m    enabled: false,[m
+[32m+[m[32m    heroId: '',[m
+[32m+[m[32m    extraCards: [],[m
+[32m+[m[32m    forceTopCards: [],[m
+[32m+[m[32m    note: ''[m
+[32m+[m[32m};[m
+[32m+[m
+[32m+[m[32mconst sanitizeGMConfig = (config = DEFAULT_GM_CONFIG) => {[m
+[32m+[m[32m    const normalizeList = (list) => {[m
+[32m+[m[32m        if (!Array.isArray(list)) return [];[m
+[32m+[m[32m        const seen = new Set();[m
+[32m+[m[32m        return list.filter(id => {[m
+[32m+[m[32m            if (!CARD_DATABASE[id] || seen.has(id)) return false;[m
+[32m+[m[32m            seen.add(id);[m
+[32m+[m[32m            return true;[m
+[32m+[m[32m        });[m
+[32m+[m[32m    };[m
+[32m+[m[32m    return {[m
+[32m+[m[32m        enabled: !!config.enabled,[m
+[32m+[m[32m        heroId: config.heroId || '',[m
+[32m+[m[32m        extraCards: normalizeList(config.extraCards),[m
+[32m+[m[32m        forceTopCards: normalizeList(config.forceTopCards),[m
+[32m+[m[32m        note: config.note || ''[m
+[32m+[m[32m    };[m
+[32m+[m[32m};[m
+ [m
+ // ==========================================[m
+ // 2. 游戏数据库[m
+[36m@@ -585,6 +613,57 @@[m [mexport default function LegendsOfTheSpire() {[m
+     const [currentUser, setCurrentUser] = useState(null);[m
+     const [showDeadEndPrompt, setShowDeadEndPrompt] = useState(false);[m
+     const [bgmStarted, setBgmStarted] = useState(false);[m
+[32m+[m[32m    const loadStoredGMConfig = () => {[m
+[32m+[m[32m        if (typeof window === 'undefined') return DEFAULT_GM_CONFIG;[m
+[32m+[m[32m        try {[m
+[32m+[m[32m            const stored = localStorage.getItem(GM_STORAGE_KEY);[m
+[32m+[m[32m            if (stored) return sanitizeGMConfig(JSON.parse(stored));[m
+[32m+[m[32m        } catch (error) {[m
+[32m+[m[32m            console.warn('[GM] Failed to load config', error);[m
+[32m+[m[32m        }[m
+[32m+[m[32m        return DEFAULT_GM_CONFIG;[m
+[32m+[m[32m    };[m
+[32m+[m[32m    const [gmConfig, setGmConfig] = useState(loadStoredGMConfig);[m
+[32m+[m[32m    const [showGMPanel, setShowGMPanel] = useState(false);[m
+[32m+[m
+[32m+[m[32m    useEffect(() => {[m
+[32m+[m[32m        try {[m
+[32m+[m[32m            localStorage.setItem(GM_STORAGE_KEY, JSON.stringify(gmConfig));[m
+[32m+[m[32m        } catch (error) {[m
+[32m+[m[32m            console.warn('[GM] Failed to persist config', error);[m
+[32m+[m[32m        }[m
+[32m+[m[32m    }, [gmConfig]);[m
+[32m+[m
+[32m+[m[32m    const updateGmConfig = (updater) => {[m
+[32m+[m[32m        setGmConfig(prev => {[m
+[32m+[m[32m            const next = typeof updater === 'function' ? updater(prev) : updater;[m
+[32m+[m[32m            return sanitizeGMConfig(next);[m
+[32m+[m[32m        });[m
+[32m+[m[32m    };[m
+[32m+[m
+[32m+[m[32m    const gmHeroOptions = useMemo([m
+[32m+[m[32m        () => Object.values(CHAMPION_POOL).map(hero => ({ id: hero.id, name: hero.name })),[m
+[32m+[m[32m        [][m
+[32m+[m[32m    );[m
+[32m+[m
+[32m+[m[32m    const heroNameLookup = useMemo(() => {[m
+[32m+[m[32m        return Object.values(CHAMPION_POOL).reduce((acc, hero) => {[m
+[32m+[m[32m            acc[hero.id] = hero.name;[m
+[32m+[m[32m            return acc;[m
+[32m+[m[32m        }, {});[m
+[32m+[m[32m    }, []);[m
+[32m+[m
+[32m+[m[32m    const gmRSkillCards = useMemo([m
+[32m+[m[32m        () => Object.values(CARD_DATABASE)[m
+[32m+[m[32m            .filter(card => card.hero && card.hero !== 'Neutral' && card.id?.endsWith('R'))[m
+[32m+[m[32m            .map(card => ({[m
+[32m+[m[32m                id: card.id,[m
+[32m+[m[32m                name: card.name,[m
+[32m+[m[32m                heroId: card.hero,[m
+[32m+[m[32m                heroName: heroNameLookup[card.hero] || card.hero[m
+[32m+[m[32m            })),[m
+[32m+[m[32m        [heroNameLookup][m
+[32m+[m[32m    );[m
+ [m
+     const getSaveKey = (user) => user ? `${SAVE_KEY}_${user.email}` : SAVE_KEY;[m
+ [m
+[36m@@ -724,18 +803,18 @@[m [mexport default function LegendsOfTheSpire() {[m
+ [m
+     const applyRSkillTestOverrides = (champion) => {[m
+         const baseCards = [...(champion.initialCards || [])];[m
+[31m-        const shouldApply = R_SKILL_TEST?.enabled && (!R_SKILL_TEST.heroId || R_SKILL_TEST.heroId === champion.id);[m
+[32m+[m[32m        const shouldApply = gmConfig.enabled && (!gmConfig.heroId || gmConfig.heroId === champion.id);[m
+         if (!shouldApply) {[m
+             return { ...champion, initialCards: baseCards, gmOverrides: { enabled: false } };[m
+         }[m
+[31m-        const extraCards = [...(R_SKILL_TEST.extraCards || [])];[m
+[31m-        const forceTopCards = [...(R_SKILL_TEST.forceTopCards || [])];[m
+[32m+[m[32m        const extraCards = (gmConfig.extraCards || []).filter(id => CARD_DATABASE[id]);[m
+[32m+[m[32m        const forceTopCards = (gmConfig.forceTopCards || []).filter(id => CARD_DATABASE[id]);[m
+         return {[m
+             ...champion,[m
+             initialCards: [...baseCards, ...extraCards],[m
+             gmOverrides: {[m
+                 enabled: true,[m
+[31m-                note: R_SKILL_TEST.note || 'R-Skill QA Mode',[m
+[32m+[m[32m                note: gmConfig.note || 'GM QA Mode',[m
+                 extraCards,[m
+                 forceTopCards[m
+             }[m
+[36m@@ -917,6 +996,19 @@[m [mexport default function LegendsOfTheSpire() {[m
+         }, 3000);[m
+     };[m
+ [m
+[32m+[m[32m    const handleGMResetSave = () => {[m
+[32m+[m[32m        localStorage.removeItem(SAVE_KEY);[m
+[32m+[m[32m        if (currentUser) {[m
+[32m+[m[32m            localStorage.removeItem(getSaveKey(currentUser));[m
+[32m+[m[32m        }[m
+[32m+[m[32m        setHasSave(false);[m
+[32m+[m[32m        setMapData({ grid: [], nodes: [], nodeMap: new Map() });[m
+[32m+[m[32m        setActiveNode(null);[m
+[32m+[m[32m        setChampion(null);[m
+[32m+[m[32m        setView('CHAMPION_SELECT');[m
+[32m+[m[32m        showToast('GM：已清空存档，请重新选择英雄', 'default');[m
+[32m+[m[32m    };[m
+[32m+[m
+     const handleBattleWin = (battleResult) => {[m
+         // 处理战斗结果（可能是旧格式的remainingHp数字，也可能是新格式的对象）[m
+         const result = typeof battleResult === 'number'[m
+[36m@@ -1307,10 +1399,35 @@[m [mexport default function LegendsOfTheSpire() {[m
+                     </div>[m
+                 </>[m
+             )}[m
+[32m+[m[32m            <div className="absolute bottom-6 right-6 z-[200] pointer-events-auto flex flex-col items-end gap-2">[m
+[32m+[m[32m                <button[m
+[32m+[m[32m                    onClick={() => setShowGMPanel(true)}[m
+[32m+[m[32m                    className="px-4 py-2 rounded-full bg-emerald-600/80 hover:bg-emerald-500 text-white text-xs uppercase tracking-[0.4em] border border-emerald-300 shadow-lg"[m
+[32m+[m[32m                >[m
+[32m+[m[32m                    GM 控制台[m
+[32m+[m[32m                </button>[m
+[32m+[m[32m                {gmConfig.enabled && ([m
+[32m+[m[32m                    <div className="text-[10px] text-emerald-200 bg-emerald-900/40 border border-emerald-700 px-3 py-1 rounded shadow">[m
+[32m+[m[32m                        GM: {gmConfig.note || 'R 技能测试模式'}[m
+[32m+[m[32m                    </div>[m
+[32m+[m[32m                )}[m
+[32m+[m[32m            </div>[m
+[32m+[m[32m            {showGMPanel && ([m
+[32m+[m[32m                <GMPanel[m
+[32m+[m[32m                    gmConfig={gmConfig}[m
+[32m+[m[32m                    onChange={updateGmConfig}[m
+[32m+[m[32m                    onClose={() => setShowGMPanel(false)}[m
+[32m+[m[32m                    heroOptions={gmHeroOptions}[m
+[32m+[m[32m                    rSkillCards={gmRSkillCards}[m
+[32m+[m[32m                    cardDatabase={CARD_DATABASE}[m
+[32m+[m[32m                    onResetSave={handleGMResetSave}[m
+[32m+[m[32m                    onResetConfig={() => updateGmConfig(DEFAULT_GM_CONFIG)}[m
+[32m+[m[32m                />[m
+[32m+[m[32m            )}[m
+             {renderView()}[m
+             {showCodex && <CodexView onClose={() => setShowCodex(false)} />}[m
+             {showCollection && <CollectionSystem onClose={() => setShowCollection(false)} />}[m
+[31m-            {showDeck && <DeckView deck={masterDeck} onClose={() => setShowDeck(false)} />}[m
+[32m+[m[32m            {showDeck && <DeckView deck={masterDeck} gmConfig={gmConfig} onClose={() => setShowDeck(false)} />}[m
+             <ToastContainer toasts={toasts} />[m
+         </div>[m
+     );[m

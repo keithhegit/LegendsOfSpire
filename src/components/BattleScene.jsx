@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Sword, Shield, Zap, Skull, Activity, AlertTriangle, Droplet, Ghost, Crosshair, Lock, RefreshCw, TrendingDown, Clock, Layers, Flame, Heart } from 'lucide-react';
+import { Sword, Shield, Zap, Skull, Activity, AlertTriangle, Droplet, Ghost, Crosshair, Lock, RefreshCw, TrendingDown, Clock, Layers, Flame, Heart, Link, Users } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CARD_DATABASE } from '../data/cards';
 import { RELIC_DATABASE } from '../data/relics';
@@ -62,6 +62,17 @@ const BattleScene = ({
     const ambitionPactPendingRef = useRef(0);
     const discountQueueRef = useRef([]);
     const isFirstTurnRef = useRef(true);
+    const jinxEmptyHandGrantedRef = useRef(false);
+    const playerDamagedThisTurnRef = useRef(false);
+    const sonaSkillCountRef = useRef(0);
+    const powerChordReadyRef = useRef(false);
+    const ekkoHitRef = useRef(0);
+    const sylasEmpowerRef = useRef(false);
+    const viktorShardsRef = useRef(0);
+    const leeSinStacksRef = useRef(0);
+    const vayneHitsRef = useRef(0);
+    const teemoIdleRef = useRef(false);
+    const cloneAttackPercentRef = useRef(0);
     const [dmgOverlay, setDmgOverlay] = useState(null);
     const [enemyTrap, setEnemyTrap] = useState(null);
     const [enemyBaitDamage, setEnemyBaitDamage] = useState(0);
@@ -121,9 +132,22 @@ const BattleScene = ({
         strWhenHit: 0,
         permaStrOnKill: false,
         nextAttackX2: false,
-        nextAttackDoubleNextTurn: false
+        nextAttackDoubleNextTurn: false,
+        firstAttackBonus: 0,
+        firstAttackBonusArmed: false,
+        cloneAttackPercent: 0
     });
-    const [enemyStatus, setEnemyStatus] = useState({ strength: 0, weak: 0, vulnerable: 0, mark: 0, markDamage: 0, trap: 0 });
+    const [enemyStatus, setEnemyStatus] = useState({ 
+        strength: 0, 
+        weak: 0, 
+        vulnerable: 0, 
+        mark: 0, 
+        markDamage: 0, 
+        trap: 0,
+        slowed: 0,
+        tetherMark: 0,
+        armorReduction: 0
+    });
     const heroBaseCritChance = heroData?.id === 'Yasuo' ? 10 : 0;
     const heroStrengthCritMultiplier = 1; // 所有英雄每点力量统一+1%暴击
 
@@ -531,7 +555,12 @@ const BattleScene = ({
             tempStrength: 0,
             globalAttackBonus: 0,
             critDamageMultiplier: prev.critDamageMultiplier || 2,
-            idleBlock: 0
+            idleBlock: 0,
+            firstAttackBonusArmed: true
+        }));
+        setEnemyStatus(prev => ({
+            ...prev,
+            slowed: Math.max(0, (prev.slowed || 0) - 1)
         }));
         if (heroData.relicId === "ViktorPassive" && Math.random() < 0.5) {
             const basicCard = shuffle(['Strike', 'Defend'])[0];
@@ -668,6 +697,20 @@ const BattleScene = ({
             if (card.type === 'SKILL') skillBonusPool = 0;
             applyDirectDamage(directDamage, 'SKILL');
         }
+        if (effectUpdates.enemyBlockChange) {
+            setEnemyBlock(b => Math.max(0, b + effectUpdates.enemyBlockChange));
+        }
+        if (effectUpdates.cloneAttack) {
+            setPlayerStatus(prev => ({ ...prev, cloneAttackPercent: effectUpdates.cloneAttack }));
+        }
+        if (effectUpdates.tetherMark) {
+            setEnemyStatus(prev => ({ ...prev, tetherMark: effectUpdates.tetherMark }));
+        }
+        if (effectUpdates.placeTrap) {
+            setEnemyTrap(effectUpdates.placeTrap);
+        }
+        if (effectUpdates.playerStatus) setPlayerStatus(mergedPlayerStatus);
+        if (effectUpdates.enemyStatus) setEnemyStatus(mergedEnemyStatus);
 
         // FIX: 金币奖励 (Bug #2)
         if (effectUpdates.goldGain && typeof onGoldChange === 'function') {
@@ -691,10 +734,15 @@ const BattleScene = ({
             }));
         }
         if (effectUpdates.enemyStatus) {
-            setEnemyStatus(prev => ({
-                ...prev,
-                ...effectUpdates.enemyStatus
-            }));
+            setEnemyStatus(prev => {
+                const nextStatus = { ...prev, ...effectUpdates.enemyStatus };
+                // Batch 6: 破甲一击 - 减少敌人护甲
+                if (effectUpdates.enemyStatus.armorReduction > 0) {
+                    setEnemyBlock(b => Math.max(0, b - effectUpdates.enemyStatus.armorReduction));
+                    nextStatus.armorReduction = 0; // 立即消耗
+                }
+                return nextStatus;
+            });
         }
         if (effectUpdates.removeEnemyBuffs) {
             removeEnemyBuffs(effectUpdates.removeEnemyBuffs);
@@ -739,6 +787,12 @@ const BattleScene = ({
         }
         if (effectUpdates.placeBait) {
             setEnemyBaitDamage(effectUpdates.placeBait);
+        }
+        if (effectUpdates.cloneAttack) {
+            cloneAttackPercentRef.current = effectUpdates.cloneAttack;
+        }
+        if (effectUpdates.tetherMark) {
+            setEnemyStatus(prev => ({ ...prev, tetherMark: effectUpdates.tetherMark }));
         }
 
         if (effectUpdates.permaStrPactGain) {
@@ -848,6 +902,18 @@ const BattleScene = ({
             // Batch 2: 暴击次数缩放 (SCALE_BY_CRIT) - YasuoR
             if (card.effect === 'SCALE_BY_CRIT') {
                 baseDmg = baseDmg * Math.max(1, critCount || 0); // 伤害 = 基础值 × 暴击次数
+            }
+
+            // Batch 6: 蓄势待发 (FIRST_ATTACK_PLUS)
+            if (card.type === 'ATTACK' && mergedPlayerStatus.firstAttackBonusArmed) {
+                baseDmg += (mergedPlayerStatus.firstAttackBonus || 0);
+                setPlayerStatus(prev => ({ ...prev, firstAttackBonusArmed: false }));
+            }
+
+            // Batch 6: 闪避突袭 (NEXT_ATTACK_BONUS)
+            if (mergedPlayerStatus.nextAttackBonus > 0) {
+                baseDmg += mergedPlayerStatus.nextAttackBonus;
+                setPlayerStatus(prev => ({ ...prev, nextAttackBonus: 0 }));
             }
 
             // Batch 2: 回溯加成 (RETRO_BONUS) - EkkoQ
@@ -973,12 +1039,17 @@ const BattleScene = ({
                         setTimeout(() => playSfx('HIT_TAKEN'), 250);
                     }
 
-                    // 薇恩被动：连续命中计数
-                    if (heroData.relicId === "VaynePassive" && dmgToHp > 0) {
-                        const newHitCount = vayneHitCount + 1;
+                    // 薇恩被动：连续命中计数 (圣银弩箭)
+                    const hasVaynePassive = heroData.relicId === "VaynePassive" || 
+                                           heroData.relics.includes("VaynePassive") ||
+                                           (Array.isArray(playerDeck) && playerDeck.some(c => c.id === 'VaynePassive'));
+                    
+                    if (hasVaynePassive && dmgToHp > 0) {
+                        const newHitCount = (vayneHitCount || 0) + 1;
                         if (newHitCount >= 3) {
-                            dmgToHp += 10; // 额外10点伤害
+                            dmgToHp += 12; // 额外12点真实伤害 (根据描述更新)
                             setVayneHitCount(0); // 重置计数
+                            console.debug('[VAYNE_PASSIVE] Triggered +12 damage');
                         } else {
                             setVayneHitCount(newHitCount);
                         }
@@ -1031,6 +1102,18 @@ const BattleScene = ({
                     if (heroData.relicId === "DariusPassive") setEnemyStatus(s => ({ ...s, weak: s.weak + 1 }));
 
                     // FIX: Multi-hit display - Stagger damage numbers
+                    let cloneExtra = 0;
+                    if ((enemyStatus.tetherMark || 0) > 0 && dmgToHp > 0) {
+                        cloneExtra += enemyStatus.tetherMark;
+                        setEnemyStatus(prev => ({ ...prev, tetherMark: 0 }));
+                    }
+                    if ((cloneAttackPercentRef.current || 0) > 0 && dmgToHp > 0) {
+                        cloneExtra += Math.floor(dmgToHp * (cloneAttackPercentRef.current / 100));
+                        cloneAttackPercentRef.current = 0;
+                    }
+                    if (cloneExtra > 0) {
+                        applyDirectDamage(cloneExtra, 'CLONE');
+                    }
                     const hitDmg = dmgToHp; // Capture current hit damage
                     setTimeout(() => {
                         setDmgOverlay({ val: hitDmg, target: 'ENEMY', isCrit: didCrit });
@@ -1318,6 +1401,9 @@ const BattleScene = ({
                 poison: (prev.poison || 0) + (enemyTrap.poison || 0),
                 trap: Math.max((prev.trap || 1) - 1, 0)
             }));
+            if (enemyTrap.damage > 0) {
+                applyDirectDamage(enemyTrap.damage, 'TRAP');
+            }
             setDmgOverlay({ val: 'TRAP!', target: 'ENEMY', color: 'text-green-400' });
             playSfx('HIT_TAKEN');
         }
@@ -1383,6 +1469,10 @@ const BattleScene = ({
             const count = act.count || 1;
             for (let i = 0; i < count; i++) {
                 let finalDmg = dmg;
+                if (enemyStatus.slowed > 0) {
+                    finalDmg = Math.max(0, Math.floor(finalDmg * 0.75));
+                    setEnemyStatus(s => ({ ...s, slowed: Math.max(0, (s.slowed || 1) - 1) }));
+                }
                 if (playerStatus.damageReduction > 0) {
                     finalDmg = Math.max(0, Math.floor(finalDmg * (1 - playerStatus.damageReduction / 100)));
                 }
@@ -1459,16 +1549,21 @@ const BattleScene = ({
             {status.voidDot > 0 && <div className="flex items-center text-[10px] text-purple-300 bg-purple-950/40 px-1 rounded border border-purple-800 shadow-sm"><Ghost size={10} className="mr-1" /> 虚空 {status.voidDot}</div>}
             {status.mark > 0 && <div className="flex items-center text-[10px] text-orange-400 bg-orange-900/40 px-1 rounded border border-orange-900 shadow-sm"><Crosshair size={10} className="mr-1" /> 标记 {status.mark}</div>}
             {status.trap > 0 && <div className="flex items-center text-[10px] text-green-200 bg-green-900/40 px-1 rounded border border-green-700 shadow-sm"><Layers size={10} className="mr-1" /> 陷阱 {status.trap}</div>}
+            {status.tetherMark > 0 && <div className="flex items-center text-[10px] text-blue-300 bg-blue-900/40 px-1 rounded border border-blue-700 shadow-sm"><Link size={10} className="mr-1" /> 牵绊 {status.tetherMark}</div>}
             {(status.immuneOnce || status.avoidNextDamage) && <div className="flex items-center text-[10px] text-yellow-200 bg-yellow-900/40 px-1 rounded border border-yellow-700 shadow-sm"><Lock size={10} className="mr-1" /> 免疫</div>}
             {status.stunned > 0 && <div className="flex items-center text-[10px] text-blue-400 bg-blue-900/40 px-1 rounded border border-blue-900 shadow-sm"><AlertTriangle size={10} className="mr-1" /> 眩晕 {status.stunned}</div>}
             {status.reflect > 0 && <div className="flex items-center text-[10px] text-orange-300 bg-orange-950/40 px-1 rounded border border-orange-800 shadow-sm"><RefreshCw size={10} className="mr-1" /> 反伤 {status.reflect}</div>}
             {status.damageReduce > 0 && <div className="flex items-center text-[10px] text-blue-300 bg-blue-950/40 px-1 rounded border border-blue-800 shadow-sm"><TrendingDown size={10} className="mr-1" /> 减伤 {status.damageReduce}%</div>}
+            {status.damageReduction > 0 && <div className="flex items-center text-[10px] text-blue-300 bg-blue-950/40 px-1 rounded border border-blue-800 shadow-sm"><TrendingDown size={10} className="mr-1" /> 减伤 {status.damageReduction}%</div>}
+            {status.retaliation > 0 && <div className="flex items-center text-[10px] text-orange-400 bg-orange-950/40 px-1 rounded border border-orange-800 shadow-sm"><Activity size={10} className="mr-1" /> 反弹 {status.retaliation}</div>}
+            {status.firstAttackBonus > 0 && <div className="flex items-center text-[10px] text-amber-300 bg-amber-900/30 px-1 rounded border border-amber-700 shadow-sm"><Sword size={10} className="mr-1" /> 蓄势 +{status.firstAttackBonus}</div>}
             {status.healReduce > 0 && <div className="flex items-center text-[10px] text-red-300 bg-red-950/40 px-1 rounded border border-red-900 shadow-sm"><Skull size={10} className="mr-1" /> 重伤 {status.healReduce}%</div>}
             {status.lifesteal > 0 && <div className="flex items-center text-[10px] text-pink-400 bg-pink-900/40 px-1 rounded border border-pink-800 shadow-sm"><Heart size={10} className="mr-1" /> 吸血</div>}
             {status.regenMana > 0 && <div className="flex items-center text-[10px] text-blue-400 bg-blue-900/40 px-1 rounded border border-blue-800 shadow-sm"><Zap size={10} className="mr-1" /> 回蓝 {status.regenMana}</div>}
             {status.nextAttackBonus > 0 && <div className="flex items-center text-[10px] text-amber-200 bg-amber-900/30 px-1 rounded border border-amber-700 shadow-sm"><Sword size={10} className="mr-1" /> 下一击 +{status.nextAttackBonus}</div>}
             {status.nextAttackDouble && <div className="flex items-center text-[10px] text-red-400 bg-red-900/40 px-1 rounded border border-red-800 shadow-sm"><Sword size={10} className="mr-1" /> 双倍伤害</div>}
             {status.nextAttackX2 && <div className="flex items-center text-[10px] text-red-300 bg-red-900/30 px-1 rounded border border-red-700 shadow-sm"><Sword size={10} className="mr-1" /> 下一击 x2</div>}
+            {status.cloneAttackPercent > 0 && <div className="flex items-center text-[10px] text-gray-300 bg-gray-900/40 px-1 rounded border border-gray-700 shadow-sm"><Users size={10} className="mr-1" /> 影分身 {status.cloneAttackPercent}%</div>}
 
             {/* Next Turn Effects */}
             {status.nextTurnBlock > 0 && <div className="flex items-center text-[10px] text-blue-200 bg-blue-900/40 px-1 rounded border border-blue-800 shadow-sm"><Shield size={10} className="mr-1" /><Clock size={8} className="mr-1" /> +{status.nextTurnBlock}</div>}

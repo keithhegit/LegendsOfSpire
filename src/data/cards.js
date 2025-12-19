@@ -80,7 +80,7 @@ export const CARD_DATABASE = {
   DariusR: { id: 'DariusR', name: '诺克萨斯断头台', type: 'ATTACK', cost: 3, value: 18, rarity: 'RARE', hero: 'Darius', target: 'single', effect: 'BLEED_EXECUTE', effectValue: 4, description: '对目标造成18点伤害；若目标流血层数 ≥4，则直接处决并无视护盾。', img: `${SPELL_URL}/DariusExecute.png`, price: 150 },
 
   // Lux
-  LuxQ: { id: 'LuxQ', name: '光之束缚', type: 'ATTACK', cost: 1, value: 8, rarity: 'COMMON', hero: 'Lux', target: 'single', effect: 'VULNERABLE', effectValue: 1, description: '对单体造成9点伤害并施加1层易伤。', img: `${SPELL_URL}/LuxLightBinding.png`, price: 50 },
+    LuxQ: { id: 'LuxQ', name: '光之束缚', type: 'ATTACK', cost: 1, value: 9, rarity: 'COMMON', hero: 'Lux', target: 'single', effect: 'VULNERABLE', effectValue: 1, description: '对单体造成9点伤害并施加1层易伤。', img: `${SPELL_URL}/LuxLightBinding.png`, price: 50 },
   LuxW: { id: 'LuxW', name: '结界护盾', type: 'SKILL', cost: 1, value: 6, block: 6, rarity: 'UNCOMMON', hero: 'Lux', target: 'self', effect: 'DRAW_NEXT', effectValue: 1, description: '获得6护甲；下回合抽1张牌。', img: `${SPELL_URL}/LuxPrismaticWave.png`, price: 80 },
   LuxE: { id: 'LuxE', name: '透光奇点', type: 'ATTACK', cost: 2, value: 12, rarity: 'UNCOMMON', hero: 'Lux', target: 'single', effect: 'BONUS_PER_EXTRA_MANA', effectValue: 2, description: '对单体造成12伤害；若本回合你获得额外法力则每点法力+2伤害。', img: `${SPELL_URL}/LuxLightStrikeKugel.png`, price: 100 },
   LuxR: { id: 'LuxR', name: '终极闪光', type: 'ATTACK', cost: 3, value: 28, rarity: 'RARE', hero: 'Lux', target: 'single', effect: 'CONDITIONAL_DOUBLE', effectValue: 4, description: '对单体造成30伤害；若本回合打出≥4张牌则伤害翻倍。', img: `${SPELL_URL}/LuxR.png`, price: 150 },

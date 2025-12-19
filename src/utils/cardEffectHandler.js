@@ -230,10 +230,10 @@ function applyEffect(effectType, value, context, updates, card = {}) {
             break;
 
         case 'STR_DEBUFF':
-            // 虚弱契约 - Apply weak stacks instead
+            // 力量削减 - 减少敌人力量
             updates.enemyStatus = {
                 ...(updates.enemyStatus || enemyStatus),
-                weak: ((updates.enemyStatus?.weak || enemyStatus.weak) || 0) + (value || 3)
+                strength: Math.max(0, (enemyStatus.strength || 0) - (value || 0))
             };
             break;
 
@@ -962,9 +962,10 @@ function applyEffect(effectType, value, context, updates, card = {}) {
         // ==================== BATCH 5: Miscellaneous & Rare ====================
 
         case 'TRAP_TRIGGER':
-            // 陷阱触发 - Place trap
+            // 陷阱触发 - Place trap (damage based on description)
             updates.placeTrap = {
-                poison: value,
+                damage: value,
+                poison: card.trapPoison || 0,
                 weak: card.trapWeak || 0
             };
             break;
@@ -972,6 +973,7 @@ function applyEffect(effectType, value, context, updates, card = {}) {
         case 'BAIT_TRIGGER':
             // 诱饵触发 - Reuse Teemo trap logic
             updates.placeTrap = {
+                damage: card.baitDamage || 0,
                 poison: value,
                 weak: card.trapWeak || 0
             };
