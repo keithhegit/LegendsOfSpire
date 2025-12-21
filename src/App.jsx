@@ -849,40 +849,14 @@ export default function LegendsOfTheSpire() {
     };
 
     const persistRemoteSave = useCallback(async () => {
-        if (!currentUser) return;
-        try {
-            await fetch('/api/game/save', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    userId: currentUser.id,
-                    achievements: { unlocked: achievementTracker.getUnlocked() },
-                    modes: unlockedModes,
-                    featureFlag: achievementsEnabled
-                })
-            });
-        } catch (error) {
-            console.warn('[Achievement Sync] Failed to persist remote state', error);
-        }
-    }, [currentUser, unlockedModes, achievementsEnabled]);
+        // Remote sync disabled - Backend functions removed to avoid CF 500
+        return;
+    }, []);
 
     const hydrateRemoteAchievements = useCallback(async (user) => {
-        if (!user) return;
-        try {
-            const response = await fetch(`/api/game/load?userId=${user.id}`);
-            if (!response.ok) return;
-            const data = await response.json();
-            if (Array.isArray(data?.achievements?.unlocked)) {
-                achievementTracker.hydrateUnlocked(data.achievements.unlocked);
-                setAchievementSnapshot(achievementTracker.getUnlocked());
-            }
-            if (Array.isArray(data?.modes)) {
-                setUnlockedModes(data.modes);
-            }
-        } catch (error) {
-            console.warn('[Achievement Sync] Failed to hydrate remote state', error);
-        }
-    }, [setUnlockedModes]);
+        // Remote sync disabled - Backend functions removed to avoid CF 500
+        return;
+    }, []);
 
     useEffect(() => {
         const storedUser = authService.getCurrentUser();
