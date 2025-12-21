@@ -1564,21 +1564,6 @@ export const CARD_DATABASE = {
     price: 60
   },
 
-  // Neutral_056
-  Neutral_056: {
-    id: 'Neutral_056',
-    name: '蓄势待发',
-    type: 'POWER',
-    target: 'self',
-    cost: 1,
-    value: 0,
-    rarity: 'COMMON',
-    effect: 'FIRST_ATTACK_PLUS',
-    effectValue: 4,
-    description: '每回合你的第一张攻击牌额外造成4点伤害。',
-    price: 85
-  },
-
   // Neutral_057
   Neutral_057: {
     id: 'Neutral_057',

@@ -748,11 +748,12 @@ function applyEffect(effectType, value, context, updates, card = {}) {
 
         case 'FIRST_ATTACK_PLUS_2_TURNS':
             // 蓄势待发: 未来2回合，第一张攻击牌额外造成 value 点伤害
+            // 打出时只设置回合数和加成值，不设置 armed（下回合开始时才 arm）
             updates.firstAttackBonusTurns = 2;
             updates.playerStatus = {
                 ...(updates.playerStatus || playerStatus),
                 firstAttackBonus: value,
-                firstAttackBonusArmed: true
+                firstAttackBonusTurns: 2
             };
             break;
 

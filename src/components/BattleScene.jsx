@@ -728,18 +728,11 @@ const BattleScene = ({
         }
 
         // FIX: 下回合效果 (Bug #5, #9) - merge status updates
+        // 蓄势待发等效果通过 effectUpdates.playerStatus 传递，统一在此处理
         if (effectUpdates.playerStatus) {
             setPlayerStatus(prev => ({
                 ...prev,
                 ...effectUpdates.playerStatus
-            }));
-        }
-        if (effectUpdates.firstAttackBonusTurns !== undefined) {
-            setPlayerStatus(prev => ({
-                ...prev,
-                firstAttackBonus: effectUpdates.playerStatus?.firstAttackBonus || prev.firstAttackBonus,
-                firstAttackBonusTurns: effectUpdates.firstAttackBonusTurns,
-                firstAttackBonusArmed: true
             }));
         }
         if (effectUpdates.enemyStatus) {
