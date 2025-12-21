@@ -676,17 +676,6 @@ export default function LegendsOfTheSpire() {
         }
     }, [language]);
 
-    useEffect(() => {
-        const handler = (e) => {
-            const heroId = e?.detail?.heroId;
-            if (heroId) {
-                handleHeroUnlock(heroId);
-            }
-        };
-        window.addEventListener('hero-unlock', handler);
-        return () => window.removeEventListener('hero-unlock', handler);
-    }, [handleHeroUnlock]);
-
     const openInventory = (tab = 'CARDS') => {
         setActiveInventoryTab(tab);
         setShowInventory(true);
@@ -1006,6 +995,18 @@ export default function LegendsOfTheSpire() {
             /* ignore */
         }
     }, []);
+
+    // 监听成就系统分发的英雄解锁事件
+    useEffect(() => {
+        const handler = (e) => {
+            const heroId = e?.detail?.heroId;
+            if (heroId) {
+                handleHeroUnlock(heroId);
+            }
+        };
+        window.addEventListener('hero-unlock', handler);
+        return () => window.removeEventListener('hero-unlock', handler);
+    }, [handleHeroUnlock]);
 
     const handleRestartMap = () => {
         if (!window.confirm('检测到死胡同，重新生成地图会清除当前进度。是否继续？')) return;
