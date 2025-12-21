@@ -734,6 +734,14 @@ const BattleScene = ({
                 ...effectUpdates.playerStatus
             }));
         }
+        if (effectUpdates.firstAttackBonusTurns !== undefined) {
+            setPlayerStatus(prev => ({
+                ...prev,
+                firstAttackBonus: effectUpdates.playerStatus?.firstAttackBonus || prev.firstAttackBonus,
+                firstAttackBonusTurns: effectUpdates.firstAttackBonusTurns,
+                firstAttackBonusArmed: true
+            }));
+        }
         if (effectUpdates.enemyStatus) {
             setEnemyStatus(prev => {
                 const nextStatus = { ...prev, ...effectUpdates.enemyStatus };

@@ -748,10 +748,10 @@ function applyEffect(effectType, value, context, updates, card = {}) {
 
         case 'FIRST_ATTACK_PLUS_2_TURNS':
             // 蓄势待发: 未来2回合，第一张攻击牌额外造成 value 点伤害
+            updates.firstAttackBonusTurns = 2;
             updates.playerStatus = {
                 ...(updates.playerStatus || playerStatus),
                 firstAttackBonus: value,
-                firstAttackBonusTurns: 2,
                 firstAttackBonusArmed: true
             };
             break;
