@@ -431,6 +431,35 @@ export const ACHIEVEMENTS = [
         trigger: { type: 'meta', meta: 'ascensionClears', valueGte: 15 },
         reward: { type: 'MODE', ref: 'AscensionGlory' }
     }
+
+    // === Hero Unlocks (章节通关) ===
+    ,{
+        id: 'ACH_201',
+        category: 'HERO',
+        name: '人定胜天',
+        description: '首次通关 Act1，解锁英雄：维克托',
+        difficulty: 'B',
+        trigger: { type: 'act_complete', act: 1 },
+        reward: { type: 'HERO', ref: 'Viktor' }
+    },
+    {
+        id: 'ACH_202',
+        category: 'HERO',
+        name: '终末之女武神',
+        description: '首次通关 Act2，解锁英雄：劫',
+        difficulty: 'A',
+        trigger: { type: 'act_complete', act: 2 },
+        reward: { type: 'HERO', ref: 'Zed' }
+    },
+    {
+        id: 'ACH_203',
+        category: 'HERO',
+        name: '诸神之黄昏',
+        description: '首次通关 Act3，解锁英雄：德莱厄斯（后续通关随机解锁其他未解锁英雄）',
+        difficulty: 'S',
+        trigger: { type: 'act_complete', act: 3 },
+        reward: { type: 'HERO', ref: 'RANDOM_OR_DARIUS' }
+    }
 ];
 
 export const ACHIEVEMENT_STORAGE_KEY = 'lots_achievements_v1';

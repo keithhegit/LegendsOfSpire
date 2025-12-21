@@ -3,6 +3,9 @@ import { Sword, Shield, Zap, Skull, Heart, RefreshCw, AlertTriangle, Flame, XCir
 import { motion, AnimatePresence } from 'framer-motion';
 import { generateGridMap } from './data/gridMapLayout_v4'; // v4生成器（带死胡同检测）
 import { CARD_DATABASE } from './data/cards'; // 卡牌数据
+import { CHAMPION_POOL } from './data/champions';
+import IntroVideo from './components/IntroVideo';
+import { DEFAULT_UNLOCKED_HEROES, PRIVILEGED_ACCOUNTS, ACT_UNLOCK_HEROES } from './data/constants';
 import { getBaseCardId, getCardWithUpgrade, getUpgradeLevel } from './utils/cardUtils';
 import GridMapView_v3 from './components/GridMapView_v3'; // 新版六边形地图视图（三选一机制）
 import ChampionSelect from './components/ChampionSelect';
@@ -62,7 +65,7 @@ const SFX = {
 
 const STARTING_DECK_BASIC = ["Strike", "Strike", "Strike", "Strike", "Defend", "Defend", "Defend", "Defend"];
 const SAVE_KEY = 'lots_save_v75';
-const UNLOCK_KEY = 'lots_unlocks_v75';
+const UNLOCK_STORAGE_KEY = 'lots_unlocks_v2';
 const CARD_DELETE_COST = { COMMON: 50, UNCOMMON: 100, RARE: 200 };
 const MAX_EXTRA_RELICS = 6;
 const ACHIEVEMENT_MODE_KEY = 'lots_achievement_modes_v1';
@@ -109,32 +112,6 @@ const isRelicAvailableInAct = (relicId, act = 1) => {
 // ==========================================
 // 2. 游戏数据库
 // ==========================================
-
-const CHAMPION_POOL = {
-    // --- 第一梯队 ---
-    "Garen": { id: "Garen", name: "盖伦", title: "德玛西亚之力", maxHp: 80, maxMana: 3, avatar: `${CDN_URL}/img/champion/Garen.png`, img: `${LOADING_URL}/Garen_0.jpg`, passive: "坚韧: 战斗结束时恢复 6 HP", relicId: "GarenPassive", initialCards: ["GarenQ", "GarenW", "Ignite", "Defend"], description: "德玛西亚的重装战士，擅长叠甲和持续作战。" },
-    "Darius": { id: "Darius", name: "德莱厄斯", title: "诺克萨斯之手", maxHp: 90, maxMana: 3, avatar: `${CDN_URL}/img/champion/Darius.png`, img: `${LOADING_URL}/Darius_0.jpg`, passive: "出血: 每次攻击时，给予敌人 1 层虚弱", relicId: "DariusPassive", initialCards: ["DariusW", "DariusE", "Strike", "Ignite"], description: "诺克萨斯的象征，依靠力量和流血效果压制敌人。" },
-    "Lux": { id: "Lux", name: "拉克丝", title: "光辉女郎", maxHp: 70, maxMana: 3, avatar: `${CDN_URL}/img/champion/Lux.png`, img: `${LOADING_URL}/Lux_0.jpg`, passive: "光芒四射: 每回合开始时获得 1 点法力", relicId: "LuxPassive", initialCards: ["LuxQ", "LuxE", "Heal", "Ignite"], description: "法师英雄，擅长利用额外法力打出高费控制牌。" },
-    "Jinx": { id: "Jinx", name: "金克丝", title: "暴走萝莉", maxHp: 75, maxMana: 3, avatar: `${CDN_URL}/img/champion/Jinx.png`, img: `${LOADING_URL}/Jinx_0.jpg`, passive: "爆发: 每回合初始手牌数量+1", relicId: "JinxPassive", initialCards: ["JinxQ", "JinxW", "Strike", "Strike"], description: "高爆发射手，通过快速抽牌和连击造成伤害。" },
-    "Yasuo": { id: "Yasuo", name: "亚索", title: "疾风剑豪", maxHp: 78, maxMana: 3, avatar: `${CDN_URL}/img/champion/Yasuo.png`, img: `${LOADING_URL}/Yasuo_0.jpg`, passive: "浪客之道: 暴击几率+10%", relicId: "YasuoPassive", initialCards: ["YasuoQ", "YasuoE", "Defend", "Defend"], description: "高机动性剑客，利用连击和暴击进行爆发输出。" },
-    "Sona": { id: "Sona", name: "娑娜", title: "琴瑟仙女", maxHp: 72, maxMana: 3, avatar: `${CDN_URL}/img/champion/Sona.png`, img: `${LOADING_URL}/Sona_0.jpg`, passive: "能量弦: 每回合打出第三张卡时，获得 3 点临时护甲", relicId: "SonaPassive", initialCards: ["SonaQ", "SonaW", "Defend", "Heal"], description: "辅助英雄，专注于恢复和团队增益。" },
-    "Ekko": { id: "Ekko", name: "艾克", title: "时间刺客", maxHp: 82, maxMana: 3, avatar: `${CDN_URL}/img/champion/Ekko.png`, img: `${LOADING_URL}/Ekko_0.jpg`, passive: "Z型驱动: 每次打出消耗卡时，获得 1 点力量", relicId: "EkkoPassive", initialCards: ["EkkoQ", "EkkoE", "Defend", "Ignite"], description: "高爆发刺客，利用消耗卡牌的机制快速成长。" },
-    "Sylas": { id: "Sylas", name: "塞拉斯", title: "解脱者", maxHp: 85, maxMana: 3, avatar: `${CDN_URL}/img/champion/Sylas.png`, img: `${LOADING_URL}/Sylas_0.jpg`, passive: "叛乱: 每次打出技能牌时，回复 3 点生命值", relicId: "SylasPassive", initialCards: ["SylasQ", "SylasW", "Strike", "Defend"], description: "斗士英雄，通过频繁打出技能获得生存优势。" },
-    "Urgot": { id: "Urgot", name: "厄加特", title: "无畏战车", maxHp: 100, maxMana: 3, avatar: `${CDN_URL}/img/champion/Urgot.png`, img: `${LOADING_URL}/Urgot_0.jpg`, passive: "回火: 战斗开始时获得 15 点临时护甲", relicId: "UrgotPassive", initialCards: ["UrgotQ", "UrgotW", "Defend", "Defend"], description: "坦克英雄，拥有高生命值和强力防御。" },
-    "Viktor": { id: "Viktor", name: "维克托", title: "机械先驱", maxHp: 70, maxMana: 3, avatar: `${CDN_URL}/img/champion/Viktor.png`, img: `${LOADING_URL}/Viktor_0.jpg`, passive: "光荣进化: 回合开始时，50% 几率获得一张额外基础卡", relicId: "ViktorPassive", initialCards: ["ViktorQ", "ViktorE", "Ignite", "Heal"], description: "高科技法师，擅长通过快速滤牌获得优势。" },
-
-    // --- 第二梯队 (新储备) ---
-    "Riven": { id: "Riven", name: "瑞文", title: "放逐之刃", maxHp: 75, maxMana: 3, avatar: `${CDN_URL}/img/champion/Riven.png`, img: `${LOADING_URL}/Riven_0.jpg`, passive: "符文之刃: 每打出3张攻击牌，获得1点能量", relicId: "RivenPassive", initialCards: ["RivenQ", "RivenE", "Strike", "Defend"], description: "连招型战士，通过连续攻击积累能量。" },
-    "TwistedFate": { id: "TwistedFate", name: "卡牌大师", title: "崔斯特", maxHp: 70, maxMana: 3, avatar: `${CDN_URL}/img/champion/TwistedFate.png`, img: `${LOADING_URL}/TwistedFate_0.jpg`, passive: "灌铅骰子: 战斗胜利额外获得 15 金币", relicId: "TwistedFatePassive", initialCards: ["TwistedFateW", "TwistedFateQ", "Strike", "Ignite"], description: "经济型法师，通过额外金币获得装备优势。" },
-    "LeeSin": { id: "LeeSin", name: "盲僧", title: "李青", maxHp: 80, maxMana: 3, avatar: `${CDN_URL}/img/champion/LeeSin.png`, img: `${LOADING_URL}/LeeSin_0.jpg`, passive: "疾风骤雨: 打出技能牌后，下一张攻击牌费用-1", relicId: "LeeSinPassive", initialCards: ["LeeSinQ", "LeeSinW", "Strike", "Defend"], description: "节奏型战士，通过技能和攻击的配合打出连招。" },
-    "Vayne": { id: "Vayne", name: "薇恩", title: "暗夜猎手", maxHp: 70, maxMana: 3, avatar: `${CDN_URL}/img/champion/Vayne.png`, img: `${LOADING_URL}/Vayne_0.jpg`, passive: "圣银弩箭: 对同一目标连续造成3次伤害时，额外造成10伤", relicId: "VaynePassive", initialCards: ["VayneQ", "VayneE", "Strike", "Strike"], description: "单体爆发射手，专注于对单一目标的持续输出。" },
-    "Teemo": { id: "Teemo", name: "提莫", title: "迅捷斥候", maxHp: 65, maxMana: 3, avatar: `${CDN_URL}/img/champion/Teemo.png`, img: `${LOADING_URL}/Teemo_0.jpg`, passive: "游击战: 回合开始时，随机给一名敌人施加 2 层虚弱", relicId: "TeemoPassive", initialCards: ["TeemoQ", "TeemoR", "Strike", "Ignite"], description: "DoT型射手，通过虚弱和易伤削弱敌人。" },
-    "Zed": { id: "Zed", name: "劫", title: "影流之主", maxHp: 75, maxMana: 3, avatar: `${CDN_URL}/img/champion/Zed.png`, img: `${LOADING_URL}/Zed_0.jpg`, passive: "影分身: 每回合第一张攻击牌会重复施放一次(50%伤害)", relicId: "ZedPassive", initialCards: ["ZedQ", "ZedE", "Strike", "Strike"], description: "爆发型刺客，通过复制攻击造成巨额伤害。" },
-    "Nasus": { id: "Nasus", name: "内瑟斯", title: "沙漠死神", maxHp: 85, maxMana: 3, avatar: `${CDN_URL}/img/champion/Nasus.png`, img: `${LOADING_URL}/Nasus_0.jpg`, passive: "汲魂痛击: 每次用攻击牌击杀敌人，获得1点力量", relicId: "NasusPassive", initialCards: ["NasusQ", "NasusW", "Strike", "Defend"], description: "无限成长型战士，通过击杀敌人永久提升力量。" },
-    "Irelia": { id: "Irelia", name: "艾瑞莉娅", title: "刀锋舞者", maxHp: 75, maxMana: 3, avatar: `${CDN_URL}/img/champion/Irelia.png`, img: `${LOADING_URL}/Irelia_0.jpg`, passive: "热诚: 每次击杀敌人，恢复 1 点能量并抽 1 张牌", relicId: "IreliaPassive", initialCards: ["IreliaQ", "IreliaE", "Strike", "Defend"], description: "收割型战士，通过击杀重置和抽牌形成连击。", baseStr: 0 },
-    "Thresh": { id: "Thresh", name: "锤石", title: "魂锁典狱长", maxHp: 90, maxMana: 3, avatar: `${CDN_URL}/img/champion/Thresh.png`, img: `${LOADING_URL}/Thresh_0.jpg`, passive: "地狱诅咒: 每次击杀敌人，永久增加 2 最大生命值", relicId: "ThreshPassive", initialCards: ["ThreshQ", "ThreshW", "Strike", "Defend"], description: "成长型坦克，通过击杀敌人永久提升生命上限。", baseStr: 0 },
-    "Katarina": { id: "Katarina", name: "卡特琳娜", title: "不祥之刃", maxHp: 70, maxMana: 3, avatar: `${CDN_URL}/img/champion/Katarina.png`, img: `${LOADING_URL}/Katarina_0.jpg`, passive: "贪婪: 每回合每打出 3 张攻击牌后，下一张攻击牌伤害翻倍", relicId: "KatarinaPassive", initialCards: ["KatarinaQ", "KatarinaE", "Strike", "Strike"], description: "计数器型刺客，通过连击触发高额爆发伤害。", baseStr: 0 },
-};
 
 const RELIC_DATABASE = {
     // 基础被动遗物 (20个)
@@ -638,8 +615,8 @@ export default function LegendsOfTheSpire() {
 
     const [unlockedChamps, setUnlockedChamps] = useState(() => {
         try {
-            const d = localStorage.getItem(UNLOCK_KEY);
-            if (!d) return Object.keys(CHAMPION_POOL);
+            const d = localStorage.getItem(UNLOCK_STORAGE_KEY);
+            if (!d) return [...DEFAULT_UNLOCKED_HEROES];
 
             let saved = JSON.parse(d);
             // 修复旧版本的ID (Thresh_Hero -> Thresh, Katarina_Hero -> Katarina)
@@ -650,7 +627,7 @@ export default function LegendsOfTheSpire() {
             });
             return saved;
         } catch {
-            return Object.keys(CHAMPION_POOL);
+            return [...DEFAULT_UNLOCKED_HEROES];
         }
     });
     const [hasSave, setHasSave] = useState(false);
@@ -660,6 +637,13 @@ export default function LegendsOfTheSpire() {
     });
     const [loginComplete, setLoginComplete] = useState(false);
     const [currentUser, setCurrentUser] = useState(null);
+    const [showIntro, setShowIntro] = useState(() => {
+        try {
+            return !localStorage.getItem('lots_intro_watched');
+        } catch {
+            return true;
+        }
+    });
     const [showDeadEndPrompt, setShowDeadEndPrompt] = useState(false);
     const [bgmStarted, setBgmStarted] = useState(false);
     const [language, setLanguage] = useState(() => {
@@ -671,6 +655,18 @@ export default function LegendsOfTheSpire() {
     });
     const [activeInventoryTab, setActiveInventoryTab] = useState('CARDS');
 
+    const isPrivilegedUser = useMemo(() => {
+        if (!currentUser?.email) return false;
+        const email = currentUser.email.toLowerCase();
+        const localPart = email.split('@')[0];
+        return PRIVILEGED_ACCOUNTS.some(acc => localPart.startsWith(acc));
+    }, [currentUser]);
+
+    const effectiveUnlockedChamps = useMemo(() => {
+        if (isPrivilegedUser) return Object.keys(CHAMPION_POOL);
+        return unlockedChamps;
+    }, [isPrivilegedUser, unlockedChamps]);
+
     useEffect(() => {
         document.documentElement.lang = language === 'en' ? 'en' : 'zh';
         try {
@@ -679,6 +675,17 @@ export default function LegendsOfTheSpire() {
             /* ignore */
         }
     }, [language]);
+
+    useEffect(() => {
+        const handler = (e) => {
+            const heroId = e?.detail?.heroId;
+            if (heroId) {
+                handleHeroUnlock(heroId);
+            }
+        };
+        window.addEventListener('hero-unlock', handler);
+        return () => window.removeEventListener('hero-unlock', handler);
+    }, [handleHeroUnlock]);
 
     const openInventory = (tab = 'CARDS') => {
         setActiveInventoryTab(tab);
@@ -957,6 +964,49 @@ export default function LegendsOfTheSpire() {
         setNextBattleDrawBonus(0);
     };
 
+    const handleAct3Unlock = useCallback(() => {
+        if (isPrivilegedUser) return;
+        const allIds = Object.keys(CHAMPION_POOL);
+        const locked = allIds.filter(id => !unlockedChamps.includes(id));
+        let newUnlock = null;
+
+        // 首次优先德莱厄斯
+        if (!unlockedChamps.includes(ACT_UNLOCK_HEROES[3])) {
+            newUnlock = ACT_UNLOCK_HEROES[3];
+        } else if (locked.length > 0) {
+            newUnlock = locked[Math.floor(Math.random() * locked.length)];
+        }
+
+        if (newUnlock) {
+            const updated = [...unlockedChamps, newUnlock];
+            setUnlockedChamps(updated);
+            localStorage.setItem(UNLOCK_STORAGE_KEY, JSON.stringify(updated));
+            alert(`恭喜通关！新英雄解锁: ${CHAMPION_POOL[newUnlock].name}`);
+        }
+    }, [isPrivilegedUser, unlockedChamps]);
+
+    const handleHeroUnlock = useCallback((heroId) => {
+        if (!heroId || isPrivilegedUser) return;
+        if (heroId === 'RANDOM_OR_DARIUS') {
+            handleAct3Unlock();
+            return;
+        }
+        if (unlockedChamps.includes(heroId)) return;
+        const updated = [...unlockedChamps, heroId];
+        setUnlockedChamps(updated);
+        localStorage.setItem(UNLOCK_STORAGE_KEY, JSON.stringify(updated));
+        alert(`新英雄解锁: ${CHAMPION_POOL[heroId]?.name || heroId}`);
+    }, [handleAct3Unlock, isPrivilegedUser, unlockedChamps]);
+
+    const handleIntroComplete = useCallback(() => {
+        setShowIntro(false);
+        try {
+            localStorage.setItem('lots_intro_watched', 'true');
+        } catch {
+            /* ignore */
+        }
+    }, []);
+
     const handleRestartMap = () => {
         if (!window.confirm('检测到死胡同，重新生成地图会清除当前进度。是否继续？')) return;
         const resetMap = generateGridMap(currentAct, []);
@@ -1067,16 +1117,7 @@ export default function LegendsOfTheSpire() {
                 alert(`第 ${currentAct} 章通关！进入下一章...`);
                 setView('MAP');
             } else {
-                // 游戏通关
-                const allIds = Object.keys(CHAMPION_POOL);
-                const locked = allIds.filter(id => !unlockedChamps.includes(id));
-                if (locked.length > 0) {
-                    const newUnlock = locked[Math.floor(Math.random() * locked.length)];
-                    const updated = [...unlockedChamps, newUnlock];
-                    setUnlockedChamps(updated);
-                    localStorage.setItem(UNLOCK_KEY, JSON.stringify(updated));
-                    alert(`恭喜通关！新英雄解锁: ${CHAMPION_POOL[newUnlock].name}`);
-                }
+                // 游戏通关（解锁逻辑改由成就事件处理）
                 localStorage.removeItem(SAVE_KEY);
                 setView('VICTORY_ALL');
             }
@@ -1602,7 +1643,7 @@ export default function LegendsOfTheSpire() {
                     )}
                 </div>
             );
-            case 'CHAMPION_SELECT': return <ChampionSelect onChampionSelect={handleChampionSelect} unlockedIds={unlockedChamps} currentUser={currentUser} />;
+            case 'CHAMPION_SELECT': return <ChampionSelect onChampionSelect={handleChampionSelect} unlockedIds={effectiveUnlockedChamps} currentUser={currentUser} />;
             case 'MAP': return (
                 <div className="relative w-full h-full">
                     {/* [DEV ONLY] 跳关调试按钮 */}
@@ -1900,6 +1941,9 @@ export default function LegendsOfTheSpire() {
                 />
             )}
             {renderView()}
+            {showIntro && view === 'MENU' && (
+                <IntroVideo onComplete={handleIntroComplete} />
+            )}
             {showInventory && (
                 <InventoryPanel
                     onClose={() => setShowInventory(false)}

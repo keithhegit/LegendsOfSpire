@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Lock } from 'lucide-react';
 import { HERO_LIST } from '../data/heroSkins';
 
 const HeroSelectView = ({ onChampionSelect, unlockedIds = [], currentUser }) => {
@@ -17,7 +17,13 @@ const HeroSelectView = ({ onChampionSelect, unlockedIds = [], currentUser }) => 
         if (stored) setFavoriteHero(stored);
     }, [currentUser]);
 
+    const isLocked = (heroId) => unlockedIds.length > 0 && !unlockedIds.includes(heroId);
+
     const handleHeroSelect = (hero) => {
+        if (isLocked(hero.id)) {
+            alert('须成就解锁');
+            return;
+        }
         setSelectedHero(hero);
         setCurrentSkinIndex(0); // Reset skin to first when changing hero
     };
@@ -53,6 +59,11 @@ const HeroSelectView = ({ onChampionSelect, unlockedIds = [], currentUser }) => 
                         skinName: selectedSkin.name,
                         splashUrl: selectedSkin.splashUrl
                     };
+                }
+
+                if (isLocked(selectedHero.id)) {
+                    alert('该英雄尚未解锁');
+                    return;
                 }
 
                 if (championData) {
@@ -169,7 +180,7 @@ const HeroSelectView = ({ onChampionSelect, unlockedIds = [], currentUser }) => 
                                 className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${selectedHero.id === hero.id
                                     ? 'border-amber-400 shadow-[0_0_25px_rgba(251,191,36,0.6)] opacity-100'
                                     : 'border-slate-600 hover:border-amber-300/50 opacity-60 hover:opacity-100'
-                                    } ${favoriteHero === hero.id ? 'ring-2 ring-cyan-400 ring-offset-2 ring-offset-slate-900' : ''}`}
+                                    } ${favoriteHero === hero.id ? 'ring-2 ring-cyan-400 ring-offset-2 ring-offset-slate-900' : ''} ${isLocked(hero.id) ? 'opacity-40 grayscale cursor-not-allowed' : ''}`}
                             >
                                 {/* Avatar Image */}
                                 <img
@@ -177,6 +188,15 @@ const HeroSelectView = ({ onChampionSelect, unlockedIds = [], currentUser }) => 
                                     alt={hero.name}
                                     className="w-full h-full object-cover"
                                 />
+
+                                {isLocked(hero.id) && (
+                                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center z-10">
+                                        <div className="flex items-center gap-2 text-amber-200 text-xs font-semibold">
+                                            <Lock size={16} />
+                                            <span>须成就解锁</span>
+                                        </div>
+                                    </div>
+                                )}
 
                                 {/* Selected Indicator */}
                                 {selectedHero.id === hero.id && (

@@ -24,3 +24,19 @@ export const ACT_BACKGROUNDS = {
     2: "https://images.17173cdn.com/2014/lol/2014/08/22/Shadow_Isles_10.jpg", // 暗影之地
     3: "https://pic.upmedia.mg/uploads/content/20220519/EV220519112427593030.webp"  // 虚空之地
 };
+
+// 初始解锁英雄（普通账号）
+export const DEFAULT_UNLOCKED_HEROES = ['Garen', 'LeeSin', 'Irelia'];
+
+// 特权账号（邮箱前缀匹配）默认全英雄解锁
+export const PRIVILEGED_ACCOUNTS = ['keithhe2026', 'momota'];
+
+// 片头视频地址
+export const INTRO_VIDEO_URL = 'https://pub-c98d5902eedf42f6a9765dfad981fd88.r2.dev/LoL/begin_sprite.mp4';
+
+// 章节通关默认解锁英雄（Act1/2固定，Act3 首次德莱厄斯）
+export const ACT_UNLOCK_HEROES = {
+    1: 'Viktor',
+    2: 'Zed',
+    3: 'Darius'
+};

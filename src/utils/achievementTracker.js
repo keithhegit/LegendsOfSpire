@@ -72,10 +72,26 @@ const unlockAchievement = (id) => {
     if (!achievementMap[id] || defaultState.unlocked.has(id)) {
         return;
     }
+    const achievement = achievementMap[id];
     defaultState.unlocked.add(id);
     defaultState.runUnlocked.add(id);
     persistState();
-    defaultState.notifier?.(achievementMap[id]);
+    // 触发 HERO 解锁奖励（事件由 App 监听处理）
+    if (achievement?.reward?.type === 'HERO') {
+        unlockHeroReward(achievement.reward.ref);
+    }
+    defaultState.notifier?.(achievement);
+};
+
+// 统一分发英雄解锁事件，由前端消费
+const unlockHeroReward = (heroRef) => {
+    if (typeof window === 'undefined') return;
+    try {
+        const event = new CustomEvent('hero-unlock', { detail: { heroId: heroRef } });
+        window.dispatchEvent(event);
+    } catch (err) {
+        console.warn('[AchievementTracker] Failed to dispatch hero unlock event', err);
+    }
 };
 
 const matchesTrigger = (trigger, payload = {}) => {
