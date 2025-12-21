@@ -18,6 +18,10 @@ const HeroSelectView = ({ onChampionSelect, unlockedIds = [], currentUser }) => 
     }, [currentUser]);
 
     const handleHeroSelect = (hero) => {
+        if (hero.id === 'Riven' || hero.id === 'TwistedFate') {
+            alert("须成就解锁");
+            return;
+        }
         setSelectedHero(hero);
         setCurrentSkinIndex(0); // Reset skin to first when changing hero
     };
@@ -160,41 +164,53 @@ const HeroSelectView = ({ onChampionSelect, unlockedIds = [], currentUser }) => 
                 {/* Grid Container */}
                 <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
                     <div className="grid grid-cols-5 gap-3">
-                        {HERO_LIST.map((hero) => (
-                            <motion.button
-                                key={hero.id}
-                                onClick={() => handleHeroSelect(hero)}
-                                whileHover={{ scale: selectedHero.id === hero.id ? 1 : 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${selectedHero.id === hero.id
-                                    ? 'border-amber-400 shadow-[0_0_25px_rgba(251,191,36,0.6)] opacity-100'
-                                    : 'border-slate-600 hover:border-amber-300/50 opacity-60 hover:opacity-100'
-                                    } ${favoriteHero === hero.id ? 'ring-2 ring-cyan-400 ring-offset-2 ring-offset-slate-900' : ''}`}
-                            >
-                                {/* Avatar Image */}
-                                <img
-                                    src={hero.avatar}
-                                    alt={hero.name}
-                                    className="w-full h-full object-cover"
-                                />
-
-                                {/* Selected Indicator */}
-                                {selectedHero.id === hero.id && (
-                                    <motion.div
-                                        initial={{ opacity: 0 }}
-                                        animate={{ opacity: 1 }}
-                                        className="absolute inset-0 bg-gradient-to-t from-amber-500/30 to-transparent"
+                        {HERO_LIST.map((hero) => {
+                            const isLocked = hero.id === 'Riven' || hero.id === 'TwistedFate';
+                            return (
+                                <motion.button
+                                    key={hero.id}
+                                    onClick={() => handleHeroSelect(hero)}
+                                    whileHover={{ scale: (selectedHero.id === hero.id || isLocked) ? 1 : 1.05 }}
+                                    whileTap={{ scale: isLocked ? 1 : 0.95 }}
+                                    className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${selectedHero.id === hero.id
+                                        ? 'border-amber-400 shadow-[0_0_25px_rgba(251,191,36,0.6)] opacity-100'
+                                        : isLocked
+                                            ? 'border-slate-800 bg-black/40 grayscale opacity-40 cursor-not-allowed'
+                                            : 'border-slate-600 hover:border-amber-300/50 opacity-60 hover:opacity-100'
+                                        } ${favoriteHero === hero.id ? 'ring-2 ring-cyan-400 ring-offset-2 ring-offset-slate-900' : ''}`}
+                                >
+                                    {/* Avatar Image */}
+                                    <img
+                                        src={hero.avatar}
+                                        alt={hero.name}
+                                        className="w-full h-full object-cover"
                                     />
-                                )}
 
-                                {/* Name Label on Hover */}
-                                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-2">
-                                    <p className="text-white text-xs font-semibold text-center truncate">
-                                        {hero.name}
-                                    </p>
-                                </div>
-                            </motion.button>
-                        ))}
+                                    {/* Lock Icon Overlay */}
+                                    {isLocked && (
+                                        <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                                            <Lock size={24} className="text-slate-400 opacity-80" />
+                                        </div>
+                                    )}
+
+                                    {/* Selected Indicator */}
+                                    {selectedHero.id === hero.id && (
+                                        <motion.div
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            className="absolute inset-0 bg-gradient-to-t from-amber-500/30 to-transparent"
+                                        />
+                                    )}
+
+                                    {/* Name Label on Hover */}
+                                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-2">
+                                        <p className="text-white text-[10px] font-semibold text-center truncate">
+                                            {hero.name}
+                                        </p>
+                                    </div>
+                                </motion.button>
+                            );
+                        })}
                     </div>
                 </div>
             </div>
