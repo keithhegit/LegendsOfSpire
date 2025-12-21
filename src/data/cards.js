@@ -128,10 +128,10 @@ export const CARD_DATABASE = {
   ViktorR: { id: 'ViktorR', name: '进化歧路', type: 'SKILL', cost: 3, value: 18, rarity: 'RARE', hero: 'Viktor', target: 'single', effect: 'DRAW_ON_USE', effectValue: 1, description: '对目标造成18伤并抽1张牌（进化打点）。', img: `${SPELL_URL}/ViktorChaosStorm.png`, price: 150 },
 
   // Lee Sin
-  LeeQ: { id: 'LeeQ', name: '音波回音', type: 'ATTACK', cost: 1, value: 7, rarity: 'COMMON', hero: 'LeeSin', target: 'single', effect: 'CHAIN_TRIGGER', effectValue: 7, description: '对目标造成7伤；命中后可免费再触发一次（0费）。', img: `${SPELL_URL}/LeeSinQ.png`, price: 50 },
-  LeeW: { id: 'LeeW', name: '金钟罩', type: 'SKILL', cost: 1, value: 8, block: 8, rarity: 'UNCOMMON', hero: 'LeeSin', target: 'self', effect: 'ATTACK_BUFF', effectValue: 2, description: '获得8护甲；下一次攻击+2伤害。', img: `${SPELL_URL}/LeeSinW.png`, price: 80 },
-  LeeE: { id: 'LeeE', name: '天雷破', type: 'ATTACK', cost: 1, value: 6, rarity: 'UNCOMMON', hero: 'LeeSin', target: 'single', effect: 'WEAK_ON_HIT', effectValue: 1, description: '对目标造成6伤并施加1层虚弱。', img: `${SPELL_URL}/LeeSinE.png`, price: 100 },
-  LeeR: { id: 'LeeR', name: '猛龙摆尾', type: 'ATTACK', cost: 3, value: 20, rarity: 'RARE', hero: 'LeeSin', target: 'single', effect: 'REMOVE_BUFF', effectValue: 1, description: '对目标造成20伤并移除目标的一个增益。', img: `${SPELL_URL}/LeeSinR.png`, price: 150 },
+  LeeQ: { id: 'LeeQ', name: '音波回音', type: 'ATTACK', cost: 1, value: 7, rarity: 'COMMON', hero: 'LeeSin', target: 'single', effect: 'CHAIN_TRIGGER', effectValue: 7, description: '对目标造成7伤；命中后可免费再触发一次（0费）。', img: `${SPELL_URL}/BlindMonkQOne.png`, price: 50 },
+  LeeW: { id: 'LeeW', name: '金钟罩', type: 'SKILL', cost: 1, value: 8, block: 8, rarity: 'UNCOMMON', hero: 'LeeSin', target: 'self', effect: 'ATTACK_BUFF', effectValue: 2, description: '获得8护甲；下一次攻击+2伤害。', img: `${SPELL_URL}/BlindMonkWOne.png`, price: 80 },
+  LeeE: { id: 'LeeE', name: '天雷破', type: 'ATTACK', cost: 1, value: 6, rarity: 'UNCOMMON', hero: 'LeeSin', target: 'single', effect: 'WEAK_ON_HIT', effectValue: 1, description: '对目标造成6伤并施加1层虚弱。', img: `${SPELL_URL}/BlindMonkEOne.png`, price: 100 },
+  LeeR: { id: 'LeeR', name: '猛龙摆尾', type: 'ATTACK', cost: 3, value: 20, rarity: 'RARE', hero: 'LeeSin', target: 'single', effect: 'REMOVE_BUFF', effectValue: 1, description: '对目标造成20伤并移除目标的一个增益。', img: `${SPELL_URL}/BlindMonkRKick.png`, price: 150 },
 
   // Riven
   RivenQ: { id: 'RivenQ', name: '断剑重铸', type: 'ATTACK', cost: 1, value: 12, rarity: 'COMMON', hero: 'Riven', target: 'single', effect: 'MULTI_HIT', effectValue: 4, description: '对单体造成三段打击，总计12伤。', img: `${SPELL_URL}/RivenQ.png`, price: 50 },
