@@ -18,9 +18,9 @@ const IntroVideo = ({ onComplete }) => {
             />
             <button
                 onClick={onComplete}
-                className="absolute bottom-8 right-8 px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg border border-white/30 transition"
+                className="absolute bottom-8 right-8 px-6 py-2 bg-amber-500/90 hover:bg-amber-400 text-black font-semibold rounded-lg border border-amber-200 shadow-lg transition"
             >
-                跳过
+                跳过片头
             </button>
         </motion.div>
     );

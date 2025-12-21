@@ -1942,7 +1942,7 @@ export default function LegendsOfTheSpire() {
                 />
             )}
             {renderView()}
-            {showIntro && view === 'MENU' && (
+            {showIntro && (
                 <IntroVideo onComplete={handleIntroComplete} />
             )}
             {showInventory && (
