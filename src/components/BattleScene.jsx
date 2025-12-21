@@ -135,6 +135,7 @@ const BattleScene = ({
         nextAttackDoubleNextTurn: false,
         firstAttackBonus: 0,
         firstAttackBonusArmed: false,
+        firstAttackBonusTurns: 0,
         cloneAttackPercent: 0
     });
     const [enemyStatus, setEnemyStatus] = useState({ 
@@ -556,7 +557,7 @@ const BattleScene = ({
             globalAttackBonus: 0,
             critDamageMultiplier: prev.critDamageMultiplier || 2,
             idleBlock: 0,
-            firstAttackBonusArmed: true
+            firstAttackBonusArmed: prev.firstAttackBonusTurns > 0
         }));
         setEnemyStatus(prev => ({
             ...prev,
@@ -907,7 +908,11 @@ const BattleScene = ({
             // Batch 6: 蓄势待发 (FIRST_ATTACK_PLUS)
             if (card.type === 'ATTACK' && mergedPlayerStatus.firstAttackBonusArmed) {
                 baseDmg += (mergedPlayerStatus.firstAttackBonus || 0);
-                setPlayerStatus(prev => ({ ...prev, firstAttackBonusArmed: false }));
+                setPlayerStatus(prev => ({ 
+                    ...prev, 
+                    firstAttackBonusArmed: false,
+                    firstAttackBonusTurns: Math.max(0, (prev.firstAttackBonusTurns || 0) - 1)
+                }));
             }
 
             // Batch 6: 闪避突袭 (NEXT_ATTACK_BONUS)
@@ -1561,7 +1566,11 @@ const BattleScene = ({
             {status.damageReduce > 0 && <div className="flex items-center text-[10px] text-blue-300 bg-blue-950/40 px-1 rounded border border-blue-800 shadow-sm"><TrendingDown size={10} className="mr-1" /> 减伤 {status.damageReduce}%</div>}
             {status.damageReduction > 0 && <div className="flex items-center text-[10px] text-blue-300 bg-blue-950/40 px-1 rounded border border-blue-800 shadow-sm"><TrendingDown size={10} className="mr-1" /> 减伤 {status.damageReduction}%</div>}
             {status.retaliation > 0 && <div className="flex items-center text-[10px] text-orange-400 bg-orange-950/40 px-1 rounded border border-orange-800 shadow-sm"><Activity size={10} className="mr-1" /> 反弹 {status.retaliation}</div>}
-            {status.firstAttackBonus > 0 && <div className="flex items-center text-[10px] text-amber-300 bg-amber-900/30 px-1 rounded border border-amber-700 shadow-sm"><Sword size={10} className="mr-1" /> 蓄势 +{status.firstAttackBonus}</div>}
+            {status.firstAttackBonusTurns > 0 && (
+                <div className="flex items-center text-[10px] text-amber-300 bg-amber-900/30 px-1 rounded border border-amber-700 shadow-sm">
+                    <Sword size={10} className="mr-1" /> 蓄 +{status.firstAttackBonusTurns}
+                </div>
+            )}
             {status.healReduce > 0 && <div className="flex items-center text-[10px] text-red-300 bg-red-950/40 px-1 rounded border border-red-900 shadow-sm"><Skull size={10} className="mr-1" /> 重伤 {status.healReduce}%</div>}
             {status.lifesteal > 0 && <div className="flex items-center text-[10px] text-pink-400 bg-pink-900/40 px-1 rounded border border-pink-800 shadow-sm"><Heart size={10} className="mr-1" /> 吸血</div>}
             {status.regenMana > 0 && <div className="flex items-center text-[10px] text-blue-400 bg-blue-900/40 px-1 rounded border border-blue-800 shadow-sm"><Zap size={10} className="mr-1" /> 回蓝 {status.regenMana}</div>}
