@@ -839,9 +839,9 @@ const getOptionalBranchType = () => {
 };
 
 const getBossId = (act) => {
-  if (act === 1) return "Darius_BOSS";
-  if (act === 2) return "Viego_BOSS";
-  return "BelVeth_BOSS";
+  if (act === 1) return "Talos";
+  if (act === 2) return "Charon";
+  return "Zeus";
 };
 
 const getRandomEnemy = (act, usedEnemies = []) => {

@@ -25,22 +25,24 @@ const BattleScene = ({
     onLose,
     floorIndex,
     act,
+    ascensionLevel = 0,
     onGoldChange,
     openingDrawBonus = 0,
     onConsumeOpeningDrawBonus,
     openingManaBonus = 0,
     onConsumeOpeningManaBonus
 }) => {
-    const getScaledEnemy = (enemyId, floor, currentAct) => {
-        const baseEnemy = ENEMY_POOL[enemyId];
+    const [activeEnemyId, setActiveEnemyId] = useState(enemyId);
+    const getScaledEnemy = (eid, floor, currentAct, asc) => {
+        const baseEnemy = ENEMY_POOL[eid];
         if (!baseEnemy) {
-            console.error(`Enemy not found: ${enemyId}`);
+            console.error(`Enemy not found: ${eid}`);
             return { maxHp: 50, actions: [{ type: 'ATTACK', value: 5 }] };
         }
-        const { maxHp, actions } = scaleEnemyStats(baseEnemy, floor, currentAct);
+        const { maxHp, actions } = scaleEnemyStats(baseEnemy, floor, currentAct, asc);
         return { ...baseEnemy, maxHp, actions };
     };
-    const enemyConfig = getScaledEnemy(enemyId, floorIndex, act);
+    const enemyConfig = useMemo(() => getScaledEnemy(activeEnemyId, floorIndex, act, ascensionLevel), [activeEnemyId, floorIndex, act, ascensionLevel]);
     const initialMana = heroData.maxMana || 3;
     const [gameState, setGameState] = useState('PLAYER_TURN');
     const [playerHp, setPlayerHp] = useState(heroData.currentHp);
@@ -49,6 +51,21 @@ const BattleScene = ({
     const [enemyHp, setEnemyHp] = useState(enemyConfig.maxHp);
     const [enemyBlock, setEnemyBlock] = useState(0);
     const [nextEnemyAction, setNextEnemyAction] = useState(enemyConfig.actions[0]);
+
+    // 当敌配置改变时重置血量和动作 (用于阶段切换)
+    useEffect(() => {
+        setEnemyHp(enemyConfig.maxHp);
+        setNextEnemyAction(enemyConfig.actions[0]);
+        setEnemyBlock(0);
+        setEnemyStatus(prev => ({ 
+            ...prev, 
+            actionIndex: 0,
+            isCharging: false,
+            charging: 0,
+            undying: 0,
+            usedUndying: false
+        }));
+    }, [enemyConfig]);
 
     const deckRef = useRef({ drawPile: [], hand: [], discardPile: [] });
     const [renderTrigger, setRenderTrigger] = useState(0);
@@ -136,7 +153,10 @@ const BattleScene = ({
         firstAttackBonus: 0,
         firstAttackBonusArmed: false,
         firstAttackBonusTurns: 0,
-        cloneAttackPercent: 0
+        cloneAttackPercent: 0,
+        stunned: 0,
+        hpDegen: 0,
+        hpDegenFlat: 0
     });
     const [enemyStatus, setEnemyStatus] = useState({ 
         strength: 0, 
@@ -147,7 +167,18 @@ const BattleScene = ({
         trap: 0,
         slowed: 0,
         tetherMark: 0,
-        armorReduction: 0
+        armorReduction: 0,
+        charging: 0,
+        isCharging: false,
+        evasion: 0,
+        reflect: 0,
+        phase: 1,
+        reviveCount: 0,
+        undying: 0,
+        usedUndying: false,
+        isImmortalThisTurn: false,
+        parry: 0,
+        actionIndex: 0
     });
     const heroBaseCritChance = heroData?.id === 'Yasuo' ? 10 : 0;
     const heroStrengthCritMultiplier = 1; // 所有英雄每点力量统一+1%暴击
@@ -170,6 +201,9 @@ const BattleScene = ({
     const [dealtDamageLastTurn, setDealtDamageLastTurn] = useState(false);
     // Batch 2: 死亡印记
     const [deathMarkDamage, setDeathMarkDamage] = useState(0);
+
+    const [phaseTransitioning, setPhaseTransitioning] = useState(false);
+    const [transitionText, setTransitionText] = useState("");
 
     useEffect(() => {
         achievementTracker.startBattle();
@@ -211,7 +245,12 @@ const BattleScene = ({
             if (rid === heroData.relicId && heroData.relicId === "UrgotPassive") block += 15;
         });
         setPlayerBlock(block);
-        setPlayerStatus(prev => ({ ...prev, strength: str, ambitionPactUsed: false }));
+        setPlayerStatus(prev => ({ 
+            ...prev, 
+            strength: str, 
+            ambitionPactUsed: false,
+            hpDegen: enemyConfig.traits?.includes("AURA_HP_DEGEN") ? (enemyConfig.traitValues?.hpDegenPercent || 5) : 0
+        }));
         startTurnLogic();
     }, []);
 
@@ -519,6 +558,42 @@ const BattleScene = ({
     };
 
     const startTurnLogic = () => {
+        // --- 御林军架招 (New Act Flow) ---
+        if (enemyConfig.traits?.includes("PARRY_ACCUMULATE")) {
+            setEnemyStatus(prev => ({ ...prev, parry: (prev.parry || 0) + 1 }));
+            spawnOverlay({ val: "架招!", target: 'ENEMY', color: 'text-blue-200' }, 800);
+        }
+        // ---------------------------------
+
+        // --- 腐蚀与眩晕机制 (New Act Flow) ---
+        let totalDegen = (playerStatus.hpDegenFlat || 0);
+        if (playerStatus.hpDegen > 0) {
+            totalDegen += Math.ceil(heroData.maxHp * (playerStatus.hpDegen / 100));
+        }
+        
+        // 检查敌人是否具有腐蚀领域 AURA_HP_DEGEN (Charon)
+        if (enemyConfig.traits?.includes("AURA_HP_DEGEN")) {
+            const auraDegen = Math.ceil(heroData.maxHp * ((enemyConfig.traitValues?.hpDegenPercent || 5) / 100));
+            totalDegen += auraDegen;
+        }
+
+        if (totalDegen > 0) {
+            setPlayerHp(prev => Math.max(1, prev - totalDegen)); // 保持至少1血，防止被环境直接跳死
+            spawnOverlay({ val: `腐蚀 -${totalDegen}`, target: 'PLAYER', color: 'text-purple-400' }, 1000);
+        }
+
+        if (playerStatus.stunned > 0) {
+            setPlayerStatus(prev => ({ ...prev, stunned: prev.stunned - 1 }));
+            spawnOverlay({ val: "眩晕跳过!", target: 'PLAYER', color: 'text-blue-400' }, 1000);
+            
+            // 跳过本回合，直接进入敌人回合
+            setTimeout(() => {
+                endTurn();
+            }, 1200);
+            return;
+        }
+        // ------------------------------------
+
         setGameState('PLAYER_TURN');
         const startMana = initialMana + (heroData.relicId === "LuxPassive" ? 1 : 0) + (isFirstTurnRef.current ? openingManaBonus : 0);
         if (isFirstTurnRef.current && openingManaBonus > 0) {
@@ -569,7 +644,15 @@ const BattleScene = ({
             hand.push(basicCard);
             forceUpdate();
         }
-        setNextEnemyAction(enemyConfig.actions[Math.floor(Math.random() * enemyConfig.actions.length)]);
+        let nextAction;
+        if (enemyConfig.actionPattern === "SEQUENTIAL" || enemyConfig.actionPattern === "ALTERNATING") {
+            const idx = enemyStatus.actionIndex % enemyConfig.actions.length;
+            nextAction = enemyConfig.actions[idx];
+            setEnemyStatus(prev => ({ ...prev, actionIndex: prev.actionIndex + 1 }));
+        } else {
+            nextAction = enemyConfig.actions[Math.floor(Math.random() * enemyConfig.actions.length)];
+        }
+        setNextEnemyAction(nextAction);
 
         // 被动技能：回合开始触发
         // 劫被动：重置首次攻击标记
@@ -1004,6 +1087,24 @@ const BattleScene = ({
 
             const processMultiHit = () => {
                 for (let i = 0; i < hits; i++) {
+                    // --- 闪避机制 (New Act Flow) ---
+                    if (enemyConfig.traits?.includes("EVASION")) {
+                        const chance = enemyConfig.traitValues?.evasionChance || 50;
+                        if (Math.random() * 100 < chance) {
+                            spawnOverlay({ val: "MISS!", target: 'ENEMY', color: 'text-gray-400' }, 600);
+                            continue; // 跳过本次伤害
+                        }
+                    }
+                    // ------------------------------
+
+                    // --- 架招机制 (New Act Flow) ---
+                    if (enemyStatus.parry > 0) {
+                        setEnemyStatus(prev => ({ ...prev, parry: Math.max(0, prev.parry - 1) }));
+                        spawnOverlay({ val: "PARRIED!", target: 'ENEMY', color: 'text-blue-300' }, 600);
+                        continue; // 跳过本次伤害
+                    }
+                    // ------------------------------
+
                     let finalDmg = baseDmg; // 每次击打使用已计算易伤的基础伤害
                     if (heroData.relics.includes("InfinityEdge")) finalDmg = Math.floor(finalDmg * 1.5);
 
@@ -1030,6 +1131,14 @@ const BattleScene = ({
                         });
                     }
 
+                    // --- 格架机制 (New Act Flow - Golden Guard) ---
+                    if ((enemyStatus.parry || 0) > 0) {
+                        setEnemyStatus(prev => ({ ...prev, parry: prev.parry - 1 }));
+                        spawnOverlay({ val: "格架!", target: 'ENEMY', color: 'text-yellow-100' }, 800);
+                        playSfx('BLOCK_SHIELD');
+                        continue; // 本次打击被格架
+                    }
+
                     isFirstHit = false;
                     let dmgToHp = finalDmg;
                     if (blockBuffer > 0) {
@@ -1050,6 +1159,12 @@ const BattleScene = ({
                         setTimeout(() => playSfx('HIT_TAKEN'), 250);
                     }
 
+                    // --- 亡语锁定逻辑 (New Act Flow) ---
+                    if (enemyStatus.isImmortalThisTurn && dmgToHp >= enemyHp) {
+                        dmgToHp = Math.max(0, enemyHp - 1);
+                    }
+                    // ----------------------------------
+
                     // 薇恩被动：连续命中计数 (圣银弩箭)
                     const hasVaynePassive = heroData.relicId === "VaynePassive" || 
                                            (heroData.relics && heroData.relics.includes("VaynePassive")) ||
@@ -1066,7 +1181,23 @@ const BattleScene = ({
                         }
                     }
 
-                    setEnemyHp(h => Math.max(0, h - dmgToHp)); total += dmgToHp;
+                    const finalDmgToHp = (enemyStatus.isImmortalThisTurn && dmgToHp >= blockBuffer + enemyHp) 
+                        ? Math.max(0, blockBuffer + enemyHp - 1) 
+                        : dmgToHp;
+
+                    setEnemyHp(h => Math.max(0, h - (finalDmgToHp - (dmgToHp > blockBuffer ? blockBuffer : dmgToHp)))); 
+                    total += dmgToHp;
+
+                    // --- 反弹伤害 (New Act Flow) ---
+                    if (enemyConfig.traits?.includes("REFLECT") && dmgToHp > 0) {
+                        const reflectVal = enemyConfig.traitValues?.reflectDamage || 5;
+                        setPlayerHp(prev => Math.max(0, prev - reflectVal));
+                        setTimeout(() => {
+                            spawnOverlay({ val: `反弹 -${reflectVal}`, target: 'PLAYER', color: 'text-orange-500' }, 800);
+                        }, 200);
+                    }
+                    // ------------------------------
+
                     if (lifelinkValue > 0 && dmgToHp > 0) {
                         updatePlayerHp(prev => prev + dmgToHp, { showHeal: true, label: 'LIFE' });
                     }
@@ -1190,6 +1321,46 @@ const BattleScene = ({
 
     useEffect(() => {
         if (enemyHp <= 0) {
+            // --- 阶段切换逻辑 (Zeus P1/P2) ---
+            if (enemyConfig.traits?.includes("PHASE_TRANSITION") && enemyConfig.nextPhase) {
+                setPhaseTransitioning(true);
+                setTransitionText(enemyConfig.id === 'Zeus' ? "宙斯进入二阶段: 阿陀磨须!" : "宙斯进入最终形态: 终焉形态!");
+                
+                setTimeout(() => {
+                    setActiveEnemyId(enemyConfig.nextPhase);
+                    setPhaseTransitioning(false);
+                }, 3000); 
+                return;
+            }
+
+            // --- 复活机制 (Zeus P3) ---
+            if (enemyConfig.traits?.includes("REVIVE_ONCE") && enemyStatus.reviveCount === 0) {
+                setEnemyStatus(prev => ({ 
+                    ...prev, 
+                    reviveCount: 1,
+                    strength: (prev.strength || 0) * 2
+                }));
+                setEnemyHp(enemyConfig.maxHp * 2); // 策划案说全属性翻倍，包括HP
+                spawnOverlay({ val: "终焉之刻: 复苏!", target: 'ENEMY', color: 'text-amber-400' }, 1500);
+                return;
+            }
+
+            // --- 亡语 / 自爆机制 (New Act Flow) ---
+            if (enemyConfig.traits?.includes("UNDYING") && !enemyStatus.usedUndying) {
+                setEnemyStatus(prev => ({ ...prev, usedUndying: true, isImmortalThisTurn: true }));
+                setEnemyHp(1); // 锁血 1
+                spawnOverlay({ val: "不屈!", target: 'ENEMY', color: 'text-red-500' }, 1000);
+                return; // 不触发胜利
+            }
+
+            if (enemyConfig.traits?.includes("EXPLODE_ON_DEATH")) {
+                const explodeDmg = enemyConfig.traitValues?.explodeDamage || 25;
+                setPlayerHp(prev => Math.max(0, prev - explodeDmg));
+                spawnOverlay({ val: `自爆 -${explodeDmg}!`, target: 'PLAYER', color: 'text-red-600' }, 1200);
+                playSfx('EXPLODE'); 
+            }
+            // ------------------------------------
+
             // 敌人死亡时触发的被动
             let battleResult = {
                 finalHp: playerHp,
@@ -1349,6 +1520,7 @@ const BattleScene = ({
 
     // FIX: 下回合效果处理函数
     const applyNextTurnEffects = () => {
+        setEnemyStatus(prev => ({ ...prev, isImmortalThisTurn: false }));
         setPlayerStatus(prev => {
             const updates = { ...prev };
 
@@ -1403,6 +1575,36 @@ const BattleScene = ({
 
     const enemyAction = () => {
         if (enemyHp <= 0) return;
+
+        // --- 奥林匹斯光环 (New Act Flow) ---
+        if (enemyConfig.traits?.includes("OLYMPUS_AURA")) {
+            setEnemyStatus(prev => ({ ...prev, strength: (prev.strength || 0) + 1 }));
+            spawnOverlay({ val: "光环: 力量+1", target: 'ENEMY', color: 'text-orange-300' }, 800);
+        }
+
+        // --- 腐蚀领域 (New Act Flow - Charon) ---
+        if (enemyConfig.traits?.includes("AURA_HP_DEGEN")) {
+            const degenPercent = enemyConfig.traitValues?.hpDegenPercent || 5;
+            const hpLoss = Math.ceil(heroData.maxHp * (degenPercent / 100));
+            setPlayerHp(h => Math.max(1, h - hpLoss)); // 不会直接毒死，保留 1 HP
+            spawnOverlay({ val: `腐蚀 -${hpLoss}`, target: 'PLAYER', color: 'text-purple-500' }, 1000);
+        }
+        // ---------------------------------
+
+        // --- 蓄力逻辑 (New Act Flow) ---
+        if (enemyConfig.actionPattern === "CHARGING") {
+            if (!enemyStatus.isCharging) {
+                setEnemyStatus(prev => ({ ...prev, isCharging: true, charging: 1 }));
+                spawnOverlay({ val: "蓄力中...", target: 'ENEMY', color: 'text-orange-400' }, 800);
+                
+                setTimeout(() => {
+                    applyNextTurnEffects();
+                    startTurnLogic();
+                }, 1000);
+                return;
+            }
+        }
+        // ------------------------------
 
         if (enemyTrap) {
             setEnemyTrap(null);
@@ -1475,6 +1677,13 @@ const BattleScene = ({
 
             const baseDmg = act.type === 'ATTACK' ? act.value : act.dmgValue;
             let dmg = baseDmg + enemyStatus.strength;
+            
+            // --- 蓄力伤害倍数 (New Act Flow) ---
+            if (enemyStatus.isCharging) {
+                dmg = Math.floor(dmg * 3);
+            }
+            // ------------------------------
+
             if (enemyStatus.weak > 0) dmg = Math.floor(dmg * 0.75);
             let total = 0; let remBlock = playerBlock; let currHp = playerHp;
             const count = act.count || 1;
@@ -1512,6 +1721,13 @@ const BattleScene = ({
                 }
                 total += finalDmg;
             }
+
+            // --- 重置蓄力状态 (New Act Flow) ---
+            if (enemyStatus.isCharging) {
+                setEnemyStatus(prev => ({ ...prev, isCharging: false, charging: 0 }));
+            }
+            // ---------------------------------
+
             const damageTaken = Math.max(0, playerHp - currHp);
             setPlayerBlock(remBlock); setPlayerHp(currHp); setDmgOverlay({ val: total, target: 'PLAYER' }); setTimeout(() => setDmgOverlay(null), 800);
             if (damageTaken > 0) {
@@ -1535,9 +1751,54 @@ const BattleScene = ({
         if (act.type === 'BUFF') {
             // 敌人获得格挡时播放格挡音效
             playSfx('BLOCK_SHIELD');
-            setEnemyBlock(b => b + act.effectValue);
+            if (act.effect === 'BLOCK') {
+                setEnemyBlock(b => b + act.effectValue);
+            }
+            if (act.effect === 'PARRY') {
+                setEnemyStatus(prev => ({ ...prev, parry: (prev.parry || 0) + act.effectValue }));
+                spawnOverlay({ val: `格架 +${act.effectValue}`, target: 'ENEMY', color: 'text-yellow-200' }, 800);
+            }
+            if (act.effect === 'STRENGTH') {
+                setEnemyStatus(prev => ({ ...prev, strength: (prev.strength || 0) + act.effectValue }));
+                spawnOverlay({ val: `力量 +${act.effectValue}`, target: 'ENEMY', color: 'text-red-500' }, 800);
+            }
         }
-        if (act.type === 'DEBUFF') { if (act.effect === 'WEAK') setPlayerStatus(s => ({ ...s, weak: s.weak + act.effectValue })); if (act.effect === 'VULNERABLE') setPlayerStatus(s => ({ ...s, vulnerable: s.vulnerable + act.effectValue })); }
+        if (act.type === 'DEBUFF') { 
+            if (act.effect === 'WEAK') setPlayerStatus(s => ({ ...s, weak: s.weak + act.effectValue })); 
+            if (act.effect === 'VULNERABLE') setPlayerStatus(s => ({ ...s, vulnerable: s.vulnerable + act.effectValue })); 
+            if (act.effect === 'POISON') setPlayerStatus(s => ({ ...s, poison: (s.poison || 0) + act.effectValue }));
+            if (act.effect === 'WEAK_VULN') {
+                setPlayerStatus(s => ({ 
+                    ...s, 
+                    weak: s.weak + act.effectValue,
+                    vulnerable: s.vulnerable + act.effectValue 
+                }));
+                spawnOverlay({ val: "虚弱 & 易伤!", target: 'PLAYER', color: 'text-purple-500' }, 1000);
+            }
+            if (act.effect === 'STUN_PLAYER') {
+                setPlayerStatus(s => ({ ...s, stunned: (s.stunned || 0) + act.effectValue }));
+                spawnOverlay({ val: "眩晕!", target: 'PLAYER', color: 'text-blue-400' }, 1000);
+            }
+        }
+        
+        // --- 特殊行动处理 (New Act Flow) ---
+        if (act.type === 'SPECIAL') {
+            if (act.specialId === 'STUN_PLAYER') {
+                setPlayerStatus(prev => ({ ...prev, stunned: (prev.stunned || 0) + act.effectValue || 1 }));
+                spawnOverlay({ val: "你被眩晕了!", target: 'PLAYER', color: 'text-blue-400' }, 1000);
+            }
+            if (act.specialId === 'EXECUTE_LOW_HP') {
+                if (playerHp < heroData.maxHp * 0.5) {
+                    spawnOverlay({ val: "碾压!", target: 'PLAYER', color: 'text-red-700' }, 1500);
+                    setPlayerHp(0);
+                    return; // 结束逻辑由 useEffect 处理
+                } else {
+                    spawnOverlay({ val: "蓄力不足", target: 'ENEMY', color: 'text-gray-400' }, 1000);
+                }
+            }
+        }
+        // ----------------------------------
+
         // setEnemyBlock(0); // FIX: 移除此处的清零，防止敌人刚获得格挡就被清除
         setTimeout(() => {
             // FIX Bug #5, #9: 下回合开始时应用效果
@@ -1579,6 +1840,14 @@ const BattleScene = ({
             {status.nextAttackDouble && <div className="flex items-center text-[10px] text-red-400 bg-red-900/40 px-1 rounded border border-red-800 shadow-sm"><Sword size={10} className="mr-1" /> 双倍伤害</div>}
             {status.nextAttackX2 && <div className="flex items-center text-[10px] text-red-300 bg-red-900/30 px-1 rounded border border-red-700 shadow-sm"><Sword size={10} className="mr-1" /> 下一击 x2</div>}
             {status.cloneAttackPercent > 0 && <div className="flex items-center text-[10px] text-gray-300 bg-gray-900/40 px-1 rounded border border-gray-700 shadow-sm"><Users size={10} className="mr-1" /> 影分身 {status.cloneAttackPercent}%</div>}
+            
+            {/* New Act Flow Statuses */}
+            {status.isCharging && <div className="flex items-center text-[10px] text-orange-400 bg-orange-950/40 px-1 rounded border border-orange-800 shadow-sm"><Zap size={10} className="mr-1" /> 蓄力中</div>}
+            {status.evasion > 0 && <div className="flex items-center text-[10px] text-blue-300 bg-blue-900/40 px-1 rounded border border-blue-700 shadow-sm"><Activity size={10} className="mr-1" /> 闪避 {status.evasion}%</div>}
+            {status.undying > 0 && <div className="flex items-center text-[10px] text-red-400 bg-red-900/40 px-1 rounded border border-red-800 shadow-sm"><Skull size={10} className="mr-1" /> 不屈</div>}
+            {status.parry > 0 && <div className="flex items-center text-[10px] text-blue-200 bg-blue-900/40 px-1 rounded border border-blue-700 shadow-sm"><Shield size={10} className="mr-1" /> 架招 {status.parry}</div>}
+            {status.hpDegen > 0 && <div className="flex items-center text-[10px] text-purple-400 bg-purple-900/40 px-1 rounded border border-purple-800 shadow-sm"><TrendingDown size={10} className="mr-1" /> 腐蚀 {status.hpDegen}%</div>}
+            {status.hpDegenFlat > 0 && <div className="flex items-center text-[10px] text-purple-400 bg-purple-900/40 px-1 rounded border border-purple-800 shadow-sm"><TrendingDown size={10} className="mr-1" /> 腐蚀 {status.hpDegenFlat}</div>}
 
             {/* Next Turn Effects */}
             {status.nextTurnBlock > 0 && <div className="flex items-center text-[10px] text-blue-200 bg-blue-900/40 px-1 rounded border border-blue-800 shadow-sm"><Shield size={10} className="mr-1" /><Clock size={8} className="mr-1" /> +{status.nextTurnBlock}</div>}
@@ -1681,6 +1950,41 @@ const BattleScene = ({
                 </div>
                 <button onClick={endTurn} disabled={gameState !== 'PLAYER_TURN'} className="absolute right-8 bottom-8 w-24 h-24 rounded-full bg-[#C8AA6E] border-4 border-[#F0E6D2] flex items-center justify-center font-bold text-[#091428] shadow-lg hover:scale-105 hover:bg-white active:scale-95 transition-all pointer-events-auto">结束<br />回合</button>
             </div>
+
+            {/* 阶段切换剧情过渡 */}
+            <AnimatePresence>
+                {phaseTransitioning && (
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="absolute inset-0 z-[100] bg-black/95 flex flex-col items-center justify-center p-10 text-center"
+                    >
+                        <motion.div 
+                            initial={{ y: 20, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{ delay: 0.5 }}
+                            className="text-5xl font-black text-[#C8AA6E] mb-8 tracking-[0.2em] italic uppercase drop-shadow-[0_0_15px_#C8AA6E]"
+                        >
+                            {transitionText}
+                        </motion.div>
+                        <motion.div 
+                            initial={{ width: 0 }}
+                            animate={{ width: "300px" }}
+                            transition={{ duration: 2, ease: "easeInOut", delay: 0.5 }}
+                            className="h-1 bg-[#C8AA6E] rounded-full shadow-[0_0_10px_#C8AA6E]"
+                        />
+                        <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 1.5 }}
+                            className="mt-6 text-gray-400 text-sm tracking-widest uppercase"
+                        >
+                            形态重构中...
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 };

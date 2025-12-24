@@ -4,6 +4,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { generateGridMap } from './data/gridMapLayout_v4'; // v4生成器（带死胡同检测）
 import { CARD_DATABASE } from './data/cards'; // 卡牌数据
 import { CHAMPION_POOL } from './data/champions';
+import { ENEMY_POOL } from './data/enemies';
+import { RELIC_DATABASE } from './data/relics';
+import { scaleEnemyStats, shuffle } from './utils/gameLogic';
 import IntroVideo from './components/IntroVideo';
 import { DEFAULT_UNLOCKED_HEROES, PRIVILEGED_ACCOUNTS, ACT_UNLOCK_HEROES } from './data/constants';
 import { getBaseCardId, getCardWithUpgrade, getUpgradeLevel } from './utils/cardUtils';
@@ -654,6 +657,19 @@ export default function LegendsOfTheSpire() {
         }
     });
     const [activeInventoryTab, setActiveInventoryTab] = useState('CARDS');
+
+    const [ascensionLevel, setAscensionLevel] = useState(() => {
+        try {
+            const val = localStorage.getItem('lots_ascension_level');
+            return val ? parseInt(val) : 0;
+        } catch {
+            return 0;
+        }
+    });
+
+    useEffect(() => {
+        localStorage.setItem('lots_ascension_level', ascensionLevel);
+    }, [ascensionLevel]);
 
     const isPrivilegedUser = useMemo(() => {
         if (!currentUser?.email) return false;
@@ -1597,7 +1613,25 @@ export default function LegendsOfTheSpire() {
             case 'MENU': return (
                 <div className="h-screen w-full bg-slate-900 flex flex-col items-center justify-center text-white bg-[url('https://ddragon.leagueoflegends.com/cdn/img/champion/splash/Ryze_0.jpg')] bg-cover bg-center">
                     <div className="absolute inset-0 bg-black/60"></div>
-                    <div className="z-10 text-center"><h1 className="text-8xl font-black text-[#C8AA6E] mb-8 drop-shadow-lg tracking-widest">峡谷尖塔</h1><div className="flex flex-col gap-4 w-64 mx-auto">{hasSave && (<button onClick={handleContinue} className="px-8 py-4 bg-[#0AC8B9] hover:bg-white hover:text-[#0AC8B9] text-black font-bold rounded flex items-center justify-center gap-2 transition-all"><Play fill="currentColor" /> 继续征程</button>)}<button onClick={handleNewGame} className="px-8 py-4 border-2 border-[#C8AA6E] hover:bg-[#C8AA6E] hover:text-black text-[#C8AA6E] font-bold rounded flex items-center justify-center gap-2 transition-all"><RotateCcw /> 新游戏</button></div><p className="mt-8 text-slate-400 text-sm">v0.8.0 Beta</p></div>
+                    <div className="z-10 text-center">
+                        <h1 className="text-8xl font-black text-[#C8AA6E] mb-2 drop-shadow-lg tracking-widest">峡谷尖塔</h1>
+                        {ascensionLevel > 0 && (
+                            <div className="text-[#0AC8B9] font-bold text-xl mb-8 tracking-[0.2em]">
+                                ASCENSION {ascensionLevel}
+                            </div>
+                        )}
+                        <div className="flex flex-col gap-4 w-64 mx-auto">
+                            {hasSave && (
+                                <button onClick={handleContinue} className="px-8 py-4 bg-[#0AC8B9] hover:bg-white hover:text-[#0AC8B9] text-black font-bold rounded flex items-center justify-center gap-2 transition-all">
+                                    <Play fill="currentColor" /> 继续征程
+                                </button>
+                            )}
+                            <button onClick={handleNewGame} className="px-8 py-4 border-2 border-[#C8AA6E] hover:bg-[#C8AA6E] hover:text-black text-[#C8AA6E] font-bold rounded flex items-center justify-center gap-2 transition-all">
+                                <RotateCcw /> 新游戏
+                            </button>
+                        </div>
+                        <p className="mt-8 text-slate-400 text-sm">v0.8.0 Beta</p>
+                    </div>
                     {showUpdateLog && (
                         <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/90">
                             <div className="max-w-2xl bg-[#091428]/95 border-2 border-[#C8AA6E] p-8 rounded-xl shadow-[0_0_50px_#C8AA6E]">
@@ -1750,6 +1784,7 @@ export default function LegendsOfTheSpire() {
                         }}
                         floorIndex={currentFloor}
                         act={currentAct}
+                        ascensionLevel={ascensionLevel}
                         onGoldChange={handleBattleGoldChange}
                         openingDrawBonus={nextBattleDrawBonus}
                         onConsumeOpeningDrawBonus={() => setNextBattleDrawBonus(0)}
@@ -1759,7 +1794,21 @@ export default function LegendsOfTheSpire() {
                 );
             case 'REWARD': return <RewardView goldReward={50} onCardSelect={handleCardReward} onSkip={handleSkipReward} championName={champion.name} />;
             case 'REST': return <RestView onRest={handleRest} />;
-            case 'VICTORY_ALL': return <div className="h-screen w-full bg-[#0AC8B9]/20 flex flex-col items-center justify-center text-white"><h1 className="text-6xl font-bold text-[#0AC8B9]">传奇永不熄灭！</h1><button onClick={() => setView('MENU')} className="mt-8 px-8 py-3 bg-[#0AC8B9] text-black font-bold rounded">回到菜单</button></div>;
+            case 'VICTORY_ALL': return (
+                <div className="h-screen w-full bg-[#0AC8B9]/20 flex flex-col items-center justify-center text-white">
+                    <h1 className="text-6xl font-bold text-[#0AC8B9]">传奇永不熄灭！</h1>
+                    <div className="mt-4 text-xl text-[#0AC8B9]/80 italic">当前周目: {ascensionLevel} → 下一周目: {ascensionLevel + 1}</div>
+                    <button 
+                        onClick={() => {
+                            setAscensionLevel(prev => prev + 1);
+                            setView('MENU');
+                        }} 
+                        className="mt-8 px-8 py-3 bg-[#0AC8B9] text-black font-bold rounded hover:bg-[#0AC8B9]/80 transition-all"
+                    >
+                        开启新轮回
+                    </button>
+                </div>
+            );
             case 'GAMEOVER': return <div className="h-screen w-full bg-black flex flex-col items-center justify-center text-white"><h1 className="text-6xl font-bold text-red-600">战败</h1><button onClick={() => setView('MENU')} className="mt-8 px-8 py-3 bg-red-800 rounded font-bold">回到菜单</button></div>;
             default: return <div>Loading...</div>;
         }

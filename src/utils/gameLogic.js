@@ -7,21 +7,24 @@ export const shuffle = (array) => {
   return newArr;
 };
 
-export const scaleEnemyStats = (baseStats, floorIndex) => {
+export const scaleEnemyStats = (baseStats, floorIndex, act = 1, ascensionLevel = 0) => {
   const difficultyMultiplier = 1 + 0.1 * floorIndex;
-  const scaledHp = Math.floor(baseStats.maxHp * difficultyMultiplier);
+  const actMultiplier = 1 + (act - 1) * 0.5; // ACT加成改为每章+50%
+  const ascensionMultiplier = 1 + (ascensionLevel * 0.1); // 周目加成每级+10%
+  
+  const scaledHp = Math.floor(baseStats.maxHp * difficultyMultiplier * actMultiplier * ascensionMultiplier);
   const scaledActions = baseStats.actions.map(action => {
     let scaledAction = { ...action };
     const isAttack = scaledAction.type === 'ATTACK' || scaledAction.actionType === 'Attack';
     if (isAttack) {
       const baseDmg = scaledAction.type === 'ATTACK' ? scaledAction.value : scaledAction.dmgValue;
-      // 降低攻击力50%：原来 floorIndex * 2，现在改为 floorIndex * 1，并且整体降低50%
-      const scaledDmg = Math.floor((baseDmg + floorIndex * 1) * 0.5);
+      // 基础公式：(基础 + 楼层 + 章节) * 缩放 * 周目
+      const scaledDmg = Math.floor((baseDmg + floorIndex * 0.5 + (act - 1) * 2) * 0.8 * ascensionMultiplier);
       if (scaledAction.type === 'ATTACK') scaledAction.value = scaledDmg;
       if (scaledAction.actionType === 'Attack') scaledAction.dmgValue = scaledDmg;
     }
-    if (action.effect && ['WEAK', 'VULNERABLE', 'STRENGTH'].includes(action.effect)) {
-      scaledAction.effectValue = action.effectValue + Math.floor(floorIndex / 5);
+    if (action.effect && ['WEAK', 'VULNERABLE', 'STRENGTH', 'BLOCK'].includes(action.effect)) {
+      scaledAction.effectValue = Math.floor((action.effectValue + Math.floor(floorIndex / 5)) * ascensionMultiplier);
     }
     return scaledAction;
   });
